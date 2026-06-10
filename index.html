@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hair Apparent — Find your crowning look</title>
+<meta name="description" content="Free, private, open-source hairstyle advisor. Photos analyzed in your browser. Nothing uploaded, ever.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Hair Apparent v001 — palette: Ink Plum #2E2236, Champagne Gold #D9A84E,
+   Warm Ivory #F5EEE3, Rose Copper #C26E5A, Dusk Violet #6B5A78 */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: #F5EEE3;
+  color: #2E2236;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; line-height: 1.15; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+header {
+  background: #2E2236;
+  padding: 14px 0;
+  position: sticky; top: 0; z-index: 50;
+  border-bottom: 3px solid #D9A84E;
+}
+.header-row { display: flex; align-items: center; gap: 12px; max-width: 860px; margin: 0 auto; padding: 0 20px; }
+.header-row svg { display: block; }
+.brand-name { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 22px; color: #F5EEE3; letter-spacing: 0.5px; }
+.brand-tag { font-size: 12px; color: #D9A84E; font-style: italic; margin-left: auto; }
+
+/* Progress crown dots */
+.steps { display: flex; gap: 8px; justify-content: center; padding: 22px 0 6px 0; }
+.step-dot { width: 11px; height: 11px; border-radius: 50%; background: #DACDB8; border: 2px solid #DACDB8; }
+.step-dot.done { background: #D9A84E; border-color: #D9A84E; }
+.step-dot.now { background: #C26E5A; border-color: #C26E5A; transform: scale(1.25); }
+
+/* Screens */
+.screen { display: none; padding: 18px 0 70px 0; }
+.screen.active { display: block; animation: fadein 0.35s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.hero-title { font-size: 42px; font-weight: 700; text-align: center; margin: 18px 0 10px 0; }
+.hero-title em { font-style: italic; color: #C26E5A; }
+.hero-sub { text-align: center; font-size: 18px; color: #6B5A78; max-width: 560px; margin: 0 auto 26px auto; }
+.screen h2 { font-size: 32px; text-align: center; margin: 10px 0 6px 0; }
+.screen .lede { text-align: center; color: #6B5A78; margin-bottom: 24px; }
+
+/* Privacy ribbon */
+.privacy {
+  background: #2E2236; color: #F5EEE3; border-radius: 14px;
+  padding: 16px 20px; margin: 26px auto; max-width: 640px;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.privacy strong { color: #D9A84E; }
+.privacy .lock { font-size: 26px; line-height: 1; }
+.privacy p { font-size: 14px; }
+
+/* Buttons */
+.btn {
+  display: inline-block; font-family: 'Public Sans', Arial, sans-serif;
+  font-weight: 700; font-size: 17px; border: none; cursor: pointer;
+  border-radius: 999px; padding: 14px 34px; transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-gold { background: #D9A84E; color: #2E2236; }
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(217,168,78,0.45); }
+.btn-plum { background: #2E2236; color: #F5EEE3; }
+.btn-plum:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(46,34,54,0.35); }
+.btn-ghost { background: transparent; color: #6B5A78; border: 2px solid #DACDB8; }
+.btn-ghost:hover { border-color: #6B5A78; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+
+/* Photo grid */
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin: 20px 0; }
+.photo-slot {
+  position: relative; aspect-ratio: 1/1; border-radius: 14px; overflow: hidden;
+  background: #EAE0CF; border: 2px dashed #C9B89B;
+}
+.photo-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-slot .x {
+  position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
+  border-radius: 50%; background: #2E2236; color: #F5EEE3; border: none;
+  font-size: 14px; cursor: pointer; line-height: 1;
+}
+.drop {
+  border: 3px dashed #C9B89B; border-radius: 18px; background: #FBF7EE;
+  padding: 38px 20px; text-align: center; cursor: pointer; transition: border-color 0.15s;
+}
+.drop:hover, .drop.over { border-color: #D9A84E; }
+.drop .big { font-size: 40px; }
+.drop p { color: #6B5A78; }
+.hint { text-align: center; font-size: 14px; color: #6B5A78; margin-top: 8px; }
+.counter { text-align: center; font-weight: 700; margin-top: 14px; }
+.counter span { color: #C26E5A; }
+
+/* Analyze screen */
+.analyzing { text-align: center; padding: 30px 0; }
+.crown-load { margin: 0 auto 18px auto; width: 120px; }
+.crown-load .tine { animation: bob 1.1s ease-in-out infinite; transform-origin: bottom center; }
+.crown-load .t2 { animation-delay: 0.15s; }
+.crown-load .t3 { animation-delay: 0.3s; }
+.crown-load .t4 { animation-delay: 0.45s; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.analyze-status { font-size: 16px; color: #6B5A78; min-height: 24px; }
+.bar { width: 100%; max-width: 420px; height: 10px; border-radius: 5px; background: #EAE0CF; margin: 16px auto; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0%; background: #D9A84E; border-radius: 5px; transition: width 0.3s ease; }
+
+/* Confirm chips */
+.attr-group { background: #FBF7EE; border: 1px solid #EADBC2; border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; }
+.attr-group h3 { font-size: 19px; margin-bottom: 4px; }
+.attr-note { font-size: 13px; color: #6B5A78; margin-bottom: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  border: 2px solid #DACDB8; background: #F5EEE3; color: #2E2236;
+  border-radius: 999px; padding: 8px 16px; font-size: 15px; cursor: pointer;
+  font-family: 'Public Sans', Arial, sans-serif; transition: all 0.12s;
+}
+.chip:hover { border-color: #C26E5A; }
+.chip.on { background: #2E2236; color: #D9A84E; border-color: #2E2236; font-weight: 700; }
+.chip .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0,0,0,0.18); }
+.detected { display: inline-block; background: #C26E5A; color: #FFFFFF; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; margin-left: 8px; vertical-align: 2px; }
+
+/* Results */
+.style-card {
+  background: #FBF7EE; border: 1px solid #EADBC2; border-radius: 18px;
+  padding: 20px 22px; margin-bottom: 16px; position: relative;
+}
+.style-card.top-pick { border: 2px solid #D9A84E; box-shadow: 0 8px 24px rgba(217,168,78,0.18); }
+.rank-badge {
+  position: absolute; top: -12px; left: 18px; background: #D9A84E; color: #2E2236;
+  font-weight: 700; font-size: 12px; border-radius: 999px; padding: 3px 12px;
+}
+.style-card h3 { font-size: 23px; margin-bottom: 2px; }
+.style-meta { font-size: 13px; color: #6B5A78; margin-bottom: 10px; }
+.style-meta b { color: #C26E5A; }
+.style-why { font-size: 15px; margin-bottom: 12px; }
+.match-pct { float: right; font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; color: #C26E5A; }
+
+/* Stylist Card */
+.stylist-card {
+  background: #FFFFFF; border: 2px solid #2E2236; border-radius: 18px;
+  padding: 28px; margin: 18px 0; box-shadow: 0 10px 30px rgba(46,34,54,0.12);
+}
+.sc-head { display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #D9A84E; padding-bottom: 14px; margin-bottom: 18px; }
+.sc-head h3 { font-size: 26px; }
+.sc-head .sc-sub { font-size: 13px; color: #6B5A78; }
+.sc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.sc-block h4 { font-family: 'Public Sans', Arial, sans-serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #C26E5A; margin-bottom: 6px; }
+.sc-block p, .sc-block li { font-size: 14px; }
+.sc-block ul { padding-left: 18px; }
+.sc-zone { display: flex; justify-content: space-between; border-bottom: 1px dotted #DACDB8; padding: 4px 0; font-size: 14px; }
+.sc-zone b { font-weight: 700; }
+.sc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid #EADBC2; font-size: 12px; color: #6B5A78; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+
+footer { background: #2E2236; color: #B9A8C6; text-align: center; padding: 26px 20px; font-size: 13px; }
+footer a { color: #D9A84E; }
+
+.error-box { background: #C26E5A; color: #FFFFFF; border-radius: 12px; padding: 14px 18px; margin: 14px 0; font-size: 14px; display: none; }
+
+@media (max-width: 620px) {
+  .hero-title { font-size: 32px; }
+  .sc-grid { grid-template-columns: 1fr; }
+  .brand-tag { display: none; }
+}
+@media print {
+  header, footer, .steps, .btn-row, .no-print { display: none !important; }
+  body { background: #FFFFFF; }
+  .screen { display: none !important; }
+  #screen-card { display: block !important; padding: 0; }
+  .stylist-card { border: 2px solid #000000; box-shadow: none; margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crown-load .tine { animation: none; }
+  .screen.active { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <svg width="40" height="40" viewBox="0 0 240 240" aria-hidden="true">
+      <rect x="0" y="0" width="240" height="240" rx="48" fill="#2E2236"/>
+      <rect x="48" y="162" width="144" height="16" rx="8" fill="#D9A84E"/>
+      <path d="M68,158 L68,92" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="68" cy="82" r="6" fill="#C26E5A"/>
+      <path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="104" cy="66" r="6" fill="#C26E5A"/>
+      <path d="M138,158 L138,116" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="138" cy="99" r="13" fill="none" stroke="#D9A84E" stroke-width="9"/>
+      <circle cx="138" cy="99" r="6" fill="#C26E5A"/>
+      <path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="173" cy="88" r="6" fill="#C26E5A"/>
+    </svg>
+    <span class="brand-name">Hair Apparent</span>
+    <span class="brand-tag">Find your crowning look.</span>
+  </div>
+</header>
+
+<div class="steps" id="stepDots" aria-hidden="true"></div>
+
+<div class="wrap">
+
+<!-- ============ SCREEN 1: WELCOME ============ -->
+<section class="screen active" id="screen-welcome">
+  <h1 class="hero-title">The look that's <em>rightfully yours.</em></h1>
+  <p class="hero-sub">Add a few photos. Your browser studies your face shape and features, then recommends hairstyles that genuinely suit you — and writes the instructions your stylist needs to make it happen.</p>
+
+  <div class="privacy">
+    <div class="lock">&#128274;</div>
+    <p><strong>Your photos never leave this device.</strong> All analysis runs locally in your browser. Nothing is uploaded, no account is needed, and your results are saved only in this browser's local storage. This app is free and open source.</p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="goTo('photos')">Get started</button>
+    <button class="btn btn-ghost" id="resumeBtn" style="display:none" onclick="resumeSession()">Resume my last session</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 2: PHOTOS ============ -->
+<section class="screen" id="screen-photos">
+  <h2>Add 5&ndash;10 photos</h2>
+  <p class="lede">Clear, well-lit, face visible. Mix it up: straight-on, slight angles, hair pulled back if you can.</p>
+
+  <div class="drop" id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <div class="big">&#128247;</div>
+    <p><strong>Tap to choose photos</strong> or drag them here</p>
+    <p style="font-size:13px">JPG, PNG, or HEIC-converted &middot; stays on your device</p>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+
+  <div class="photo-grid" id="photoGrid"></div>
+  <div class="counter" id="photoCount">0 photos added &middot; <span>add at least 3</span></div>
+  <div class="error-box" id="photoError"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('welcome')">Back</button>
+    <button class="btn btn-gold" id="analyzeBtn" disabled onclick="startAnalysis()">Analyze my features</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 3: ANALYZING ============ -->
+<section class="screen" id="screen-analyze">
+  <div class="analyzing">
+    <div class="crown-load">
+      <svg width="120" height="120" viewBox="0 0 240 240">
+        <rect x="48" y="162" width="144" height="16" rx="8" fill="#2E2236"/>
+        <g class="tine t1"><path d="M68,158 L68,92" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/><circle cx="68" cy="82" r="6" fill="#C26E5A"/></g>
+        <g class="tine t2"><path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/><circle cx="104" cy="66" r="6" fill="#C26E5A"/></g>
+        <g class="tine t3"><path d="M138,158 L138,116" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/><circle cx="138" cy="99" r="13" fill="none" stroke="#2E2236" stroke-width="9"/><circle cx="138" cy="99" r="6" fill="#C26E5A"/></g>
+        <g class="tine t4"><path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="173" cy="88" r="6" fill="#C26E5A"/></g>
+      </svg>
+    </div>
+    <h2>Studying your features&hellip;</h2>
+    <div class="bar"><i id="progressBar"></i></div>
+    <p class="analyze-status" id="analyzeStatus">Loading face analysis engine&hellip;</p>
+  </div>
+</section>
+
+<!-- ============ SCREEN 4: CONFIRM ============ -->
+<section class="screen" id="screen-confirm">
+  <h2>Here's what we found</h2>
+  <p class="lede">Anything marked <span class="detected" style="vertical-align:0">detected</span> came from your photos. Tap any chip to correct it.</p>
+  <div id="confirmGroups"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('photos')">Back</button>
+    <button class="btn btn-gold" onclick="goTo('prefs')">Looks right</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 5: PREFERENCES ============ -->
+<section class="screen" id="screen-prefs">
+  <h2>A few things photos can't tell us</h2>
+  <p class="lede">This is the whole quiz. We promise.</p>
+  <div id="prefGroups"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('confirm')">Back</button>
+    <button class="btn btn-gold" onclick="showResults()">Show my styles</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 6: RESULTS ============ -->
+<section class="screen" id="screen-results">
+  <h2>Your crowning looks</h2>
+  <p class="lede" id="resultsLede"></p>
+  <div id="resultsList"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('prefs')">Adjust preferences</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 7: STYLIST CARD ============ -->
+<section class="screen" id="screen-card">
+  <h2 class="no-print">Your Stylist Card</h2>
+  <p class="lede no-print">Show this to your barber or stylist — it has everything they need.</p>
+  <div id="cardHolder"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo('results')">Back to styles</button>
+    <button class="btn btn-plum" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Hair Apparent &middot; free &amp; open source (MIT) &middot; your photos never leave your device &middot; created by David Fliesen
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+/* ============================================================
+   Hair Apparent v001 — all logic, ES5 only
+   ============================================================ */
+
+var SCREENS = ['welcome', 'photos', 'analyze', 'confirm', 'prefs', 'results', 'card'];
+var STORE_KEY = 'hairApparent_v001';
+var MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+
+var state = {
+  photos: [],          // array of { dataUrl }
+  analysis: null,      // { faceShape, skinTone, hairColor, eyeColor, detected:{} }
+  attrs: {},           // confirmed attributes
+  prefs: {},           // user preferences
+  chosenStyle: null
+};
+
+/* ---------- navigation ---------- */
+function goTo(name) {
+  var i;
+  for (i = 0; i < SCREENS.length; i++) {
+    var el = document.getElementById('screen-' + SCREENS[i]);
+    if (el) { el.className = (SCREENS[i] === name) ? 'screen active' : 'screen'; }
+  }
+  drawSteps(name);
+  if (name === 'confirm') { renderConfirm(); }
+  if (name === 'prefs') { renderPrefs(); }
+  window.scrollTo(0, 0);
+}
+
+function drawSteps(current) {
+  var flow = ['photos', 'confirm', 'prefs', 'results', 'card'];
+  var idx = -1, i;
+  for (i = 0; i < flow.length; i++) { if (flow[i] === current) { idx = i; } }
+  if (current === 'analyze') { idx = 0; }
+  var html = '';
+  for (i = 0; i < flow.length; i++) {
+    var cls = 'step-dot';
+    if (idx > -1 && i < idx) { cls += ' done'; }
+    if (i === idx) { cls += ' now'; }
+    html += '<span class="' + cls + '"></span>';
+  }
+  document.getElementById('stepDots').innerHTML = (current === 'welcome') ? '' : html;
+}
+
+/* ---------- photo intake ---------- */
+var fileInput = document.getElementById('fileInput');
+var dropZone = document.getElementById('dropZone');
+
+fileInput.addEventListener('change', function (e) { addFiles(e.target.files); fileInput.value = ''; });
+dropZone.addEventListener('dragover', function (e) { e.preventDefault(); dropZone.className = 'drop over'; });
+dropZone.addEventListener('dragleave', function () { dropZone.className = 'drop'; });
+dropZone.addEventListener('drop', function (e) {
+  e.preventDefault(); dropZone.className = 'drop';
+  if (e.dataTransfer && e.dataTransfer.files) { addFiles(e.dataTransfer.files); }
+});
+
+function addFiles(files) {
+  var i;
+  for (i = 0; i < files.length; i++) {
+    if (state.photos.length >= 10) { showPhotoError('Maximum of 10 photos — quality over quantity!'); break; }
+    if (files[i].type.indexOf('image') !== 0) { continue; }
+    readOne(files[i]);
+  }
+}
+
+function readOne(file) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    // Downscale large photos so analysis is fast and memory stays low
+    var img = new Image();
+    img.onload = function () {
+      var maxSide = 900;
+      var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      state.photos.push({ dataUrl: canvas.toDataURL('image/jpeg', 0.85) });
+      renderPhotos();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(idx) {
+  state.photos.splice(idx, 1);
+  renderPhotos();
+}
+
+function renderPhotos() {
+  var grid = document.getElementById('photoGrid');
+  var html = '', i;
+  for (i = 0; i < state.photos.length; i++) {
+    html += '<div class="photo-slot"><img src="' + state.photos[i].dataUrl + '" alt="Your photo ' + (i + 1) + '">' +
+            '<button class="x" onclick="removePhoto(' + i + ')" aria-label="Remove photo">&#10005;</button></div>';
+  }
+  grid.innerHTML = html;
+  var n = state.photos.length;
+  var msg;
+  if (n < 3) { msg = n + ' photo' + (n === 1 ? '' : 's') + ' added &middot; <span>add at least 3</span>'; }
+  else if (n < 5) { msg = n + ' photos added &middot; <span>good — 5+ is even better</span>'; }
+  else { msg = n + ' photos added &middot; <span>perfect</span>'; }
+  document.getElementById('photoCount').innerHTML = msg;
+  document.getElementById('analyzeBtn').disabled = (n < 3);
+  document.getElementById('photoError').style.display = 'none';
+}
+
+function showPhotoError(msg) {
+  var box = document.getElementById('photoError');
+  box.innerHTML = msg;
+  box.style.display = 'block';
+}
+
+/* ---------- face analysis ---------- */
+var modelsReady = false;
+
+function setProgress(pct, msg) {
+  document.getElementById('progressBar').style.width = pct + '%';
+  if (msg) { document.getElementById('analyzeStatus').innerHTML = msg; }
+}
+
+function startAnalysis() {
+  goTo('analyze');
+  setProgress(5, 'Loading face analysis engine&hellip;');
+  loadModels(function (ok) {
+    if (!ok) {
+      // Graceful fallback: manual selection
+      state.analysis = manualFallback();
+      setProgress(100, 'Engine unavailable — switching to manual selection.');
+      setTimeout(function () { goTo('confirm'); }, 900);
+      return;
+    }
+    analyzeAll();
+  });
+}
+
+function loadModels(cb) {
+  if (modelsReady) { cb(true); return; }
+  if (typeof faceapi === 'undefined') { cb(false); return; }
+  Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+    faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL)
+  ]).then(function () {
+    modelsReady = true; cb(true);
+  })['catch'](function () { cb(false); });
+}
+
+function analyzeAll() {
+  var results = [];
+  var idx = 0;
+
+  function next() {
+    if (idx >= state.photos.length) { finish(); return; }
+    var pct = 10 + Math.round((idx / state.photos.length) * 80);
+    setProgress(pct, 'Analyzing photo ' + (idx + 1) + ' of ' + state.photos.length + '&hellip;');
+    var img = new Image();
+    img.onload = function () {
+      var opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 });
+      faceapi.detectSingleFace(img, opts).withFaceLandmarks(true).then(function (det) {
+        if (det && det.landmarks) {
+          results.push(measureFace(det.landmarks.positions, img));
+        }
+        idx++; next();
+      })['catch'](function () { idx++; next(); });
+    };
+    img.onerror = function () { idx++; next(); };
+    img.src = state.photos[idx].dataUrl;
+  }
+
+  function finish() {
+    setProgress(95, 'Combining results across photos&hellip;');
+    if (results.length === 0) {
+      state.analysis = manualFallback();
+      state.analysis.note = 'We could not find a clear face in these photos — pick your features below.';
+    } else {
+      state.analysis = combineMeasurements(results);
+    }
+    state.attrs = {
+      faceShape: state.analysis.faceShape,
+      skinTone: state.analysis.skinTone,
+      hairColor: state.analysis.hairColor,
+      eyeColor: state.analysis.eyeColor,
+      texture: ''
+    };
+    setProgress(100, 'Done!');
+    setTimeout(function () { goTo('confirm'); }, 600);
+  }
+  next();
+}
+
+function dist(a, b) {
+  var dx = a.x - b.x, dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/* Measure one face: ratios + color samples */
+function measureFace(pts, img) {
+  // 68-landmark indices: 0-16 jawline, 17-26 brows, 36-47 eyes, 8 chin
+  var cheekW = dist(pts[1], pts[15]);
+  var jawW = dist(pts[4], pts[12]);
+  var foreheadW = dist(pts[17], pts[26]);
+  var midBrow = { x: (pts[21].x + pts[22].x) / 2, y: (pts[21].y + pts[22].y) / 2 };
+  var faceLen = dist(pts[8], midBrow) * 1.42; // estimate up to hairline
+
+  var canvas = document.createElement('canvas');
+  canvas.width = img.width; canvas.height = img.height;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+
+  // Skin: midpoint between cheek edge and nose, both sides
+  var skin = avgRegion(ctx, (pts[2].x + pts[30].x) / 2, (pts[2].y + pts[30].y) / 2, 6);
+  var skin2 = avgRegion(ctx, (pts[14].x + pts[30].x) / 2, (pts[14].y + pts[30].y) / 2, 6);
+  skin = mixRGB(skin, skin2);
+
+  // Eye: center of left eye (36-41)
+  var ex = (pts[37].x + pts[38].x + pts[40].x + pts[41].x) / 4;
+  var ey = (pts[37].y + pts[38].y + pts[40].y + pts[41].y) / 4;
+  var eye = avgRegion(ctx, ex, ey, 2);
+
+  // Hair: sample above the forehead, ~70% of brow-to-chin distance upward from brows
+  var browChin = dist(midBrow, pts[8]);
+  var hy = midBrow.y - browChin * 0.55;
+  var hair = avgRegion(ctx, midBrow.x, Math.max(4, hy), 8);
+
+  return {
+    lenRatio: faceLen / cheekW,
+    jawRatio: jawW / cheekW,
+    fhRatio: foreheadW / cheekW,
+    skin: skin, eye: eye, hair: hair
+  };
+}
+
+function avgRegion(ctx, x, y, r) {
+  x = Math.round(x); y = Math.round(y);
+  var w = ctx.canvas.width, h = ctx.canvas.height;
+  var x0 = Math.max(0, x - r), y0 = Math.max(0, y - r);
+  var size = Math.min(r * 2 + 1, w - x0, h - y0);
+  if (size < 1) { return { r: 128, g: 128, b: 128 }; }
+  var data = ctx.getImageData(x0, y0, size, size).data;
+  var rr = 0, gg = 0, bb = 0, n = 0, i;
+  for (i = 0; i < data.length; i += 4) { rr += data[i]; gg += data[i + 1]; bb += data[i + 2]; n++; }
+  return { r: rr / n, g: gg / n, b: bb / n };
+}
+
+function mixRGB(a, b) { return { r: (a.r + b.r) / 2, g: (a.g + b.g) / 2, b: (a.b + b.b) / 2 }; }
+
+function combineMeasurements(arr) {
+  var sum = { lenRatio: 0, jawRatio: 0, fhRatio: 0, skin: { r: 0, g: 0, b: 0 }, eye: { r: 0, g: 0, b: 0 }, hair: { r: 0, g: 0, b: 0 } };
+  var i, n = arr.length;
+  for (i = 0; i < n; i++) {
+    sum.lenRatio += arr[i].lenRatio; sum.jawRatio += arr[i].jawRatio; sum.fhRatio += arr[i].fhRatio;
+    sum.skin.r += arr[i].skin.r; sum.skin.g += arr[i].skin.g; sum.skin.b += arr[i].skin.b;
+    sum.eye.r += arr[i].eye.r; sum.eye.g += arr[i].eye.g; sum.eye.b += arr[i].eye.b;
+    sum.hair.r += arr[i].hair.r; sum.hair.g += arr[i].hair.g; sum.hair.b += arr[i].hair.b;
+  }
+  var m = {
+    lenRatio: sum.lenRatio / n, jawRatio: sum.jawRatio / n, fhRatio: sum.fhRatio / n,
+    skin: { r: sum.skin.r / n, g: sum.skin.g / n, b: sum.skin.b / n },
+    eye: { r: sum.eye.r / n, g: sum.eye.g / n, b: sum.eye.b / n },
+    hair: { r: sum.hair.r / n, g: sum.hair.g / n, b: sum.hair.b / n }
+  };
+  return {
+    faceShape: classifyShape(m),
+    skinTone: classifySkin(m.skin),
+    eyeColor: classifyEye(m.eye),
+    hairColor: classifyHair(m.hair),
+    detected: { faceShape: true, skinTone: true, eyeColor: true, hairColor: true },
+    photosUsed: n
+  };
+}
+
+function classifyShape(m) {
+  if (m.lenRatio > 1.58) { return 'oblong'; }
+  if (m.jawRatio > 0.93 && m.lenRatio < 1.42) { return 'square'; }
+  if (m.lenRatio < 1.28 && m.jawRatio > 0.86) { return 'round'; }
+  if (m.fhRatio > 0.99 && m.jawRatio < 0.82) { return 'heart'; }
+  if (m.fhRatio < 0.90 && m.jawRatio < 0.84) { return 'diamond'; }
+  return 'oval';
+}
+
+function classifySkin(c) {
+  var lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+  if (lum > 200) { return 'fair'; }
+  if (lum > 172) { return 'light'; }
+  if (lum > 140) { return 'medium'; }
+  if (lum > 110) { return 'olive'; }
+  if (lum > 80) { return 'brown'; }
+  return 'deep';
+}
+
+function classifyEye(c) {
+  var lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+  if (c.b > c.r + 14 && c.b > c.g + 6) { return 'blue'; }
+  if (c.g > c.r + 6 && c.g > c.b + 6) { return 'green'; }
+  if (lum > 150) { return 'gray'; }
+  if (c.r > 90 && c.g > 60 && lum > 95 && c.r > c.b + 25) { return 'hazel'; }
+  if (c.r > c.g + 18 && lum > 70) { return 'amber'; }
+  return 'brown';
+}
+
+function classifyHair(c) {
+  var lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+  var rg = c.r - c.b;
+  if (lum > 165 && Math.abs(c.r - c.b) < 24) { return 'gray'; }
+  if (lum > 150) { return 'blonde'; }
+  if (rg > 42 && lum > 78) { return 'auburn'; }
+  if (lum > 95) { return 'brown'; }
+  if (lum > 55) { return 'brunette'; }
+  return 'black';
+}
+
+function manualFallback() {
+  return {
+    faceShape: 'oval', skinTone: 'medium', eyeColor: 'brown', hairColor: 'brown',
+    detected: {}, photosUsed: 0,
+    note: 'The analysis engine could not load (you may be offline) — pick your features below and everything else still works.'
+  };
+}
+
+/* ---------- attribute / preference options ---------- */
+var ATTR_DEFS = [
+  { key: 'faceShape', label: 'Face shape', note: 'Measured from jaw, cheekbone, forehead, and length ratios across your photos.',
+    options: ['oval', 'round', 'square', 'heart', 'diamond', 'oblong'] },
+  { key: 'texture', label: 'Natural hair texture', note: 'Photos can hide texture (product, styling) — confirm it here.',
+    options: ['straight', 'wavy', 'curly', 'coily'] },
+  { key: 'hairColor', label: 'Natural hair color', note: 'Sampled from your photos.',
+    options: ['blonde', 'brown', 'brunette', 'black', 'auburn', 'gray'],
+    swatch: { blonde: '#D9B380', brown: '#7A4A2B', brunette: '#4A3220', black: '#1C1812', auburn: '#8A3B1E', gray: '#9C9C9C' } },
+  { key: 'skinTone', label: 'Skin tone', note: 'Used to judge contrast between hair color and complexion.',
+    options: ['fair', 'light', 'medium', 'olive', 'brown', 'deep'],
+    swatch: { fair: '#F3D9C4', light: '#EAC3A3', medium: '#D29E7C', olive: '#B98860', brown: '#8C5A3B', deep: '#5A3A26' } },
+  { key: 'eyeColor', label: 'Eye color', note: 'A small detail, but it helps with color harmony notes.',
+    options: ['brown', 'blue', 'green', 'hazel', 'gray', 'amber'],
+    swatch: { brown: '#5B3A21', blue: '#5B83A6', green: '#5E7D4F', hazel: '#8A6B3A', gray: '#8D949B', amber: '#A86A2A' } }
+];
+
+var PREF_DEFS = [
+  { key: 'presentation', label: 'Which styles should we show you?', note: 'This just filters the style library.',
+    options: [
+      { v: 'masc', t: 'Masculine styles' },
+      { v: 'fem', t: 'Feminine styles' },
+      { v: 'all', t: 'Show me everything' }
+    ] },
+  { key: 'length', label: 'How long do you want to go?', note: 'Pick the range you would actually wear.',
+    options: [
+      { v: 'short', t: 'Short' },
+      { v: 'medium', t: 'Medium' },
+      { v: 'long', t: 'Long' },
+      { v: 'any', t: 'Surprise me' }
+    ] },
+  { key: 'maintenance', label: 'How much daily effort are you up for?', note: 'Be honest — the best haircut is one you can live with.',
+    options: [
+      { v: 1, t: 'Wash and go' },
+      { v: 2, t: 'A few minutes' },
+      { v: 3, t: 'I enjoy styling' }
+    ] },
+  { key: 'vibe', label: 'What is the goal?', note: 'Helps break ties between equally good styles.',
+    options: [
+      { v: 'professional', t: 'Polished / professional' },
+      { v: 'lowkey', t: 'Easy / low-key' },
+      { v: 'bold', t: 'Bold / a real change' }
+    ] }
+];
+
+function renderConfirm() {
+  var html = '', i, j;
+  if (state.analysis && state.analysis.note) {
+    html += '<div class="error-box" style="display:block">' + state.analysis.note + '</div>';
+  }
+  for (i = 0; i < ATTR_DEFS.length; i++) {
+    var def = ATTR_DEFS[i];
+    var detected = state.analysis && state.analysis.detected && state.analysis.detected[def.key];
+    html += '<div class="attr-group"><h3>' + def.label +
+            (detected ? '<span class="detected">detected</span>' : '') +
+            '</h3><div class="attr-note">' + def.note + '</div><div class="chips">';
+    for (j = 0; j < def.options.length; j++) {
+      var opt = def.options[j];
+      var on = (state.attrs[def.key] === opt) ? ' on' : '';
+      var sw = '';
+      if (def.swatch && def.swatch[opt]) { sw = '<span class="dot" style="background:' + def.swatch[opt] + '"></span>'; }
+      html += '<button class="chip' + on + '" onclick="setAttr(\'' + def.key + '\',\'' + opt + '\')">' + sw + cap(opt) + '</button>';
+    }
+    html += '</div></div>';
+  }
+  document.getElementById('confirmGroups').innerHTML = html;
+}
+
+function setAttr(key, val) {
+  state.attrs[key] = val;
+  if (state.analysis && state.analysis.detected) { state.analysis.detected[key] = false; }
+  renderConfirm();
+  saveSession();
+}
+
+function renderPrefs() {
+  var html = '', i, j;
+  for (i = 0; i < PREF_DEFS.length; i++) {
+    var def = PREF_DEFS[i];
+    html += '<div class="attr-group"><h3>' + def.label + '</h3><div class="attr-note">' + def.note + '</div><div class="chips">';
+    for (j = 0; j < def.options.length; j++) {
+      var opt = def.options[j];
+      var on = (String(state.prefs[def.key]) === String(opt.v)) ? ' on' : '';
+      html += '<button class="chip' + on + '" onclick="setPref(\'' + def.key + '\',\'' + opt.v + '\')">' + opt.t + '</button>';
+    }
+    html += '</div></div>';
+  }
+  document.getElementById('prefGroups').innerHTML = html;
+}
+
+function setPref(key, val) {
+  state.prefs[key] = val;
+  renderPrefs();
+  saveSession();
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ---------- style library ---------- */
+/* shape scores: 0 = avoid, 1 = okay, 2 = good, 3 = excellent */
+var STYLES = [
+  /* ----- masculine ----- */
+  { id: 'txcrop', name: 'Textured Crop', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy', 'curly'], maint: 1, vibe: 'lowkey',
+    shapes: { oval: 3, round: 3, square: 2, heart: 3, diamond: 2, oblong: 2 },
+    desc: 'Short, choppy length on top with a clean taper — modern and forgiving.',
+    cut: [['Top', '2–3 in, point-cut for texture'], ['Sides', '#2–#3 guard, low taper'], ['Back', '#2 guard, blended'], ['Fringe', 'Textured, sits just above brow']],
+    tech: 'Point-cutting on top for separation; low taper fade on the sides. Matte texture, no hard lines.',
+    products: 'Matte clay or sea-salt spray', trim: 4 },
+  { id: 'classictaper', name: 'Classic Taper', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy'], maint: 1, vibe: 'professional',
+    shapes: { oval: 3, round: 2, square: 3, heart: 2, diamond: 2, oblong: 2 },
+    desc: 'The timeless gentleman\'s cut — neat, versatile, works everywhere.',
+    cut: [['Top', '2–4 in, scissor cut'], ['Sides', 'Scissor-over-comb taper'], ['Back', 'Tapered to natural neckline'], ['Part', 'Optional hard or natural part']],
+    tech: 'All-scissor work, tapered nape and sides. No clipper lines — soft and professional.',
+    products: 'Light pomade or cream', trim: 5 },
+  { id: 'sidepart', name: 'Side Part', pres: 'masc', lengths: ['short', 'medium'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
+    shapes: { oval: 3, round: 3, square: 2, heart: 2, diamond: 2, oblong: 1 },
+    desc: 'Clean comb-over with a defined part — sharp without trying hard.',
+    cut: [['Top', '3–4 in, longer at part side'], ['Sides', '#3–#4 guard or scissor taper'], ['Back', 'Blended taper'], ['Part', 'Cut in on natural part line']],
+    tech: 'Establish the part on the natural growth line; keep weight on the parted side. Optional hard-part line.',
+    products: 'Medium-hold pomade, comb in while damp', trim: 4 },
+  { id: 'quiff', name: 'Modern Quiff', pres: 'masc', lengths: ['medium'], textures: ['straight', 'wavy'], maint: 3, vibe: 'bold',
+    shapes: { oval: 2, round: 3, square: 2, heart: 1, diamond: 2, oblong: 0 },
+    desc: 'Volume up front, swept back — adds height and presence.',
+    cut: [['Top', '3–5 in, longest at front'], ['Sides', '#2–#3 guard taper or fade'], ['Back', 'Blended short'], ['Front', 'Keep length to sweep up and back']],
+    tech: 'Graduated length front to crown. Blow-dry up and back with a round brush, finish with product.',
+    products: 'Volumizing powder + medium pomade', trim: 4 },
+  { id: 'buzz', name: 'Buzz Cut', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy', 'curly', 'coily'], maint: 1, vibe: 'lowkey',
+    shapes: { oval: 3, square: 3, diamond: 2, heart: 1, round: 1, oblong: 1 },
+    desc: 'Zero-fuss, maximum confidence. Shows the face — best with strong bone structure.',
+    cut: [['Top', '#1–#3 guard, even all over'], ['Sides', 'Same guard or one shorter'], ['Back', 'Blended, clean neckline'], ['Edges', 'Square or rounded line-up']],
+    tech: 'Single guard all over or subtle fade on sides. Crisp line-up at forehead and temples if desired.',
+    products: 'None needed — sunscreen counts', trim: 3 },
+  { id: 'crew', name: 'Crew Cut', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy'], maint: 1, vibe: 'professional',
+    shapes: { oval: 3, round: 2, square: 3, heart: 2, diamond: 2, oblong: 2 },
+    desc: 'Military-neat with just enough on top to style — sharp and serviceable.',
+    cut: [['Top', '0.5–1.5 in, graduated to crown'], ['Sides', '#1–#2 guard fade'], ['Back', '#1 guard, tapered'], ['Front', 'Slightly longer for a hint of lift']],
+    tech: 'Short pomp profile: longest at front hairline, tightening toward the crown. Clean fade.',
+    products: 'Tiny dab of matte paste', trim: 3 },
+  { id: 'slickunder', name: 'Slick Back Undercut', pres: 'masc', lengths: ['medium'], textures: ['straight', 'wavy'], maint: 2, vibe: 'bold',
+    shapes: { oval: 2, round: 2, square: 2, heart: 1, diamond: 3, oblong: 0 },
+    desc: 'Long top swept straight back over disconnected short sides.',
+    cut: [['Top', '4–6 in, one length'], ['Sides', '#1–#2 guard, disconnected'], ['Back', 'Matches sides'], ['Disconnect', 'Hard line at parietal ridge']],
+    tech: 'True disconnect — no blend between top and sides. Top stays one length to slick back cleanly.',
+    products: 'High-shine pomade or gel', trim: 4 },
+  { id: 'curlyfringe', name: 'Curly Fringe', pres: 'masc', lengths: ['short', 'medium'], textures: ['curly'], maint: 2, vibe: 'lowkey',
+    shapes: { oval: 3, square: 3, oblong: 3, round: 2, heart: 2, diamond: 2 },
+    desc: 'Curls left full on top and pulled forward — softens angles, hides a tall forehead.',
+    cut: [['Top', '3–4 in of natural curl'], ['Sides', '#2–#3 guard mid taper'], ['Back', 'Tapered, follows curl line'], ['Fringe', 'Cut dry to sit on forehead']],
+    tech: 'Cut curls dry so shrinkage is accounted for. Mid taper keeps the silhouette tidy.',
+    products: 'Curl cream, scrunch while damp', trim: 5 },
+  { id: 'spongetwist', name: 'Sponge Twists', pres: 'masc', lengths: ['short'], textures: ['coily'], maint: 1, vibe: 'lowkey',
+    shapes: { oval: 3, round: 2, square: 3, heart: 2, diamond: 3, oblong: 2 },
+    desc: 'Defined coils on top with a crisp fade — sharp, modern, easy to keep.',
+    cut: [['Top', '1.5–3 in of natural coil'], ['Sides', '#1 guard fade or skin fade'], ['Back', 'Matches fade'], ['Line-up', 'Crisp edge-up all around']],
+    tech: 'Even coil length on top, sponge-twisted after moisturizing. Skin or #1 fade with a sharp line-up.',
+    products: 'Curl sponge + leave-in moisturizer', trim: 2 },
+  { id: 'flow', name: 'Medium Flow', pres: 'masc', lengths: ['medium', 'long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'lowkey',
+    shapes: { oval: 3, square: 3, diamond: 2, round: 1, heart: 2, oblong: 2 },
+    desc: 'Grown-out, pushed-back waves — relaxed and athletic.',
+    cut: [['Top', '4–6 in, layered'], ['Sides', 'Over the ear or tucked'], ['Back', 'Collar length, layered'], ['Layers', 'Long layers for movement']],
+    tech: 'Long layering throughout so it flows back without bulk. No clippers — all scissor.',
+    products: 'Sea-salt spray, air dry pushed back', trim: 8 },
+  /* ----- feminine ----- */
+  { id: 'longlayers', name: 'Long Layers', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
+    shapes: { oval: 3, round: 3, square: 3, heart: 2, diamond: 2, oblong: 1 },
+    desc: 'Face-framing layers through long hair — universally flattering movement.',
+    cut: [['Length', 'Mid-back, 1–2 in off ends'], ['Layers', 'Start at chin, cascade down'], ['Frame', 'Soft face-framing pieces'], ['Ends', 'Point-cut, not blunt']],
+    tech: 'Long internal layers plus face-frame starting at the chin. Point-cut ends to keep softness.',
+    products: 'Heat protectant + light oil on ends', trim: 10 },
+  { id: 'curtainlob', name: 'Curtain-Bang Lob', pres: 'fem', lengths: ['medium'], textures: ['straight', 'wavy'], maint: 2, vibe: 'bold',
+    shapes: { oval: 3, oblong: 3, heart: 3, round: 2, square: 2, diamond: 3 },
+    desc: 'Collarbone-length cut with soft curtain bangs — balances long or wide foreheads beautifully.',
+    cut: [['Length', 'Collarbone, slight A-line'], ['Bangs', 'Curtain, cheekbone length'], ['Layers', 'Subtle, below the bangs'], ['Part', 'Center or soft middle']],
+    tech: 'Curtain bangs cut to swoop at cheekbone; lob kept slightly longer in front. Blends as it grows.',
+    products: 'Round-brush the bangs; smoothing cream', trim: 8 },
+  { id: 'bob', name: 'Classic Chin Bob', pres: 'fem', lengths: ['short'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
+    shapes: { oval: 3, heart: 3, oblong: 3, diamond: 2, square: 1, round: 1 },
+    desc: 'Sharp, chin-grazing, and decisive — adds width right where narrow jaws want it.',
+    cut: [['Length', 'Chin line, blunt or soft'], ['Layers', 'Minimal — weight stays low'], ['Nape', 'Slightly undercut for tuck'], ['Part', 'Center or deep side']],
+    tech: 'Blunt perimeter at the chin; interior left mostly unlayered so the line reads strong.',
+    products: 'Smoothing balm, flat brush blow-dry', trim: 6 },
+  { id: 'pixie', name: 'Soft Pixie', pres: 'fem', lengths: ['short'], textures: ['straight', 'wavy'], maint: 1, vibe: 'bold',
+    shapes: { oval: 3, heart: 3, diamond: 2, square: 1, round: 1, oblong: 1 },
+    desc: 'Cropped with longer texture on top — confident, striking, and quick.',
+    cut: [['Top', '2–3 in, textured'], ['Sides', 'Tapered over ears'], ['Back', 'Tapered to nape'], ['Fringe', 'Wispy, brow-skimming']],
+    tech: 'Scissor-tapered sides and nape; top point-cut for piecey texture. Soft fringe forward.',
+    products: 'Texture paste, finger-styled', trim: 4 },
+  { id: 'shag', name: 'Modern Shag', pres: 'fem', lengths: ['medium'], textures: ['wavy', 'curly'], maint: 1, vibe: 'bold',
+    shapes: { oval: 3, square: 3, round: 2, oblong: 2, heart: 2, diamond: 2 },
+    desc: 'Heavily layered, lived-in cut that makes waves and curls do the work.',
+    cut: [['Length', 'Shoulder, choppy perimeter'], ['Layers', 'Short crown layers, heavy'], ['Bangs', 'Optional shaggy fringe'], ['Ends', 'Razored or slide-cut']],
+    tech: 'Short interior layers from the crown out; razor or slide-cut ends for that undone finish.',
+    products: 'Air-dry cream or mousse, scrunch', trim: 9 },
+  { id: 'butterfly', name: 'Butterfly Layers', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 3, vibe: 'bold',
+    shapes: { oval: 3, round: 3, oblong: 2, square: 2, heart: 2, diamond: 2 },
+    desc: 'Dramatic short-over-long layering — big bouncy volume that frames the face.',
+    cut: [['Length', 'Mid-back base'], ['Layers', 'Short top layer at chin/shoulder'], ['Frame', 'Heavy face-frame, swept back'], ['Ends', 'Feathered out']],
+    tech: 'Two-tier layering: a shorter shell over long base, blown out with a round brush for flip.',
+    products: 'Volumizing mousse + round brush', trim: 8 },
+  { id: 'bluntlob', name: 'Blunt Lob', pres: 'fem', lengths: ['medium'], textures: ['straight'], maint: 2, vibe: 'professional',
+    shapes: { oval: 3, round: 3, heart: 2, diamond: 2, square: 1, oblong: 2 },
+    desc: 'One-length, shoulder-grazing, glassy — minimalism that reads expensive.',
+    cut: [['Length', 'Shoulder, dead level'], ['Layers', 'None — single length'], ['Part', 'Center'], ['Ends', 'Blunt, polished line']],
+    tech: 'Precision one-length cut, checked level all the way around. The line is the style.',
+    products: 'Smoothing serum, occasional flat iron', trim: 8 },
+  { id: 'curlylayers', name: 'Curly Layered Cut', pres: 'fem', lengths: ['medium', 'long'], textures: ['curly'], maint: 2, vibe: 'lowkey',
+    shapes: { oval: 3, square: 3, oblong: 3, heart: 2, round: 2, diamond: 2 },
+    desc: 'Layers cut curl-by-curl so the shape works with your pattern, not against it.',
+    cut: [['Length', 'Shoulder to mid-back (dry)'], ['Layers', 'Cut dry, curl by curl'], ['Frame', 'Shorter spirals at the face'], ['Shape', 'Rounded, balanced silhouette']],
+    tech: 'Dry-cutting (DevaCut-style) so shrinkage is visible while cutting. Shape for the curl pattern.',
+    products: 'Leave-in + gel, scrunch out the cast', trim: 12 },
+  { id: 'washngo', name: 'Coily Wash-and-Go', pres: 'fem', lengths: ['short', 'medium'], textures: ['coily'], maint: 1, vibe: 'lowkey',
+    shapes: { oval: 3, round: 3, square: 3, heart: 2, diamond: 2, oblong: 2 },
+    desc: 'A shaped natural silhouette that springs back every morning with minimal effort.',
+    cut: [['Shape', 'Rounded or slightly oval crown'], ['Sides', 'Balanced to crown'], ['Frame', 'Slightly shorter at face'], ['Cut', 'Always cut dry, in its curl']],
+    tech: 'Dry shaping of the natural coil into a balanced silhouette. No heat, no straightening to cut.',
+    products: 'Leave-in conditioner + curl defining cream', trim: 10 },
+  { id: 'twa', name: 'Tapered Natural (TWA)', pres: 'fem', lengths: ['short'], textures: ['coily', 'curly'], maint: 1, vibe: 'bold',
+    shapes: { oval: 3, heart: 3, diamond: 3, oblong: 2, round: 1, square: 2 },
+    desc: 'Coils kept full on top, tapered at the sides and nape — sculptural and striking.',
+    cut: [['Top', '2–4 in of defined coil'], ['Sides', 'Tapered tight'], ['Nape', 'Tapered, soft edge'], ['Shape', 'Volume weighted to the crown']],
+    tech: 'Clipper-tapered sides/nape with shears shaping the crown. Volume on top elongates the face.',
+    products: 'Curl custard, finger-coil the top', trim: 4 },
+  { id: 'wolf', name: 'Wolf Cut', pres: 'fem', lengths: ['medium'], textures: ['straight', 'wavy', 'curly'], maint: 2, vibe: 'bold',
+    shapes: { oval: 2, round: 3, square: 2, heart: 2, diamond: 2, oblong: 1 },
+    desc: 'Shag-mullet hybrid: big volume at the crown, wispy lengths below. Maximum personality.',
+    cut: [['Crown', 'Short, heavily layered'], ['Length', 'Collarbone wisps'], ['Bangs', 'Choppy, eye-skimming'], ['Ends', 'Thinned and feathered']],
+    tech: 'Aggressive crown layering disconnects into longer wispy lengths. Texturize everything.',
+    products: 'Texture spray, rough-dry', trim: 8 },
+  { id: 'sideswept', name: 'Side-Swept Long', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
+    shapes: { oval: 3, square: 3, round: 2, oblong: 2, heart: 3, diamond: 2 },
+    desc: 'Long hair with a deep side part and sweeping fringe — softens angles instantly.',
+    cut: [['Length', 'Mid-back'], ['Bangs', 'Long, side-swept'], ['Layers', 'Soft, from cheekbone down'], ['Part', 'Deep side part']],
+    tech: 'Side-swept fringe blended into face-frame; long soft layers keep the sweep moving.',
+    products: 'Light mousse at roots for the sweep', trim: 9 }
+];
+
+/* shape-specific reasoning lines */
+var SHAPE_WHY = {
+  oval:    'Your oval proportions are the most versatile — this style simply shows them off.',
+  round:   'This adds height and keeps weight off the cheeks, which lengthens a rounder face.',
+  square:  'The softness here balances a strong jawline instead of competing with it.',
+  heart:   'This adds visual weight near the jaw to balance a wider forehead.',
+  diamond: 'This softens prominent cheekbones and balances a narrower forehead and chin.',
+  oblong:  'This adds width and keeps vertical height in check, balancing a longer face.'
+};
+
+/* ---------- scoring + results ---------- */
+function scoreStyle(s) {
+  var a = state.attrs, p = state.prefs;
+  var score = 0;
+
+  var shapeFit = (s.shapes[a.faceShape] !== undefined) ? s.shapes[a.faceShape] : 1;
+  if (shapeFit === 0) { return -1; } // never recommend an "avoid"
+  score += shapeFit * 5;                                            // 0–15
+
+  if (a.texture && s.textures.indexOf(a.texture) > -1) { score += 6; }
+  else if (a.texture) { score -= 4; }
+
+  if (p.length && p.length !== 'any') {
+    if (s.lengths.indexOf(p.length) > -1) { score += 5; }
+    else { score -= 5; }
+  } else { score += 2; }
+
+  var pm = parseInt(p.maintenance || 2, 10);
+  var diff = Math.abs(pm - s.maint);
+  score += (2 - diff) * 2;                                          // -2..+4
+
+  if (p.vibe && p.vibe === s.vibe) { score += 3; }
+
+  return score;
+}
+
+function showResults() {
+  var a = state.attrs, p = state.prefs;
+  if (!a.texture) { a.texture = 'straight'; }
+  if (!p.presentation) { p.presentation = 'all'; }
+
+  var pool = [], i;
+  for (i = 0; i < STYLES.length; i++) {
+    var s = STYLES[i];
+    if (p.presentation !== 'all' && s.pres !== p.presentation) { continue; }
+    var sc = scoreStyle(s);
+    if (sc >= 0) { pool.push({ s: s, sc: sc }); }
+  }
+  pool.sort(function (x, y) { return y.sc - x.sc; });
+  pool = pool.slice(0, 6);
+
+  var maxSc = pool.length ? pool[0].sc : 1;
+  var minSc = 0;
+  var html = '';
+  for (i = 0; i < pool.length; i++) {
+    var st = pool[i].s;
+    var pct = Math.round(60 + 38 * ((pool[i].sc - minSc) / Math.max(1, (maxSc - minSc))));
+    if (pct > 98) { pct = 98; }
+    var why = SHAPE_WHY[a.faceShape] || '';
+    var texNote = (st.textures.indexOf(a.texture) > -1) ? ' Works with your natural ' + a.texture + ' texture as-is.' : '';
+    html += '<div class="style-card' + (i === 0 ? ' top-pick' : '') + '">' +
+      (i === 0 ? '<span class="rank-badge">TOP PICK FOR YOUR FACE</span>' : '') +
+      '<span class="match-pct">' + pct + '%</span>' +
+      '<h3>' + st.name + '</h3>' +
+      '<div class="style-meta">Length: <b>' + st.lengths.join(' / ') + '</b> &middot; Effort: <b>' + ['', 'wash & go', 'a few minutes', 'daily styling'][st.maint] + '</b> &middot; Trim every <b>' + st.trim + ' weeks</b></div>' +
+      '<p class="style-why">' + st.desc + ' ' + why + texNote + '</p>' +
+      '<button class="btn btn-plum" style="padding:10px 24px;font-size:15px" onclick="chooseStyle(\'' + st.id + '\')">This is the one &rarr;</button>' +
+      '</div>';
+  }
+  if (!html) { html = '<p style="text-align:center">No matches with those filters — try widening your length or presentation choices.</p>'; }
+  document.getElementById('resultsList').innerHTML = html;
+  document.getElementById('resultsLede').innerHTML =
+    'Ranked for your <strong>' + a.faceShape + '</strong> face shape, <strong>' + a.texture + '</strong> texture, and your preferences. Tap one to build your Stylist Card.';
+  saveSession();
+  goTo('results');
+}
+
+/* ---------- stylist card ---------- */
+function chooseStyle(id) {
+  var i, st = null;
+  for (i = 0; i < STYLES.length; i++) { if (STYLES[i].id === id) { st = STYLES[i]; } }
+  if (!st) { return; }
+  state.chosenStyle = id;
+  saveSession();
+
+  var a = state.attrs;
+  var zones = '', j;
+  for (j = 0; j < st.cut.length; j++) {
+    zones += '<div class="sc-zone"><span>' + st.cut[j][0] + '</span><b>' + st.cut[j][1] + '</b></div>';
+  }
+  var today = new Date();
+  var dateStr = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+
+  var html =
+    '<div class="stylist-card">' +
+      '<div class="sc-head">' +
+        '<svg width="44" height="44" viewBox="0 0 240 240"><rect x="0" y="0" width="240" height="240" rx="48" fill="#2E2236"/><rect x="48" y="162" width="144" height="16" rx="8" fill="#D9A84E"/><path d="M68,158 L68,92" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/><circle cx="68" cy="82" r="6" fill="#C26E5A"/><path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/><circle cx="104" cy="66" r="6" fill="#C26E5A"/><path d="M138,158 L138,116" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/><circle cx="138" cy="99" r="13" fill="none" stroke="#D9A84E" stroke-width="9"/><circle cx="138" cy="99" r="6" fill="#C26E5A"/><path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="173" cy="88" r="6" fill="#C26E5A"/></svg>' +
+        '<div><h3>' + st.name + '</h3><div class="sc-sub">Stylist Card &middot; generated by Hair Apparent &middot; ' + dateStr + '</div></div>' +
+      '</div>' +
+      '<div class="sc-grid">' +
+        '<div class="sc-block"><h4>The Client</h4>' +
+          '<div class="sc-zone"><span>Face shape</span><b>' + cap(a.faceShape) + '</b></div>' +
+          '<div class="sc-zone"><span>Natural texture</span><b>' + cap(a.texture) + '</b></div>' +
+          '<div class="sc-zone"><span>Natural color</span><b>' + cap(a.hairColor) + '</b></div>' +
+          '<div class="sc-zone"><span>Skin tone</span><b>' + cap(a.skinTone) + '</b></div>' +
+        '</div>' +
+        '<div class="sc-block"><h4>Cut Map</h4>' + zones + '</div>' +
+        '<div class="sc-block"><h4>Technique Notes</h4><p>' + st.tech + '</p></div>' +
+        '<div class="sc-block"><h4>Styling &amp; Upkeep</h4>' +
+          '<div class="sc-zone"><span>Products</span><b>' + st.products + '</b></div>' +
+          '<div class="sc-zone"><span>Trim interval</span><b>Every ' + st.trim + ' weeks</b></div>' +
+          '<div class="sc-zone"><span>Daily effort</span><b>' + ['', 'Wash & go', 'A few minutes', 'Styled daily'][st.maint] + '</b></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sc-foot"><span>Why this works: ' + (SHAPE_WHY[a.faceShape] || '') + '</span><span>hairapparent &middot; free &amp; open source</span></div>' +
+    '</div>';
+
+  document.getElementById('cardHolder').innerHTML = html;
+  goTo('card');
+}
+
+/* ---------- session persistence (localStorage only) ---------- */
+function saveSession() {
+  try {
+    var save = { attrs: state.attrs, prefs: state.prefs, chosenStyle: state.chosenStyle, when: new Date().getTime() };
+    localStorage.setItem(STORE_KEY, JSON.stringify(save));
+  } catch (e) { /* storage full or blocked — fine, app still works */ }
+}
+
+function resumeSession() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) { return; }
+    var save = JSON.parse(raw);
+    state.attrs = save.attrs || {};
+    state.prefs = save.prefs || {};
+    state.chosenStyle = save.chosenStyle || null;
+    state.analysis = { detected: {}, note: '' };
+    if (state.attrs.faceShape) { showResults(); } else { goTo('confirm'); }
+  } catch (e) { goTo('photos'); }
+}
+
+(function init() {
+  try {
+    if (localStorage.getItem(STORE_KEY)) {
+      document.getElementById('resumeBtn').style.display = 'inline-block';
+    }
+  } catch (e) { /* private mode — no resume offered */ }
+  drawSteps('welcome');
+})();
+</script>
+</body>
+</html>

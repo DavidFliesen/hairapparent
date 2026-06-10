@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* Hair Apparent v002 — one dark world.
+/* Hair Apparent v003 — one dark world.
    Page #241A2B, surface #2E2236, raised #3A2C44, line #4A3A57,
    ivory #F5EEE3, muted #B9A8C6, gold #D9A84E, copper #C26E5A */
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -333,11 +333,11 @@ footer b { color: #D9A84E; font-weight: 600; }
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script>
 /* ============================================================
-   Hair Apparent v002 — ES5 only, hardcoded hex, fully on-device
+   Hair Apparent v003 — ES5 only, hardcoded hex, fully on-device
    ============================================================ */
 
 var SCREENS = ['welcome', 'photos', 'analyze', 'confirm', 'prefs', 'results', 'card'];
-var STORE_KEY = 'hairApparent_v002';
+var STORE_KEY = 'hairApparent_v003';
 var MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
 
 var state = {
@@ -575,7 +575,27 @@ function measureFace(pts, img) {
 
   var browChin = dist(midBrow, pts[8]);
   var hy = midBrow.y - browChin * 0.55;
-  var hair = avgRegion(ctx, midBrow.x, Math.max(4, hy), 8);
+  var hy2 = midBrow.y - browChin * 0.40;
+  var skinLum = 0.299 * skin.r + 0.587 * skin.g + 0.114 * skin.b;
+  var candidates = [
+    avgRegion(ctx, midBrow.x, Math.max(4, hy), 8),
+    avgRegion(ctx, midBrow.x - cheekW * 0.28, Math.max(4, hy2), 8),
+    avgRegion(ctx, midBrow.x + cheekW * 0.28, Math.max(4, hy2), 8),
+    avgRegion(ctx, midBrow.x - cheekW * 0.42, Math.max(4, midBrow.y - browChin * 0.2), 8),
+    avgRegion(ctx, midBrow.x + cheekW * 0.42, Math.max(4, midBrow.y - browChin * 0.2), 8)
+  ];
+  /* drop samples that look like skin (forehead) or blown-out background */
+  var kept = [], ci;
+  for (ci = 0; ci < candidates.length; ci++) {
+    var cl = 0.299 * candidates[ci].r + 0.587 * candidates[ci].g + 0.114 * candidates[ci].b;
+    if (Math.abs(cl - skinLum) < 26) { continue; }
+    if (cl > 238) { continue; }
+    kept.push(candidates[ci]);
+  }
+  if (kept.length === 0) { kept = candidates; }
+  var hair = { r: 0, g: 0, b: 0 };
+  for (ci = 0; ci < kept.length; ci++) { hair.r += kept[ci].r; hair.g += kept[ci].g; hair.b += kept[ci].b; }
+  hair.r /= kept.length; hair.g /= kept.length; hair.b /= kept.length;
 
   return { lenRatio: faceLen / cheekW, jawRatio: jawW / cheekW, fhRatio: foreheadW / cheekW, skin: skin, eye: eye, hair: hair };
 }
@@ -753,31 +773,43 @@ var OPEN_MID = "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 16
 var OPEN_FRINGE = "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z";
 
 var HAIR_SHAPES = {
-  buzz: { open: OPEN_MID, body: '<path d="M64,152 C58,74 182,74 176,152 C176,162 170,166 164,160 L76,160 C70,166 64,162 64,152 Z" fill="{C}"/>' },
-  crop: { open: OPEN_MID, body: '<path d="M58,156 C50,68 190,68 182,156 C180,178 170,188 150,184 L90,184 C70,188 60,178 58,156 Z" fill="{C}"/>' },
-  quiff: { open: OPEN_MID, body: '<path d="M58,156 C54,92 60,42 104,50 C150,30 188,80 182,156 C180,178 170,188 150,184 L90,184 C70,188 60,178 58,156 Z" fill="{C}"/>' },
-  slick: { open: OPEN_HIGH, body: '<path d="M60,148 C58,90 86,52 124,54 C168,56 186,96 180,150 C180,160 174,164 168,158 L72,158 C66,164 60,158 60,148 Z" fill="{C}"/>' },
-  curlshort: { open: OPEN_FRINGE, body: '<path d="M60,154 C52,100 70,66 120,64 C170,66 188,100 180,154 C178,172 168,182 150,180 L90,180 C72,182 62,172 60,154 Z" fill="{C}"/><circle cx="74" cy="106" r="17" fill="{C}"/><circle cx="98" cy="82" r="18" fill="{C}"/><circle cx="126" cy="74" r="18" fill="{C}"/><circle cx="152" cy="84" r="17" fill="{C}"/><circle cx="170" cy="108" r="16" fill="{C}"/><circle cx="62" cy="134" r="13" fill="{C}"/><circle cx="178" cy="136" r="13" fill="{C}"/>' },
-  afro: { open: OPEN_FRINGE, body: '<circle cx="120" cy="104" r="92" fill="{C}"/><circle cx="52" cy="120" r="26" fill="{C}"/><circle cx="188" cy="120" r="26" fill="{C}"/><circle cx="70" cy="56" r="24" fill="{C}"/><circle cx="170" cy="56" r="24" fill="{C}"/><circle cx="120" cy="36" r="26" fill="{C}"/>' },
-  twa: { open: OPEN_FRINGE, body: '<path d="M66,150 C60,108 76,84 96,78 L146,78 C166,84 180,108 174,150 C172,164 164,172 152,168 L88,168 C76,172 68,164 66,150 Z" fill="{C}"/><circle cx="92" cy="64" r="20" fill="{C}"/><circle cx="120" cy="56" r="22" fill="{C}"/><circle cx="148" cy="64" r="20" fill="{C}"/><circle cx="74" cy="92" r="16" fill="{C}"/><circle cx="166" cy="92" r="16" fill="{C}"/>' },
-  bob: { open: OPEN_MID, body: '<path d="M58,150 C50,66 190,66 182,150 C186,190 184,214 176,232 C168,242 152,240 150,228 C156,196 154,170 150,150 L90,150 C86,170 84,196 90,228 C88,240 72,242 64,232 C56,214 54,190 58,150 Z" fill="{C}"/>' },
-  lob: { open: OPEN_MID, body: '<path d="M58,150 C50,66 190,66 182,150 C188,200 186,236 178,260 C170,272 152,268 152,256 C158,216 156,182 150,150 L90,150 C84,182 82,216 88,256 C88,268 70,272 62,260 C54,236 52,200 58,150 Z" fill="{C}"/>' },
-  longstraight: { open: OPEN_MID, body: '<path d="M58,150 C50,64 190,64 182,150 C190,210 190,258 182,290 C174,300 154,297 155,284 C160,236 158,190 150,150 L90,150 C82,190 80,236 85,284 C86,297 66,300 58,290 C50,258 50,210 58,150 Z" fill="{C}"/>' },
-  shag: { open: OPEN_FRINGE, body: '<path d="M58,148 C50,64 190,64 182,148 C188,176 192,202 184,224 L172,212 L174,240 L158,226 L156,248 C150,250 146,244 146,236 L142,150 L98,150 L94,236 C94,244 90,250 84,248 L82,226 L66,240 L68,212 L56,224 C48,202 52,176 58,148 Z" fill="{C}"/>' },
-  curllong: { open: OPEN_FRINGE, body: '<path d="M60,150 C52,70 188,70 180,150 C178,166 170,176 154,172 L86,172 C70,176 62,166 60,150 Z" fill="{C}"/><circle cx="76" cy="96" r="18" fill="{C}"/><circle cx="120" cy="80" r="20" fill="{C}"/><circle cx="164" cy="96" r="18" fill="{C}"/><circle cx="64" cy="150" r="17" fill="{C}"/><circle cx="62" cy="184" r="17" fill="{C}"/><circle cx="64" cy="218" r="17" fill="{C}"/><circle cx="70" cy="250" r="16" fill="{C}"/><circle cx="176" cy="150" r="17" fill="{C}"/><circle cx="178" cy="184" r="17" fill="{C}"/><circle cx="176" cy="218" r="17" fill="{C}"/><circle cx="170" cy="250" r="16" fill="{C}"/>' }
+  buzz: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M60,154 C54,68 186,68 180,154 C180,166 172,170 166,162 L74,162 C68,170 60,166 60,154 Z\" fill=\"{C}\" opacity=\"0.62\"/><path d=\"M62,140 C60,76 180,76 178,140\" fill=\"none\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.4\"/>" },
+  crew: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,138 C54,62 186,62 182,138 C182,150 174,154 168,146 L72,146 C66,154 58,150 58,138 Z\" fill=\"url(#hg)\"/><path d=\"M60,142 C58,162 60,176 66,188 L82,188 C76,172 73,156 73,146 Z\" fill=\"{C2}\" opacity=\"0.45\"/><path d=\"M180,142 C182,162 180,176 174,188 L158,188 C164,172 167,156 167,146 Z\" fill=\"{C2}\" opacity=\"0.45\"/><path d=\"M88,92 C104,82 136,82 152,92\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.4\" fill=\"none\"/>" },
+  crop: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,60 192,60 184,150 C182,170 172,180 152,176 L88,176 C68,180 58,170 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M88,112 C87,102 90,94 96,90 M112,108 C111,98 114,90 120,86 M138,108 C138,98 142,92 148,90\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/>", over: "<path d=\"M92,116 C95,124 97,128 98,131 M106,114 C108,122 110,127 111,131 M120,114 C121,122 122,127 122,131 M134,114 C133,122 132,127 131,131 M147,116 C145,123 143,127 142,130\" stroke=\"{C}\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\"/>" },
+  taper: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,148 C52,64 188,64 182,148 C180,166 172,174 154,170 L86,170 C68,174 60,166 58,148 Z\" fill=\"url(#hg)\"/><path d=\"M58,148 C56,168 60,182 68,192 L84,192 C76,176 73,160 74,150 Z\" fill=\"{C2}\" opacity=\"0.5\"/><path d=\"M182,148 C184,168 180,182 172,192 L156,192 C164,176 167,160 166,150 Z\" fill=\"{C2}\" opacity=\"0.5\"/><path d=\"M84,100 C100,88 140,88 156,100\" stroke=\"{C3}\" stroke-width=\"5\" opacity=\"0.5\" fill=\"none\"/>" },
+  sidepart: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,148 C52,66 142,48 166,68 C188,84 188,122 184,150 C182,168 172,176 154,172 L88,172 C68,176 58,166 58,148 Z\" fill=\"url(#hg)\"/><path d=\"M94,80 C96,92 98,103 99,113\" stroke=\"{C2}\" stroke-width=\"5\" opacity=\"0.85\" fill=\"none\"/><path d=\"M103,84 C116,78 132,80 144,90 M103,96 C114,90 130,92 142,102 M103,108 C112,104 126,106 138,113\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.5\" fill=\"none\"/>", over: "<path d=\"M99,114 C114,108 138,110 158,122\" stroke=\"{C}\" stroke-width=\"9\" fill=\"none\" stroke-linecap=\"round\"/>" },
+  quiff: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,152 C56,96 52,44 98,34 C118,28 136,40 140,56 C170,56 186,94 182,152 C180,172 170,182 150,178 L88,178 C68,182 58,172 58,152 Z\" fill=\"url(#hg)\"/><path d=\"M80,120 C76,84 84,52 104,42 M96,124 C92,92 100,62 116,50 M150,120 C152,92 146,68 134,56\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/><path d=\"M88,110 C84,80 92,54 108,45\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.6\" fill=\"none\"/>" },
+  slick: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M60,146 C58,82 88,46 124,48 C170,50 188,92 182,148 C182,158 176,162 170,156 L72,156 C66,162 60,156 60,146 Z\" fill=\"url(#hg)\"/><path d=\"M76,112 C80,78 98,58 122,54 M94,106 C98,80 112,64 132,58 M148,104 C150,84 158,74 166,80 M64,124 C66,96 76,72 94,60\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/><path d=\"M108,102 C112,80 126,64 144,60\" stroke=\"{C3}\" stroke-width=\"5\" opacity=\"0.65\" fill=\"none\"/>" },
+  undercut: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M72,116 C68,66 100,42 128,44 C162,46 178,74 174,116 C174,128 166,132 160,124 L84,124 C76,132 72,128 72,116 Z\" fill=\"url(#hg)\"/><path d=\"M68,148 C66,122 70,106 78,98 L86,116 C81,132 79,146 79,158 Z\" fill=\"{C2}\" opacity=\"0.38\"/><path d=\"M172,148 C174,122 170,106 162,98 L154,116 C159,132 161,146 161,158 Z\" fill=\"{C2}\" opacity=\"0.38\"/><path d=\"M88,108 C92,76 108,56 128,52 M108,106 C112,80 126,62 144,58 M146,104 C150,84 158,70 166,74\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.55\" fill=\"none\"/>" },
+  flow: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M56,150 C52,78 90,50 122,50 C158,50 190,82 184,152 C186,172 182,186 174,192 C166,196 160,188 162,178 C164,166 160,156 154,150 L86,150 C80,156 76,166 78,178 C80,188 74,196 66,192 C58,186 54,170 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M74,138 C72,102 88,70 112,60 M100,132 C100,100 112,76 132,64 M150,132 C152,104 146,82 132,66\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/><path d=\"M88,128 C88,98 100,74 120,64\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.55\" fill=\"none\"/>" },
+  curlshort: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M58,154 C50,98 68,62 120,60 C172,62 190,98 182,154 C180,172 170,182 150,180 L90,180 C72,182 60,172 58,154 Z\" fill=\"url(#hg)\"/><circle cx=\"72\" cy=\"104\" r=\"18\" fill=\"{C}\"/><circle cx=\"97\" cy=\"80\" r=\"19\" fill=\"{C}\"/><circle cx=\"126\" cy=\"72\" r=\"19\" fill=\"{C}\"/><circle cx=\"153\" cy=\"83\" r=\"18\" fill=\"{C}\"/><circle cx=\"172\" cy=\"107\" r=\"17\" fill=\"{C}\"/><circle cx=\"60\" cy=\"133\" r=\"14\" fill=\"{C}\"/><circle cx=\"180\" cy=\"135\" r=\"14\" fill=\"{C}\"/><path d=\"M78,108 a9,9 0 1,1 12,-8 M104,86 a9,9 0 1,1 12,-8 M130,78 a9,9 0 1,1 12,-7 M156,90 a9,9 0 1,1 11,-6 M92,122 a8,8 0 1,1 11,-7 M122,114 a8,8 0 1,1 11,-7 M150,120 a8,8 0 1,1 10,-6\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.55\" fill=\"none\"/>" },
+  coils: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M62,148 C56,92 80,68 120,66 C160,68 184,92 178,148 C176,162 168,170 154,166 L86,166 C72,170 64,162 62,148 Z\" fill=\"url(#hg)\"/><path d=\"M62,148 C60,164 64,176 70,184 L84,184 C78,170 75,158 76,150 Z\" fill=\"{C2}\" opacity=\"0.42\"/><path d=\"M178,148 C180,164 176,176 170,184 L156,184 C162,170 165,158 164,150 Z\" fill=\"{C2}\" opacity=\"0.42\"/><circle cx=\"88\" cy=\"92\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"108\" cy=\"82\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"130\" cy=\"82\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"152\" cy=\"92\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"98\" cy=\"106\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"120\" cy=\"98\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"142\" cy=\"106\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"76\" cy=\"110\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"164\" cy=\"110\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"110\" cy=\"120\" r=\"5\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"132\" cy=\"120\" r=\"5\" fill=\"{C2}\" opacity=\"0.7\"/>" },
+  twa: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M64,148 C58,104 76,80 96,74 L146,74 C166,80 182,104 176,148 C174,162 166,170 152,166 L88,166 C76,170 66,162 64,148 Z\" fill=\"url(#hg)\"/><circle cx=\"92\" cy=\"60\" r=\"21\" fill=\"{C}\"/><circle cx=\"120\" cy=\"52\" r=\"23\" fill=\"{C}\"/><circle cx=\"148\" cy=\"60\" r=\"21\" fill=\"{C}\"/><circle cx=\"72\" cy=\"90\" r=\"17\" fill=\"{C}\"/><circle cx=\"168\" cy=\"90\" r=\"17\" fill=\"{C}\"/><path d=\"M98,66 a8,8 0 1,1 11,-7 M126,58 a8,8 0 1,1 11,-6 M152,68 a8,8 0 1,1 10,-6 M80,96 a7,7 0 1,1 10,-6 M158,98 a7,7 0 1,1 10,-5\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.55\" fill=\"none\"/>" },
+  afro: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<circle cx=\"120\" cy=\"102\" r=\"95\" fill=\"url(#hg)\"/><circle cx=\"50\" cy=\"120\" r=\"27\" fill=\"{C}\"/><circle cx=\"190\" cy=\"120\" r=\"27\" fill=\"{C}\"/><circle cx=\"68\" cy=\"52\" r=\"25\" fill=\"{C}\"/><circle cx=\"172\" cy=\"52\" r=\"25\" fill=\"{C}\"/><circle cx=\"120\" cy=\"32\" r=\"27\" fill=\"{C}\"/><path d=\"M76,80 a11,11 0 1,1 14,-9 M110,58 a11,11 0 1,1 14,-9 M148,70 a11,11 0 1,1 13,-8 M62,120 a10,10 0 1,1 13,-8 M170,114 a10,10 0 1,1 12,-8 M96,100 a9,9 0 1,1 12,-8 M140,98 a9,9 0 1,1 12,-7\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
+  pixie: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,144 C52,62 188,62 182,144 C182,162 174,172 158,168 L82,168 C66,172 58,162 58,144 Z\" fill=\"url(#hg)\"/><path d=\"M70,150 C66,164 68,176 74,184 L86,182 C80,170 78,158 79,150 Z\" fill=\"{C2}\" opacity=\"0.4\"/><path d=\"M170,150 C174,164 172,176 166,184 L154,182 C160,170 162,158 161,150 Z\" fill=\"{C2}\" opacity=\"0.4\"/><path d=\"M88,96 C104,84 138,84 154,98\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.55\" fill=\"none\"/>", over: "<path d=\"M96,114 C100,122 102,127 102,131 M114,112 C116,120 117,126 116,130 M130,112 C130,120 129,126 127,130\" stroke=\"{C}\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\" opacity=\"0.95\"/>" },
+  bob: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,62 192,62 184,150 C188,192 186,216 178,234 C170,244 152,242 150,230 C156,198 155,170 151,150 L89,150 C85,170 84,198 90,230 C88,242 70,244 62,234 C54,216 52,192 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,120 C66,160 68,200 74,226 M170,120 C174,160 172,200 166,226 M84,100 C80,140 80,180 86,214\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/><path d=\"M156,100 C160,140 160,180 154,214\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
+  lob: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,62 192,62 184,150 C190,202 188,238 180,262 C172,274 152,270 152,258 C158,218 157,184 151,150 L89,150 C83,184 82,218 88,258 C88,270 68,274 60,262 C52,238 50,202 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,130 C64,180 66,224 74,252 M170,130 C176,180 174,224 166,252 M84,104 C78,160 78,210 86,246\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/><path d=\"M156,104 C162,160 162,210 154,246\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
+  curtain: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M56,150 C48,62 192,62 184,150 C190,202 188,238 180,262 C172,274 152,270 152,258 C158,218 157,184 151,150 L89,150 C83,184 82,218 88,258 C88,270 68,274 60,262 C52,238 50,202 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,130 C64,180 66,224 74,252 M170,130 C176,180 174,224 166,252\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/>", over: "<path d=\"M91,100 C85,112 81,126 80,140\" stroke=\"{C}\" stroke-width=\"12\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M149,100 C155,112 159,126 160,140\" stroke=\"{C}\" stroke-width=\"12\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M99,100 C95,110 93,120 93,130\" stroke=\"{C2}\" stroke-width=\"4\" fill=\"none\" opacity=\"0.6\" stroke-linecap=\"round\"/><path d=\"M141,100 C145,110 147,120 147,130\" stroke=\"{C2}\" stroke-width=\"4\" fill=\"none\" opacity=\"0.6\" stroke-linecap=\"round\"/>" },
+  longstraight: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,60 192,60 184,150 C192,212 192,260 184,292 C176,302 154,299 156,286 C161,238 159,190 151,150 L89,150 C81,190 79,238 84,286 C86,299 64,302 56,292 C48,260 48,212 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,140 C62,200 64,250 72,282 M170,140 C178,200 176,250 168,282 M84,110 C76,180 76,236 84,276\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/><path d=\"M156,110 C164,180 164,236 156,276\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
+  shag: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M56,148 C48,60 192,60 184,148 C190,178 194,204 186,226 L174,214 L176,242 L160,228 L158,250 C152,252 148,246 148,238 L143,150 L97,150 L92,238 C92,246 88,252 82,250 L80,228 L64,242 L66,214 L54,226 C46,204 50,178 56,148 Z\" fill=\"url(#hg)\"/><path d=\"M72,130 C66,170 68,206 74,232 M168,130 C174,170 172,206 166,232 M88,110 C82,150 82,190 88,226 M152,110 C158,150 158,190 152,226\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
+  curllong: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M58,148 C50,66 190,66 182,148 C180,166 170,176 154,172 L86,172 C70,176 60,166 58,148 Z\" fill=\"url(#hg)\"/><circle cx=\"74\" cy=\"94\" r=\"19\" fill=\"{C}\"/><circle cx=\"120\" cy=\"78\" r=\"21\" fill=\"{C}\"/><circle cx=\"166\" cy=\"94\" r=\"19\" fill=\"{C}\"/><circle cx=\"62\" cy=\"148\" r=\"18\" fill=\"{C}\"/><circle cx=\"60\" cy=\"184\" r=\"18\" fill=\"{C}\"/><circle cx=\"62\" cy=\"220\" r=\"18\" fill=\"{C}\"/><circle cx=\"68\" cy=\"254\" r=\"17\" fill=\"{C}\"/><circle cx=\"178\" cy=\"148\" r=\"18\" fill=\"{C}\"/><circle cx=\"180\" cy=\"184\" r=\"18\" fill=\"{C}\"/><circle cx=\"178\" cy=\"220\" r=\"18\" fill=\"{C}\"/><circle cx=\"172\" cy=\"254\" r=\"17\" fill=\"{C}\"/><path d=\"M66,152 a9,9 0 1,1 12,-8 M64,188 a9,9 0 1,1 12,-8 M66,224 a9,9 0 1,1 12,-8 M72,256 a8,8 0 1,1 11,-7 M182,152 a9,9 0 1,1 -12,-8 M184,188 a9,9 0 1,1 -12,-8 M182,224 a9,9 0 1,1 -12,-8 M176,256 a8,8 0 1,1 -11,-7 M80,98 a9,9 0 1,1 12,-8 M126,82 a10,10 0 1,1 13,-8 M170,100 a9,9 0 1,1 -12,-8\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.55\" fill=\"none\"/>" }
 };
 
 var HAIR_COLORS = {
-  blonde: '#C9A35F', brown: '#6B4326', brunette: '#46301C',
-  black: '#221C16', auburn: '#7E3A1D', gray: '#A8A4A0'
+  blonde:   { c: '#C9A35F', d: '#9A7A40', l: '#E6C98C' },
+  brown:    { c: '#6B4326', d: '#4E3019', l: '#8A5C38' },
+  brunette: { c: '#46301C', d: '#2F2012', l: '#5E4226' },
+  black:    { c: '#221C16', d: '#120F0C', l: '#3A3129' },
+  auburn:   { c: '#7E3A1D', d: '#5C2A14', l: '#9C512C' },
+  gray:     { c: '#A8A4A0', d: '#7E7A76', l: '#C9C5C1' }
 };
 
 /* style id -> overlay shape */
 var STYLE_SHAPE = {
-  txcrop: 'crop', classictaper: 'crop', sidepart: 'crop', crew: 'crop', pixie: 'crop',
-  quiff: 'quiff', buzz: 'buzz', slickunder: 'slick', flow: 'slick',
-  curlyfringe: 'curlshort', spongetwist: 'curlshort', twa: 'twa', washngo: 'afro',
-  bob: 'bob', bluntlob: 'lob', curtainlob: 'lob',
+  txcrop: 'crop', classictaper: 'taper', sidepart: 'sidepart', crew: 'crew', pixie: 'pixie',
+  quiff: 'quiff', buzz: 'buzz', slickunder: 'undercut', flow: 'flow',
+  curlyfringe: 'curlshort', spongetwist: 'coils', twa: 'twa', washngo: 'afro',
+  bob: 'bob', bluntlob: 'lob', curtainlob: 'curtain',
   longlayers: 'longstraight', butterfly: 'longstraight', sideswept: 'longstraight',
   shag: 'shag', wolf: 'shag', curlylayers: 'curllong'
 };
@@ -785,21 +817,31 @@ var STYLE_SHAPE = {
 var hairImgCache = {};
 var basePhotoImg = null;
 
-function hairSvgString(shapeKey, colorHex) {
+function hairSvgString(shapeKey, colorKey) {
   var s = HAIR_SHAPES[shapeKey];
+  var col = HAIR_COLORS[colorKey] || HAIR_COLORS.brown;
   var inv = 'M-20,-20 H260 V320 H-20 Z ' + s.open;
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
-    '<defs><clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
-    '<g clip-path="url(#fc)">' + s.body.split('{C}').join(colorHex) + '</g></svg>';
+  function paint(str) {
+    return str.split('{C3}').join(col.l).split('{C2}').join(col.d).split('{C}').join(col.c);
+  }
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
+    '<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0%" stop-color="' + col.l + '"/><stop offset="55%" stop-color="' + col.c + '"/>' +
+    '<stop offset="100%" stop-color="' + col.d + '"/></linearGradient>' +
+    '<clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
+    '<g clip-path="url(#fc)">' + paint(s.body) + '</g>';
+  if (s.over) { svg += '<g>' + paint(s.over) + '</g>'; }
+  svg += '</svg>';
+  return svg;
 }
 
-function getHairImage(shapeKey, colorHex, cb) {
-  var key = shapeKey + '_' + colorHex;
+function getHairImage(shapeKey, colorKey, cb) {
+  var key = shapeKey + '_' + colorKey;
   if (hairImgCache[key]) { cb(hairImgCache[key]); return; }
   var img = new Image();
   img.onload = function () { hairImgCache[key] = img; cb(img); };
   img.onerror = function () { cb(null); };
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(hairSvgString(shapeKey, colorHex));
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(hairSvgString(shapeKey, colorKey));
 }
 
 function getBasePhotoImage(cb) {
@@ -816,27 +858,30 @@ function pt(arr) { return { x: arr[0], y: arr[1] }; }
 /* Draw composite (user photo + hair overlay) into target canvas, cropped around the head */
 function renderTryOn(canvas, styleId, done) {
   var shapeKey = STYLE_SHAPE[styleId] || 'crop';
-  var colorHex = HAIR_COLORS[state.attrs.hairColor] || '#6B4326';
+  var colorKey = HAIR_COLORS[state.attrs.hairColor] ? state.attrs.hairColor : 'brown';
 
   if (!state.basePhoto || !state.basePhoto.pts) {
-    renderMannequin(canvas, shapeKey, colorHex);
+    renderMannequin(canvas, shapeKey, colorKey);
     if (done) { done(); }
     return;
   }
 
   getBasePhotoImage(function (photo) {
-    if (!photo) { renderMannequin(canvas, shapeKey, colorHex); if (done) { done(); } return; }
-    getHairImage(shapeKey, colorHex, function (hairImg) {
-      if (!hairImg) { renderMannequin(canvas, shapeKey, colorHex); if (done) { done(); } return; }
+    if (!photo) { renderMannequin(canvas, shapeKey, colorKey); if (done) { done(); } return; }
+    getHairImage(shapeKey, colorKey, function (hairImg) {
+      if (!hairImg) { renderMannequin(canvas, shapeKey, colorKey); if (done) { done(); } return; }
 
       var P = state.basePhoto.pts;
       var le = avgPts(P, 36, 6), re = avgPts(P, 42, 6);
       var anchor = { x: (le.x + re.x) / 2, y: (le.y + re.y) / 2 };
       var angle = Math.atan2(re.y - le.y, re.x - le.x);
-      var cheekW = dist(pt(P[1]), pt(P[15]));
-      var s = cheekW / 112;
+      /* Eye distance is the most stable landmark measure.
+         Normalized head space has eye centers 50 units apart.
+         The 1.12 factor oversizes slightly so the overlay fully
+         covers the person's existing hair. */
+      var eyeDist = Math.sqrt((re.x - le.x) * (re.x - le.x) + (re.y - le.y) * (re.y - le.y));
+      var s = (eyeDist / 50) * 1.12;
 
-      /* composite at photo resolution */
       var off = document.createElement('canvas');
       off.width = photo.width; off.height = photo.height;
       var ctx = off.getContext('2d');
@@ -845,14 +890,13 @@ function renderTryOn(canvas, styleId, done) {
       ctx.translate(anchor.x, anchor.y);
       ctx.rotate(angle);
       ctx.scale(s, s);
-      ctx.globalAlpha = 0.96;
       ctx.drawImage(hairImg, -120, -150, 240, 300);
       ctx.restore();
 
-      /* crop a head-centered window */
-      var cw = cheekW * 3.0, chh = cheekW * 3.4;
-      var sx = anchor.x - cw / 2;
-      var sy = anchor.y - cheekW * 1.55;
+      /* crop a head-centered window sized from the same scale */
+      var cw = 280 * s, chh = 320 * s;
+      var sx = anchor.x - 140 * s;
+      var sy = anchor.y - 165 * s;
       sx = Math.max(0, Math.min(sx, off.width - 10));
       sy = Math.max(0, Math.min(sy, off.height - 10));
       cw = Math.min(cw, off.width - sx);
@@ -872,17 +916,26 @@ function avgPts(P, start, n) {
 }
 
 /* Mannequin fallback: style drawn on a neutral face using the user's skin tone */
-function renderMannequin(canvas, shapeKey, colorHex) {
+function renderMannequin(canvas, shapeKey, colorKey) {
   var skinHex = { fair: '#F3D9C4', light: '#EAC3A3', medium: '#D29E7C', olive: '#B98860', brown: '#8C5A3B', deep: '#5A3A26' }[state.attrs.skinTone] || '#D29E7C';
+  var col = HAIR_COLORS[colorKey] || HAIR_COLORS.brown;
   var s = HAIR_SHAPES[shapeKey];
   var inv = 'M-20,-20 H260 V320 H-20 Z ' + s.open;
+  function paint(str) {
+    return str.split('{C3}').join(col.l).split('{C2}').join(col.d).split('{C}').join(col.c);
+  }
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
+    '<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0%" stop-color="' + col.l + '"/><stop offset="55%" stop-color="' + col.c + '"/>' +
+    '<stop offset="100%" stop-color="' + col.d + '"/></linearGradient>' +
+    '<clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
     '<rect width="240" height="300" fill="#3A2C44"/>' +
     '<ellipse cx="120" cy="168" rx="58" ry="76" fill="' + skinHex + '"/>' +
     '<circle cx="97" cy="150" r="6" fill="#2E2236"/><circle cx="143" cy="150" r="6" fill="#2E2236"/>' +
     '<path d="M104,206 C114,212 126,212 136,206" stroke="#9C5B47" stroke-width="4" fill="none"/>' +
-    '<defs><clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
-    '<g clip-path="url(#fc)">' + s.body.split('{C}').join(colorHex) + '</g></svg>';
+    '<g clip-path="url(#fc)">' + paint(s.body) + '</g>';
+  if (s.over) { svg += '<g>' + paint(s.over) + '</g>'; }
+  svg += '</svg>';
   var img = new Image();
   img.onload = function () {
     canvas.width = 240; canvas.height = 300;

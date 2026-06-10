@@ -693,7 +693,7 @@ body::before {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.023</p>
+      <p>Build 2026.06.10.024</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -1292,11 +1292,14 @@ body::before {
 
   async function generateImage(style, index, total) {
     const baseImg = selectedFiles[0];
-    let safeReference = normalizedReferenceImage;
+    if (!baseImg) {
+      return { url: '', error: 'No source photo is available. Please start over and upload one clear face photo.' };
+    }
+    let safeReference = normalizedReferencePackage;
     if (!safeReference) {
       try {
         safeReference = await normalizeImageForEdit(baseImg);
-        normalizedReferenceImage = safeReference;
+        normalizedReferencePackage = safeReference;
       } catch (e) {
         console.error('Unable to normalize photo for editing', e);
         return { url: '', error: 'The uploaded photo could not be prepared. Try a clear JPG or PNG face photo.' };

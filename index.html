@@ -435,7 +435,7 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.011</p>
+      <p>Build 2026.06.10.012</p>
     </footer>
     <!-- Inline script eliminates external dependency and ensures the app loads
          correctly on GitHub Pages when only index.html is deployed. -->
@@ -628,20 +628,19 @@ body {
   }
 
   /**
-   * Convert a File object to a PNG data URL.  This helper loads the image
-   * into an offscreen canvas and draws it with a white background.  It
-   * standardizes the output format for OpenAI’s API.
+   * Convert a File object to a normalized PNG File. This helper loads the image
+   * into an offscreen canvas, draws it over a white background, and returns a
+   * standard PNG file suitable for the OpenAI images edits endpoint.
    * @param {File} file
-   * @returns {Promise<string>} Base64 data URL of a PNG
+   * @returns {Promise<File>}
    */
-  async function fileToPngDataUrl(file) {
+  async function normalizeImageForEdit(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          // Keep original dimensions; if very large, scale down for performance
           const maxDim = 1024;
           let width = img.width;
           let height = img.height;
@@ -652,11 +651,18 @@ body {
           }
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext('2d', { alpha: false });
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/png'));
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error('Could not normalize the uploaded image.'));
+              return;
+            }
+            const name = (file.name || 'reference').replace(/\.[^.]+$/, '') + '.png';
+            resolve(new File([blob], name, { type: 'image/png' }));
+          }, 'image/png');
         };
         img.onerror = (e) => reject(e);
         img.src = reader.result;
@@ -668,49 +674,49 @@ body {
 
   /**
    * Call the OpenAI image API to generate an edited photo based on the
-   * specified hairstyle.  Sends the first uploaded photo as the image for
-   * an edits request.  Returns a Promise that resolves to a Data URL
-   * representing the generated image, or an empty string if an error
-   * occurs.
+   * specified hairstyle. Uses multipart FormData, which the images edits
+   * endpoint expects.
    * @param {string} promptFragment Hairstyle description used in the prompt
    * @returns {Promise<string>}
    */
   async function generateImage(promptFragment) {
     const baseImg = selectedFiles[0];
-    let photoDataUrl;
+    let safeImage;
     try {
-      photoDataUrl = await fileToPngDataUrl(baseImg);
+      safeImage = await normalizeImageForEdit(baseImg);
     } catch (e) {
-      console.error('Unable to convert photo to PNG', e);
+      console.error('Unable to normalize photo for editing', e);
       return '';
     }
-    const b64 = photoDataUrl.split(',')[1];
-    const requestPayload = {
-      prompt:
-        `Create a photorealistic hairstyle makeover preview using the uploaded person as the identity reference. ` +
-        `Preserve the person's face, age, facial expression, skin tone, head angle, and overall identity. Change only the hairstyle and hair color. ` +
-        `Desired hairstyle direction: ${promptFragment}. ` +
-        `The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig‑like blob. ` +
-        `Keep background simple and professional. No text, no watermark, no collage.`,
-      n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json',
-      image: b64
-    };
+
+    const prompt =
+      `Create a photorealistic hairstyle makeover preview using the uploaded person as the identity reference. ` +
+      `Preserve the person's face, age, facial expression, skin tone, head angle, and overall identity. Change only the hairstyle and hair color. ` +
+      `Desired hairstyle direction: ${promptFragment}. ` +
+      `The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
+      `Keep background simple and professional. No text, no watermark, no collage.`;
+
+    const formData = new FormData();
+    formData.append('model', 'gpt-image-1');
+    formData.append('image[]', safeImage, safeImage.name);
+    formData.append('prompt', prompt);
+    formData.append('size', '1024x1024');
+    formData.append('quality', 'medium');
+    formData.append('output_format', 'png');
+
     try {
       const resp = await fetch('https://api.openai.com/v1/images/edits', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`
         },
-        body: JSON.stringify(requestPayload)
+        body: formData
       });
+      const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
-        console.error('OpenAI API error', await resp.text());
+        console.error('OpenAI API error', data);
         return '';
       }
-      const data = await resp.json();
       const imageData = data.data?.[0]?.b64_json;
       if (!imageData) return '';
       return `data:image/png;base64,${imageData}`;
@@ -748,19 +754,18 @@ body {
       `;
       recContainer.appendChild(card);
     });
-    // Generate images concurrently
-    await Promise.all(
-      currentRecommendations.map(async (style, index) => {
-        const imgUrl = await generateImage(style.prompt);
-        const imgElem = document.getElementById(`rec-img-${index}`);
-        if (imgUrl) {
-          imgElem.src = imgUrl;
-        } else {
-          imgElem.src = '';
-          imgElem.alt = 'Could not generate image';
-        }
-      })
-    );
+    // Generate images one by one for better reliability on mobile browsers
+    for (let index = 0; index < currentRecommendations.length; index++) {
+      const style = currentRecommendations[index];
+      const imgUrl = await generateImage(style.prompt);
+      const imgElem = document.getElementById(`rec-img-${index}`);
+      if (imgUrl) {
+        imgElem.src = imgUrl;
+      } else {
+        imgElem.src = '';
+        imgElem.alt = 'Could not generate image';
+      }
+    }
     // Attach event handlers for each choose button after generation
     currentRecommendations.forEach((style, index) => {
       const btn = document.getElementById(`choose-${index}`);

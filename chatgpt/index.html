@@ -263,6 +263,39 @@ body {
   height: 180px;
   object-fit: cover;
 }
+.rec-image-slot {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fbf7fb, #f1e7f3);
+  color: var(--text-muted);
+  font-size: .92rem;
+  border-bottom: 1px solid #e4e4e4;
+}
+.rec-image-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.progress-note {
+  margin-top: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+.remember-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  margin: .25rem 0 .75rem;
+  color: var(--text-muted);
+  font-size: .92rem;
+}
+.remember-row input { width: auto; }
 .rec-card .rec-info {
   padding: 0.75rem;
   flex-grow: 1;
@@ -381,8 +414,7 @@ body {
         <h2 class="screen-title">Step&nbsp;2: Connect your AI</h2>
         <p class="screen-desc">
           Hair Apparent uses OpenAI's image models to create your photorealistic looks.
-          You'll need an OpenAI API key. Your key is stored only in your browser and
-          never shared with us.
+          You'll need an OpenAI API key. Your key is remembered only for this browser session unless you choose to save it on this device.
         </p>
         <p class="screen-desc small">
           Don't have one? New users receive free credits when signing up. You can
@@ -397,19 +429,21 @@ body {
           placeholder="sk-..."
           class="text-input"
         />
+        <label class="remember-row"><input type="checkbox" id="remember-key" /> Remember my key on this device</label>
+        <p class="screen-desc small">If checked, your key is saved only in this browser on this device. Do not use this on a shared or public computer.</p>
         <div id="api-warning" class="warning" hidden>
           Please enter a valid API key before continuing.
         </div>
         <button id="btn-api-save" class="primary-btn">Use this key</button>
+        <button id="btn-clear-key" class="secondary-btn" type="button">Clear saved key</button>
       </section>
       <!-- Generating screen -->
       <section id="screen-generating" class="screen">
         <h2 class="screen-title">Generating your looks...</h2>
         <p class="screen-desc">
-          Sit tight while we create a set of six unique hairstyles just for you. This can
-          take a minute depending on your connection. Your selected photo and API key
-          remain in your browser.
+          Sit tight while we create a set of six unique hairstyles just for you. The app will show progress and move to the results screen as soon as your cards are ready.
         </p>
+        <p id="generating-status" class="progress-note">Preparing your photos…</p>
         <div class="loader"></div>
       </section>
       <!-- Recommendations screen -->
@@ -435,7 +469,7 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.012</p>
+      <p>Build 2026.06.10.013</p>
     </footer>
     <!-- Inline script eliminates external dependency and ensures the app loads
          correctly on GitHub Pages when only index.html is deployed. -->
@@ -469,7 +503,10 @@ body {
   const photoPreviews = document.getElementById('photo-previews');
   const uploadWarning = document.getElementById('upload-warning');
   const apiKeyInput = document.getElementById('api-key-input');
+  const rememberKeyCheckbox = document.getElementById('remember-key');
+  const clearKeyBtn = document.getElementById('btn-clear-key');
   const apiWarning = document.getElementById('api-warning');
+  const generatingStatus = document.getElementById('generating-status');
   const recContainer = document.getElementById('rec-container');
   const finalLookDiv = document.getElementById('final-look');
   const savePhotoBtn = document.getElementById('btn-save-photo');
@@ -586,19 +623,24 @@ body {
    */
   function saveApiKey() {
     const key = apiKeyInput.value.trim();
-    // A very basic check: OpenAI keys start with "sk-" and are 20+ characters
+    // Accept modern OpenAI keys such as sk-proj-... without being overly strict.
     if (!/^sk-[A-Za-z0-9_-]{20,}/.test(key)) {
       apiWarning.hidden = false;
+      apiWarning.textContent = 'Please enter a valid OpenAI API key. Modern keys usually start with sk-proj- or sk-.';
       return;
     }
     apiWarning.hidden = true;
     apiKey = key;
     try {
-      localStorage.setItem('hairApparentApiKey', key);
+      sessionStorage.setItem('hairApparentApiKeySession', key);
+      if (rememberKeyCheckbox.checked) {
+        localStorage.setItem('hairApparentApiKey', key);
+      } else {
+        localStorage.removeItem('hairApparentApiKey');
+      }
     } catch (e) {
       console.warn('Could not persist API key', e);
     }
-    // Start generating recommendations immediately after saving key
     generateRecommendations(false);
   }
 
@@ -679,14 +721,24 @@ body {
    * @param {string} promptFragment Hairstyle description used in the prompt
    * @returns {Promise<string>}
    */
-  async function generateImage(promptFragment) {
+  async function fetchWithTimeout(url, options, timeoutMs = 120000) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  async function generateImage(promptFragment, index, total) {
     const baseImg = selectedFiles[0];
     let safeImage;
     try {
       safeImage = await normalizeImageForEdit(baseImg);
     } catch (e) {
       console.error('Unable to normalize photo for editing', e);
-      return '';
+      return { url: '', error: 'The uploaded photo could not be prepared. Try a clear JPG or PNG face photo.' };
     }
 
     const prompt =
@@ -696,34 +748,44 @@ body {
       `The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
       `Keep background simple and professional. No text, no watermark, no collage.`;
 
-    const formData = new FormData();
-    formData.append('model', 'gpt-image-1');
-    formData.append('image[]', safeImage, safeImage.name);
-    formData.append('prompt', prompt);
-    formData.append('size', '1024x1024');
-    formData.append('quality', 'medium');
-    formData.append('output_format', 'png');
+    const modelsToTry = ['gpt-image-2', 'gpt-image-1'];
+    let lastError = '';
 
-    try {
-      const resp = await fetch('https://api.openai.com/v1/images/edits', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`
-        },
-        body: formData
-      });
-      const data = await resp.json().catch(() => ({}));
-      if (!resp.ok) {
-        console.error('OpenAI API error', data);
-        return '';
+    for (const model of modelsToTry) {
+      const formData = new FormData();
+      formData.append('model', model);
+      formData.append('image[]', safeImage, safeImage.name);
+      formData.append('prompt', prompt);
+      formData.append('size', '1024x1024');
+      formData.append('quality', 'medium');
+      formData.append('output_format', 'png');
+
+      try {
+        if (generatingStatus) generatingStatus.textContent = `Generating look ${index + 1} of ${total} with ${model}…`;
+        const resp = await fetchWithTimeout('https://api.openai.com/v1/images/edits', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${apiKey}` },
+          body: formData
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          lastError = data?.error?.message || `OpenAI returned status ${resp.status}.`;
+          console.error('OpenAI API error', data);
+          continue;
+        }
+        const imageData = data.data?.[0]?.b64_json;
+        if (!imageData) {
+          lastError = 'OpenAI did not return an image.';
+          continue;
+        }
+        return { url: `data:image/png;base64,${imageData}`, error: '' };
+      } catch (err) {
+        lastError = err?.name === 'AbortError' ? 'The image request timed out after two minutes.' : (err?.message || 'The image request failed.');
+        console.error('Failed to call OpenAI', err);
       }
-      const imageData = data.data?.[0]?.b64_json;
-      if (!imageData) return '';
-      return `data:image/png;base64,${imageData}`;
-    } catch (err) {
-      console.error('Failed to call OpenAI', err);
-      return '';
     }
+
+    return { url: '', error: lastError || 'The image could not be generated.' };
   }
 
   /**
@@ -734,44 +796,47 @@ body {
    */
   async function generateRecommendations(regenerate) {
     showScreen('generating');
-    // Choose styles
-    if (!regenerate) {
-      usedStyles.clear();
-    }
+    if (generatingStatus) generatingStatus.textContent = 'Choosing six hairstyle ideas…';
+    if (!regenerate) usedStyles.clear();
     currentRecommendations = pickRandomStyles(6);
-    // Render placeholder cards first
+
     recContainer.innerHTML = '';
     currentRecommendations.forEach((style, index) => {
       const card = document.createElement('div');
       card.className = 'rec-card';
       card.innerHTML = `
-        <img src="" alt="Generating..." id="rec-img-${index}" />
+        <div class="rec-image-slot" id="rec-img-slot-${index}"><span>Waiting to generate…</span></div>
         <div class="rec-info">
           <h3>${style.name}</h3>
           <p>${style.description}</p>
-          <button class="primary-btn choose-btn" id="choose-${index}">Select this look</button>
+          <button class="primary-btn choose-btn" id="choose-${index}" disabled>Select this look</button>
         </div>
       `;
       recContainer.appendChild(card);
     });
-    // Generate images one by one for better reliability on mobile browsers
+
+    // Move to the result screen right away so the user can see progress instead of a stuck spinner.
+    showScreen('recs');
+
     for (let index = 0; index < currentRecommendations.length; index++) {
       const style = currentRecommendations[index];
-      const imgUrl = await generateImage(style.prompt);
-      const imgElem = document.getElementById(`rec-img-${index}`);
-      if (imgUrl) {
-        imgElem.src = imgUrl;
+      const slot = document.getElementById(`rec-img-slot-${index}`);
+      const btn = document.getElementById(`choose-${index}`);
+      if (slot) slot.innerHTML = `<span>Generating look ${index + 1} of ${currentRecommendations.length}…</span>`;
+      const result = await generateImage(style.prompt, index, currentRecommendations.length);
+      if (result.url) {
+        slot.innerHTML = `<img src="${result.url}" alt="${style.name}" />`;
+        btn.disabled = false;
       } else {
-        imgElem.src = '';
-        imgElem.alt = 'Could not generate image';
+        slot.innerHTML = `<span>Could not generate this look.<br><small>${result.error || 'Try Regenerate.'}</small></span>`;
+        btn.disabled = true;
       }
     }
-    // Attach event handlers for each choose button after generation
+
     currentRecommendations.forEach((style, index) => {
       const btn = document.getElementById(`choose-${index}`);
       btn.addEventListener('click', () => selectLook(style, index));
     });
-    showScreen('recs');
   }
 
   /**
@@ -783,7 +848,7 @@ body {
   function selectLook(style, idx) {
     selectedLook = style;
     // Compose final look card
-    const imgSrc = document.getElementById(`rec-img-${idx}`).src;
+    const imgSrc = document.getElementById(`rec-img-slot-${idx}`).querySelector('img')?.src || '';
     finalLookDiv.innerHTML = '';
     const card = document.createElement('div');
     card.className = 'final-look-card';
@@ -874,9 +939,13 @@ body {
    */
   function loadStoredKey() {
     try {
-      const stored = localStorage.getItem('hairApparentApiKey');
+      const storedSession = sessionStorage.getItem('hairApparentApiKeySession');
+      const storedLocal = localStorage.getItem('hairApparentApiKey');
+      const stored = storedSession || storedLocal;
       if (stored) {
         apiKey = stored;
+        apiKeyInput.value = stored;
+        rememberKeyCheckbox.checked = Boolean(storedLocal);
       }
     } catch (e) {
       console.warn('Could not read API key from storage', e);
@@ -897,6 +966,15 @@ body {
     }
   });
   apiSaveBtn.addEventListener('click', saveApiKey);
+  clearKeyBtn.addEventListener('click', () => {
+    apiKey = '';
+    apiKeyInput.value = '';
+    rememberKeyCheckbox.checked = false;
+    sessionStorage.removeItem('hairApparentApiKeySession');
+    localStorage.removeItem('hairApparentApiKey');
+    apiWarning.hidden = false;
+    apiWarning.textContent = 'Saved key cleared from this browser.';
+  });
   regenerateBtn.addEventListener('click', () => {
     generateRecommendations(true);
   });

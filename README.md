@@ -1,72 +1,33 @@
 # Hair Apparent
 
-**Hair Apparent** is a stylish, local-first hairstyle makeover web app concept for GitHub Pages. It helps a user upload 5–10 photos privately in the browser, answer style questions, receive haircut/color/style recommendations, and create a salon-ready stylist brief.
+Hair Apparent is a private, browser-first hairstyle recommendation studio concept.
 
-## Current status
+This version is designed to work immediately on GitHub Pages. The main `index.html` file is self-contained with inline CSS and JavaScript so the page still looks polished even if asset paths or folders are not copied correctly.
 
-This is a polished static-site MVP/prototype. It includes:
+## What it does now
 
-- Responsive premium beauty-tech landing page
-- Local photo selection and preview
-- Privacy-first messaging
-- Style profile questionnaire
-- Recommendation cards
-- Stylist brief generation
-- Copy/download brief tools
-- PWA manifest and app icons
-- No server and no API key required
+- Presents a polished beauty-tech landing page
+- Lets the user select 5–10 photos locally in the browser
+- Keeps images on the user's device only
+- Collects style preferences, hair texture, complexion, face-shape guess, and maintenance comfort
+- Generates practical hairstyle recommendation cards
+- Creates a salon-ready stylist brief the user can copy or print
 
-## Important AI note
+## What it does not do yet
 
-This version does **not** claim to perform true photorealistic generative hairstyle rendering yet. It is designed as the front-end foundation and local-first user experience. True high-quality hair replacement requires either:
+This MVP does **not** pretend to perform true photorealistic generative hair rendering. A real version of that feature would require one of the following:
 
-1. a future in-browser/WebGPU image-generation pipeline, or  
-2. a user-provided API key / local model backend.
+- Local WebGPU models when browser support and device performance are strong enough
+- A local desktop companion app
+- A user-provided API key
+- A server-side model with clear privacy controls
 
-Do **not** put a private developer API key inside a public GitHub Pages app. Anyone can inspect the JavaScript and steal it.
+Do not place a private API key into a public GitHub Pages project.
 
-## Privacy model
+## Deploying on GitHub Pages
 
-- Photos are selected locally with the browser file picker.
-- Photo previews use temporary object URLs.
-- The app does not upload files.
-- The app does not store photos.
-- Refreshing the page clears the photo session.
-
-## Recommended roadmap
-
-### Phase 1 — Static local-first MVP
-
-- Polished UI
-- Local photo previews
-- Recommendation engine
-- Stylist brief generator
-
-### Phase 2 — Local computer vision
-
-Add optional browser-based face and hair analysis using open-source tools such as:
-
-- MediaPipe Face Landmarker
-- ONNX Runtime Web
-- Transformers.js
-- WebGPU where supported
-
-### Phase 3 — Generative preview
-
-Add a rendering mode with one of these safe approaches:
-
-- local in-browser model where hardware permits
-- local desktop companion app
-- user-provided API key stored only in that user's browser
-- no embedded shared developer key
-
-## GitHub Pages deployment
-
-1. Upload this folder to a GitHub repository.
-2. Go to **Settings → Pages**.
-3. Set the branch to `main` and folder to `/root`.
-4. Open the generated GitHub Pages URL.
+Upload the contents of this folder to your repository and make sure `index.html` is at the root of the published branch.
 
 ## License
 
-MIT License. See `LICENSE.md`.
+MIT. See `LICENSE.md`.

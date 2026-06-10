@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- Hair Apparent icon v001 - crown of four hair textures -->
+  <rect x="0" y="0" width="240" height="240" rx="48" fill="#2E2236"/>
+
+  <!-- Crown band -->
+  <rect x="48" y="162" width="144" height="16" rx="8" fill="#D9A84E"/>
+
+  <!-- Tine 1: STRAIGHT -->
+  <path d="M68,158 L68,92" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="68" cy="82" r="6" fill="#C26E5A"/>
+
+  <!-- Tine 2: WAVY -->
+  <path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="104" cy="66" r="6" fill="#C26E5A"/>
+
+  <!-- Tine 3: CURLY (stem topped with a curl ring) -->
+  <path d="M138,158 L138,116" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="138" cy="99" r="13" fill="none" stroke="#D9A84E" stroke-width="9"/>
+  <circle cx="138" cy="99" r="6" fill="#C26E5A"/>
+
+  <!-- Tine 4: COILY (tight zigzag) -->
+  <path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="173" cy="88" r="6" fill="#C26E5A"/>
+</svg>

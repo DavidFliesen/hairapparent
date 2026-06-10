@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240">
+  <!-- Hair Apparent horizontal logo v001 -->
+  <rect x="0" y="0" width="880" height="240" fill="#F5EEE3"/>
+
+  <!-- Crown mark -->
+  <g transform="translate(28,28)">
+    <rect x="20" y="140" width="144" height="16" rx="8" fill="#2E2236"/>
+
+    <!-- Straight -->
+    <path d="M40,136 L40,70" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="40" cy="60" r="6" fill="#C26E5A"/>
+
+    <!-- Wavy -->
+    <path d="M75,136 C65,118 85,106 75,88 C67,74 81,66 76,54" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="76" cy="44" r="6" fill="#C26E5A"/>
+
+    <!-- Curly -->
+    <path d="M110,136 L110,94" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="110" cy="77" r="13" fill="none" stroke="#2E2236" stroke-width="9"/>
+    <circle cx="110" cy="77" r="6" fill="#C26E5A"/>
+
+    <!-- Coily -->
+    <path d="M145,136 L140,122 L150,110 L140,98 L150,86 L145,76" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="145" cy="66" r="6" fill="#C26E5A"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="248" y="124" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="bold" fill="#2E2236" letter-spacing="1">Hair Apparent</text>
+
+  <!-- Gold rule -->
+  <rect x="252" y="146" width="560" height="4" rx="2" fill="#D9A84E"/>
+
+  <!-- Tagline -->
+  <text x="252" y="184" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-style="italic" fill="#6B5A78" letter-spacing="1">Find your crowning look.</text>
+</svg>

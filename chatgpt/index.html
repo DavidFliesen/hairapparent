@@ -306,6 +306,12 @@ body {
 .segment-option span { display: block; padding: .8rem .7rem; border: 1px solid #d9cfe0; border-radius: 999px; background: #fff; color: var(--primary); text-align: center; font-weight: 600; cursor: pointer; transition: .2s ease; }
 .segment-option input:checked + span { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 8px 18px rgba(75,43,91,.18); }
 .segment-option span:hover { border-color: var(--primary); }
+.speed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin: .75rem 0 1rem; }
+.speed-option input { display: none; }
+.speed-option span { display: block; height: 100%; padding: .9rem .8rem; border: 1px solid #dacfe2; border-radius: 16px; background: #fff; color: var(--primary); cursor: pointer; text-align: left; transition: .2s ease; }
+.speed-option strong { display: block; margin-bottom: .2rem; font-size: .98rem; }
+.speed-option small { display: block; color: var(--text-muted); line-height: 1.35; }
+.speed-option input:checked + span { background: rgba(75,43,91,.07); border-color: var(--primary); box-shadow: 0 10px 24px rgba(75,43,91,.13); }
 .recs-status { margin: .35rem 0 .9rem; font-size: .95rem; color: var(--primary); font-weight: 600; min-height: 1.2rem; }
 .rec-card .rec-info {
   padding: 0.75rem;
@@ -313,6 +319,11 @@ body {
   display: flex;
   flex-direction: column;
 }
+.rec-status-badge { display: inline-flex; align-items: center; gap: .35rem; align-self: flex-start; margin-bottom: .55rem; padding: .3rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .02em; background: #f2edf5; color: var(--primary); }
+.rec-status-badge.ready { background: #ecf7ef; color: #237342; }
+.rec-status-badge.rendering { background: #fdf3e8; color: #9b5f19; }
+.rec-status-badge.error { background: #fdecea; color: #9f3a35; }
+.rec-status-badge.queued { background: #f2edf5; color: var(--primary); }
 .rec-card h3 {
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
@@ -399,6 +410,9 @@ body {
   padding: 1rem 1.1rem;
   border-bottom: 1px solid #ece5ef;
 }
+.image-modal-actions { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; }
+.image-modal-nav { background: #fff; border: 1px solid #d9cfe0; color: var(--primary); border-radius: 999px; padding: .6rem .9rem; font-weight: 700; cursor: pointer; }
+.image-modal-counter { font-size: .9rem; color: var(--text-muted); }
 .image-modal-title {
   margin: 0;
   font-family: 'Playfair Display', serif;
@@ -431,6 +445,10 @@ body {
   font-size: .98rem;
   color: var(--text-muted);
   line-height: 1.45;
+}
+@media (max-width: 760px) {
+  .speed-grid { grid-template-columns: 1fr; }
+  .image-modal-actions { justify-content: space-between; width: 100%; }
 }
 
 /* Footer */
@@ -517,6 +535,15 @@ body {
         <div id="api-warning" class="warning" hidden>
           Please enter a valid API key before continuing.
         </div>
+        <div class="choice-group">
+          <p class="choice-title">Preview speed</p>
+          <p class="screen-desc small">Choose how Hair Apparent balances speed and image polish. You can switch this any time before generating.</p>
+          <div class="speed-grid">
+            <label class="speed-option"><input type="radio" name="speed-mode" value="fast" /><span><strong>Fast</strong><small>Lowest wait. Uses lighter quality and more parallel rendering.</small></span></label>
+            <label class="speed-option"><input type="radio" name="speed-mode" value="balanced" checked /><span><strong>Balanced</strong><small>Recommended. Good quality with moderate wait time.</small></span></label>
+            <label class="speed-option"><input type="radio" name="speed-mode" value="best" /><span><strong>Best</strong><small>Highest quality. Slower and more deliberate generation.</small></span></label>
+          </div>
+        </div>
         <button id="btn-api-save" class="primary-btn">Use this key</button>
         <button id="btn-clear-key" class="secondary-btn" type="button">Clear saved key</button>
       </section>
@@ -552,13 +579,18 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.015</p>
+      <p>Build 2026.06.10.016</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
         <div class="image-modal-topbar">
           <h3 id="image-modal-title" class="image-modal-title">Preview</h3>
-          <button id="image-modal-close" class="image-modal-close" type="button">Close</button>
+          <div class="image-modal-actions">
+            <button id="image-modal-prev" class="image-modal-nav" type="button">← Prev</button>
+            <span id="image-modal-counter" class="image-modal-counter">1 / 1</span>
+            <button id="image-modal-next" class="image-modal-nav" type="button">Next →</button>
+            <button id="image-modal-close" class="image-modal-close" type="button">Close</button>
+          </div>
         </div>
         <div class="image-modal-body">
           <img id="image-modal-img" src="" alt="Expanded hairstyle preview" />
@@ -610,6 +642,10 @@ body {
   const imageModalTitle = document.getElementById('image-modal-title');
   const imageModalCaption = document.getElementById('image-modal-caption');
   const imageModalClose = document.getElementById('image-modal-close');
+  const imageModalPrev = document.getElementById('image-modal-prev');
+  const imageModalNext = document.getElementById('image-modal-next');
+  const imageModalCounter = document.getElementById('image-modal-counter');
+  const speedModeInputs = document.querySelectorAll('input[name="speed-mode"]');
   const finalLookDiv = document.getElementById('final-look');
   const savePhotoBtn = document.getElementById('btn-save-photo');
   const printBtn = document.getElementById('btn-print-brief');
@@ -623,8 +659,15 @@ body {
   let currentRecommendations = [];
   let selectedLook = null;
   let styleExpression = 'show-everything';
+  let generationMode = 'balanced';
   let normalizedReferenceImage = null;
-  const GENERATION_CONCURRENCY = 2;
+  let modalRecommendationIndex = -1;
+  let touchStartX = 0;
+  const generationProfiles = {
+    fast: { quality: 'low', concurrency: 3, label: 'Fast' },
+    balanced: { quality: 'medium', concurrency: 2, label: 'Balanced' },
+    best: { quality: 'high', concurrency: 1, label: 'Best' }
+  };
 
   // Catalogue of hairstyle concepts.  Each entry contains a unique name, a
   // description, and a prompt fragment used when calling OpenAI’s image API.
@@ -856,9 +899,13 @@ body {
    */
   function openImageModal(src, title, caption) {
     if (!src) return;
+    modalRecommendationIndex = -1;
     imageModalImg.src = src;
     imageModalTitle.textContent = title || 'Preview';
     imageModalCaption.textContent = caption || '';
+    imageModalCounter.textContent = 'Preview';
+    imageModalPrev.disabled = true;
+    imageModalNext.disabled = true;
     imageModal.classList.add('open');
     imageModal.setAttribute('aria-hidden', 'false');
   }
@@ -869,20 +916,60 @@ body {
     imageModalImg.src = '';
   }
 
+  function getRenderableRecommendationIndices() {
+    return currentRecommendations
+      .map((style, index) => ({ style, index }))
+      .filter((item) => !!item.style.imageUrl)
+      .map((item) => item.index);
+  }
+
+  function syncModalRecommendation() {
+    if (modalRecommendationIndex < 0 || !currentRecommendations[modalRecommendationIndex]) return;
+    const rec = currentRecommendations[modalRecommendationIndex];
+    if (!rec.imageUrl) return;
+    imageModalImg.src = rec.imageUrl;
+    imageModalTitle.textContent = rec.name || 'Preview';
+    imageModalCaption.textContent = rec.description || '';
+    const renderable = getRenderableRecommendationIndices();
+    const visiblePosition = Math.max(0, renderable.indexOf(modalRecommendationIndex));
+    imageModalCounter.textContent = `${visiblePosition + 1} / ${renderable.length || 1}`;
+    const canBrowse = renderable.length > 1;
+    imageModalPrev.disabled = !canBrowse;
+    imageModalNext.disabled = !canBrowse;
+  }
+
+  function openRecommendationModal(index) {
+    if (index == null || !currentRecommendations[index] || !currentRecommendations[index].imageUrl) return;
+    modalRecommendationIndex = index;
+    imageModal.classList.add('open');
+    imageModal.setAttribute('aria-hidden', 'false');
+    syncModalRecommendation();
+  }
+
+  function stepModalRecommendation(direction) {
+    const renderable = getRenderableRecommendationIndices();
+    if (!renderable.length) return;
+    let currentPos = renderable.indexOf(modalRecommendationIndex);
+    if (currentPos < 0) currentPos = 0;
+    currentPos = (currentPos + direction + renderable.length) % renderable.length;
+    modalRecommendationIndex = renderable[currentPos];
+    syncModalRecommendation();
+  }
+
   function getPresentationInstruction(style) {
     if (styleExpression === 'masculine') {
       return 'Overall presentation must stay masculine. Do not feminize the person. Favor masculine haircut shapes and masculine styling. Do not add makeup or feminine presentation cues.';
     }
     if (styleExpression === 'feminine') {
-      return 'Overall presentation should lean feminine. Favor feminine salon styling while preserving the person's identity.';
+      return 'Overall presentation should lean feminine. Favor feminine salon styling while preserving the person\'s identity.';
     }
     if (style.presentation === 'masculine') {
       return 'Treat this as a masculine hairstyle concept. Keep the person presenting masculine and do not feminize the face or styling.';
     }
     if (style.presentation === 'feminine') {
-      return 'Treat this as a feminine hairstyle concept while preserving the person's identity and facial features.';
+      return 'Treat this as a feminine hairstyle concept while preserving the person\'s identity and facial features.';
     }
-    return 'You may keep the result gender-neutral and flattering, preserving the person's identity.';
+    return 'You may keep the result gender-neutral and flattering, preserving the person\'s identity.';
   }
 
   async function normalizeImageForEdit(file) {
@@ -953,6 +1040,7 @@ body {
       }
     }
 
+    const profile = generationProfiles[generationMode] || generationProfiles.balanced;
     const prompt =
       `Create a photorealistic hairstyle makeover preview using the uploaded person as the identity reference. ` +
       `Preserve the person's face, age, facial expression, skin tone, head angle, and overall identity. Change only the hairstyle and hair color. ` +
@@ -966,11 +1054,11 @@ body {
     formData.append('image[]', safeImage, safeImage.name);
     formData.append('prompt', prompt);
     formData.append('size', '1024x1024');
-    formData.append('quality', 'medium');
+    formData.append('quality', profile.quality);
     formData.append('output_format', 'png');
 
     try {
-      if (generatingStatus) generatingStatus.textContent = `Generating look ${index + 1} of ${total}…`;
+      if (generatingStatus) generatingStatus.textContent = `Generating look ${index + 1} of ${total} in ${profile.label} mode…`;
       const resp = await fetchWithTimeout('https://api.openai.com/v1/images/edits', {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}` },
@@ -1002,9 +1090,11 @@ body {
    */
   async function generateRecommendations(regenerate) {
     const checkedStyle = document.querySelector('input[name="style-expression"]:checked');
+    const checkedSpeed = document.querySelector('input[name="speed-mode"]:checked');
     styleExpression = checkedStyle ? checkedStyle.value : 'show-everything';
+    generationMode = checkedSpeed ? checkedSpeed.value : 'balanced';
     if (!regenerate) usedStyles.clear();
-    currentRecommendations = pickRandomStyles(6);
+    currentRecommendations = pickRandomStyles(6).map((style) => ({ ...style, imageUrl: '', error: '' }));
 
     recContainer.innerHTML = '';
     currentRecommendations.forEach((style, index) => {
@@ -1013,9 +1103,10 @@ body {
       card.innerHTML = `
         <div class="rec-image-slot" id="rec-img-slot-${index}"><span>Image will appear here soon.</span></div>
         <div class="rec-info">
+          <span class="rec-status-badge queued" id="rec-badge-${index}">Queued</span>
           <h3>${style.name}</h3>
           <p>${style.description}</p>
-          <p class="image-tip">Tap the preview image to enlarge it.</p>
+          <p class="image-tip">Tap the preview image to enlarge it when it is ready.</p>
           <button class="primary-btn choose-btn" id="choose-${index}" disabled>Select this look</button>
         </div>
       `;
@@ -1023,9 +1114,10 @@ body {
     });
 
     if (recsStatus) {
-      recsStatus.textContent = `Preparing 6 ${styleExpression === 'show-everything' ? 'mixed' : styleExpression} looks for you…`;
+      recsStatus.textContent = `Preparing 6 ${styleExpression === 'show-everything' ? 'mixed' : styleExpression} looks for you in ${(generationProfiles[generationMode] || generationProfiles.balanced).label} mode…`;
     }
     showScreen('recs');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     let completed = 0;
     const updateOverallStatus = () => {
@@ -1042,27 +1134,39 @@ body {
       const style = currentRecommendations[index];
       const slot = document.getElementById(`rec-img-slot-${index}`);
       const btn = document.getElementById(`choose-${index}`);
+      const badge = document.getElementById(`rec-badge-${index}`);
+      if (badge) {
+        badge.textContent = 'Rendering';
+        badge.className = 'rec-status-badge rendering';
+      }
       if (slot) slot.innerHTML = `<span>Rendering image ${index + 1} of ${currentRecommendations.length}…</span>`;
       const result = await generateImage(style, index, currentRecommendations.length);
       if (result.url) {
+        style.imageUrl = result.url;
         slot.classList.add('is-clickable');
         slot.innerHTML = `<img src="${result.url}" alt="${style.name}" />`;
         btn.disabled = false;
-        slot.onclick = () => {
-          const currentImg = slot.querySelector('img');
-          if (currentImg) openImageModal(currentImg.src, style.name, style.description);
-        };
+        slot.onclick = () => openRecommendationModal(index);
+        if (badge) {
+          badge.textContent = 'Ready';
+          badge.className = 'rec-status-badge ready';
+        }
       } else {
+        style.error = result.error || 'Try Regenerate.';
         slot.classList.remove('is-clickable');
-        slot.innerHTML = `<span>Could not generate this look.<br><small>${result.error || 'Try Regenerate.'}</small></span>`;
+        slot.innerHTML = `<span>Could not generate this look.<br><small>${style.error}</small></span>`;
         btn.disabled = true;
+        if (badge) {
+          badge.textContent = 'Error';
+          badge.className = 'rec-status-badge error';
+        }
       }
       completed += 1;
       updateOverallStatus();
     };
 
     const queue = Array.from({ length: currentRecommendations.length }, (_, i) => i);
-    const workerCount = Math.min(GENERATION_CONCURRENCY, queue.length);
+    const workerCount = Math.min((generationProfiles[generationMode] || generationProfiles.balanced).concurrency, queue.length);
     const workers = Array.from({ length: workerCount }, async () => {
       while (queue.length > 0) {
         const nextIndex = queue.shift();
@@ -1168,7 +1272,9 @@ body {
     photoInput.value = '';
     photoPreviews.innerHTML = '';
     toApiBtn.disabled = true;
+    closeImageModal();
     showScreen('intro');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /**
@@ -1194,6 +1300,7 @@ body {
   // Event listeners
   startBtn.addEventListener('click', () => {
     showScreen('upload');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
   photoInput.addEventListener('change', handleFilesSelected);
   toApiBtn.addEventListener('click', () => {
@@ -1202,6 +1309,7 @@ body {
     } else {
       uploadWarning.hidden = true;
       showScreen('api');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
   apiSaveBtn.addEventListener('click', saveApiKey);
@@ -1225,8 +1333,21 @@ body {
   });
   startOverBtn.addEventListener('click', startOver);
   imageModalClose.addEventListener('click', closeImageModal);
+  imageModalPrev.addEventListener('click', () => stepModalRecommendation(-1));
+  imageModalNext.addEventListener('click', () => stepModalRecommendation(1));
   imageModal.addEventListener('click', (event) => { if (event.target === imageModal) closeImageModal(); });
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && imageModal.classList.contains('open')) closeImageModal(); });
+  imageModalImg.addEventListener('touchstart', (event) => { touchStartX = event.changedTouches[0].clientX; }, { passive: true });
+  imageModalImg.addEventListener('touchend', (event) => {
+    const delta = event.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(delta) < 40) return;
+    stepModalRecommendation(delta < 0 ? 1 : -1);
+  }, { passive: true });
+  document.addEventListener('keydown', (event) => {
+    if (!imageModal.classList.contains('open')) return;
+    if (event.key === 'Escape') closeImageModal();
+    if (event.key === 'ArrowLeft') stepModalRecommendation(-1);
+    if (event.key === 'ArrowRight') stepModalRecommendation(1);
+  });
 
   // Initial setup
   loadStoredKey();

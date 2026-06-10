@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/hair-apparent-logo.png" alt="Hair Apparent logo" width="220">
+  <img src="assets/hair-apparent-dark-logo.png" alt="Hair Apparent logo" width="220">
 </p>
 
 # Hair Apparent

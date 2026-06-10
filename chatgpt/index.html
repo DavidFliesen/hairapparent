@@ -693,7 +693,7 @@ body::before {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.021</p>
+      <p>Build 2026.06.10.022</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -785,7 +785,7 @@ body::before {
   let dailyEffort = 'wash-and-go';
   let styleGoal = 'polished';
   let generationMode = 'balanced';
-  let normalizedReferenceImage = null;
+  let normalizedReferencePackage = null;
   let modalRecommendationIndex = -1;
   let touchStartX = 0;
   const generationProfiles = {
@@ -921,7 +921,7 @@ body::before {
   function handleFilesSelected() {
     const files = Array.from(photoInput.files || []);
     selectedFiles = files.length ? [files[0]] : [];
-    normalizedReferenceImage = null;
+    normalizedReferencePackage = null;
     photoPreviews.innerHTML = '';
     uploadWarning.hidden = true;
     if (selectedFiles.length === 0) {
@@ -1184,43 +1184,86 @@ body::before {
         const img = new Image();
         img.onload = () => {
           // Build a padded square reference instead of passing a tight crop.
-          // This gives the image model room above the head so generated hair
-          // is less likely to be cut off at the top of the frame.
+          // Build 022 also creates a mask so the model edits mostly hair and
+          // preserves the central facial features instead of repainting the person.
           const canvasSize = 1024;
           const canvas = document.createElement('canvas');
           canvas.width = canvasSize;
           canvas.height = canvasSize;
           const ctx = canvas.getContext('2d', { alpha: false });
 
-          // Soft salon-neutral background.
-          const gradient = ctx.createLinearGradient(0, 0, canvasSize, canvasSize);
-          gradient.addColorStop(0, '#f7f3f0');
-          gradient.addColorStop(1, '#ece6e1');
-          ctx.fillStyle = gradient;
+          // Keep the reference simple. A neutral background is less likely to
+          // cause identity drift than asking the model to invent a whole new room.
+          ctx.fillStyle = '#f3eee9';
           ctx.fillRect(0, 0, canvasSize, canvasSize);
 
           // Fit the user photo into a portrait-safe region with generous top space.
-          // Target: mid-chest/up headshot with about a fist of space above hair.
-          const maxDrawWidth = canvasSize * 0.84;
-          const maxDrawHeight = canvasSize * 0.72;
+          // We keep more of the original image visible because identity preservation
+          // works better when the model can see the full original head/neck/chest context.
+          const maxDrawWidth = canvasSize * 0.92;
+          const maxDrawHeight = canvasSize * 0.82;
           const scale = Math.min(maxDrawWidth / img.width, maxDrawHeight / img.height, 1);
           const drawWidth = Math.max(1, Math.round(img.width * scale));
           const drawHeight = Math.max(1, Math.round(img.height * scale));
           const drawX = Math.round((canvasSize - drawWidth) / 2);
-          let drawY = Math.round(canvasSize * 0.18);
-          if (drawY + drawHeight > canvasSize - 36) {
-            drawY = Math.max(Math.round(canvasSize * 0.12), canvasSize - drawHeight - 36);
+          let drawY = Math.round(canvasSize * 0.10);
+          if (drawY + drawHeight > canvasSize - 28) {
+            drawY = Math.max(Math.round(canvasSize * 0.06), canvasSize - drawHeight - 28);
           }
 
           ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-          canvas.toBlob((blob) => {
-            if (!blob) {
-              reject(new Error('Could not normalize the uploaded image.'));
-              return;
-            }
-            const name = (file.name || 'reference').replace(/\.[^.]+$/, '') + '-padded-headshot.png';
-            resolve(new File([blob], name, { type: 'image/png' }));
-          }, 'image/png');
+
+          // Mask semantics for image edits: transparent areas are editable;
+          // opaque areas should be preserved. This approximate mask is intentionally
+          // conservative: it opens the hair/top/sides but keeps the face center,
+          // eyes, nose, mouth, jaw, neck, clothing, and most background locked.
+          const maskCanvas = document.createElement('canvas');
+          maskCanvas.width = canvasSize;
+          maskCanvas.height = canvasSize;
+          const maskCtx = maskCanvas.getContext('2d');
+          maskCtx.clearRect(0, 0, canvasSize, canvasSize);
+          maskCtx.fillStyle = 'rgba(255,255,255,1)';
+          maskCtx.fillRect(0, 0, canvasSize, canvasSize);
+
+          const clearEllipse = (cx, cy, rx, ry) => {
+            maskCtx.save();
+            maskCtx.globalCompositeOperation = 'destination-out';
+            maskCtx.beginPath();
+            maskCtx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            maskCtx.fill();
+            maskCtx.restore();
+          };
+          const protectEllipse = (cx, cy, rx, ry) => {
+            maskCtx.save();
+            maskCtx.globalCompositeOperation = 'source-over';
+            maskCtx.fillStyle = 'rgba(255,255,255,1)';
+            maskCtx.beginPath();
+            maskCtx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            maskCtx.fill();
+            maskCtx.restore();
+          };
+
+          // Editable hair regions. These use broad approximate geometry because
+          // the app is intentionally framework-free and does not run face detection.
+          clearEllipse(canvasSize * 0.50, canvasSize * 0.30, canvasSize * 0.34, canvasSize * 0.23); // crown/top hair
+          clearEllipse(canvasSize * 0.25, canvasSize * 0.47, canvasSize * 0.16, canvasSize * 0.28); // left hair side/length
+          clearEllipse(canvasSize * 0.75, canvasSize * 0.47, canvasSize * 0.16, canvasSize * 0.28); // right hair side/length
+
+          // Re-protect the core identity zone so the model cannot repaint the face.
+          protectEllipse(canvasSize * 0.50, canvasSize * 0.52, canvasSize * 0.255, canvasSize * 0.31);
+          protectEllipse(canvasSize * 0.50, canvasSize * 0.46, canvasSize * 0.22, canvasSize * 0.16); // eye/nose center
+
+          const toBlob = (canvasRef, type = 'image/png', quality) => new Promise((res, rej) => {
+            canvasRef.toBlob((blob) => blob ? res(blob) : rej(new Error('Canvas export failed.')), type, quality);
+          });
+
+          Promise.all([toBlob(canvas), toBlob(maskCanvas)]).then(([imageBlob, maskBlob]) => {
+            const baseName = (file.name || 'reference').replace(/\.[^.]+$/, '');
+            resolve({
+              image: new File([imageBlob], `${baseName}-identity-lock-reference.png`, { type: 'image/png' }),
+              mask: new File([maskBlob], `${baseName}-identity-lock-mask.png`, { type: 'image/png' })
+            });
+          }).catch(reject);
         };
         img.onerror = (e) => reject(e);
         img.src = reader.result;
@@ -1250,9 +1293,9 @@ body::before {
   async function generateImage(style, index, total) {
     const baseImg = selectedFiles[0];
     let safeImage = normalizedReferenceImage;
-    if (!safeImage) {
+    if (!safeReference) {
       try {
-        safeImage = await normalizeImageForEdit(baseImg);
+        safeReference = await normalizeImageForEdit(baseImg);
         normalizedReferenceImage = safeImage;
       } catch (e) {
         console.error('Unable to normalize photo for editing', e);
@@ -1263,18 +1306,19 @@ body::before {
     const profile = generationProfiles[generationMode] || generationProfiles.balanced;
     const prompt =
       `Create a photorealistic hairstyle makeover preview using the uploaded person as the single identity reference. ` +
-      `Preserve the person's face, age, facial expression, skin tone, head angle, facial proportions, eye spacing, nose, mouth, cheeks, jawline, and overall identity. Do not beautify into a different person. Change only the hairstyle, grooming, and hair color when needed. ` +
+      `IDENTITY LOCK: the face is not part of the makeover. Keep the person's exact facial identity, apparent age, expression, skin texture, eye shape, eye spacing, eyebrows, nose width and length, mouth shape, cheek structure, jawline, chin, face width, head angle, neck, shoulders, body shape, clothing, jewelry, and posture from the uploaded photo. Do not smooth, beautify, slim, de-age, change ethnicity, change gender presentation beyond the chosen hairstyle, or repaint the person as a generic model. ` +
+      `Use the mask to change only the hair region. Leave the protected face and body pixels visually unchanged. Do not change the background unless unavoidable at the hair edges. ` +
       `Desired hairstyle direction: ${style.prompt}. Length preference: ${lengthPreference}. Daily effort preference: ${dailyEffort}. Style goal: ${styleGoal}. ` +
       `${taxonomyPrompt(style)} ` +
       `${getPresentationInstruction(style)} ` +
-      `Place the person in this salon setting: ${style.salonBackground}. Keep the background softly blurred and secondary to the person. ` +
-      `Preserve apparent age, identity, and facial structure. Compose this like a professional salon headshot from the breasts / mid-chest upward, not a tight face crop. The full head and full head of hair must be visible: crown, top of hair, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave about one fist of empty background above the highest hair point, roughly 15 to 20 percent of the image height. If necessary, zoom the portrait out to include the whole hairstyle. Never crop, cut off, touch, or hide the top of the hair. Prioritize showing the full hairstyle over making the face large in the frame. ` +
+      `Compose this like a professional salon headshot from the breasts / mid-chest upward, not a tight face crop. The full head and full head of hair must be visible: crown, top of hair, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave about one fist of empty background above the highest hair point, roughly 15 to 20 percent of the image height. If necessary, zoom the portrait out to include the whole hairstyle. Never crop, cut off, touch, or hide the top of the hair. Prioritize showing the full hairstyle over making the face large in the frame. ` +
       `The result must look like a real salon makeover photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
       `No text, no watermark, no collage.`;
 
     const formData = new FormData();
     formData.append('model', 'gpt-image-1');
-    formData.append('image[]', safeImage, safeImage.name);
+    formData.append('image[]', safeReference.image, safeReference.image.name);
+    formData.append('mask', safeReference.mask, safeReference.mask.name);
     formData.append('prompt', prompt);
     formData.append('size', '1024x1024');
     formData.append('quality', profile.quality);
@@ -1678,7 +1722,7 @@ body::before {
     }
     // Reset state
     selectedFiles = [];
-    normalizedReferenceImage = null;
+    normalizedReferencePackage = null;
     usedStyles.clear();
     currentRecommendations = [];
     allRenderedLooks = [];

@@ -16,13 +16,13 @@ No accounts. No paywall. No photos ever leave your device.
 
 Most “AI hairstyle” apps follow the same playbook: a long quiz funnel, a photo upload to someone else’s server, and a subscription wall right before you see your results. Hair Apparent flips that:
 
-|           |Typical paid apps        |Hair Apparent                                                |
-|-----------|-------------------------|-------------------------------------------------------------|
-|Price      |Subscription / paywall   |Free forever (MIT licensed)                                  |
-|Your photos|Uploaded to their servers|Analyzed locally, never uploaded                             |
-|Your data  |Account required, tracked|localStorage only, no accounts                               |
-|Output     |Generated previews       |Previews **plus** a Stylist Card your barber can actually use|
-|Source code|Closed                   |Open — fork it, improve it                                   |
+|           |Typical paid apps        |Hair Apparent                                                    |
+|-----------|-------------------------|-----------------------------------------------------------------|
+|Price      |Subscription / paywall   |Free forever (MIT licensed, zero API costs)                      |
+|Your photos|Uploaded to their servers|Analyzed locally, never uploaded                                 |
+|Your data  |Account required, tracked|localStorage only, no accounts                                   |
+|Output     |Generated previews       |Ranked picks **plus** a Stylist Card your barber can actually use|
+|Source code|Closed                   |Open — fork it, improve it                                       |
 
 -----
 
@@ -43,7 +43,7 @@ From the landmark data across all your photos, Hair Apparent estimates:
 A short, skippable set of questions: maintenance tolerance (wash-and-go vs. daily styling), texture you want to lean into, length range, workplace constraints, and anything you’ve tried before and hated.
 
 **4. Get ranked recommendations.**
-The app combines classic face-shape styling rules with generative AI to produce a ranked list of styles, each with: why it works for *your* face shape, a preview image rendered in your coloring, maintenance level, and grow-out friendliness.
+A rule-based engine built on classic face-shape styling principles scores every style in the library against your measurements and preferences, then explains *why* each pick works for your face — along with maintenance level and trim interval.
 
 **5. Pick your look — get the Stylist Card.**
 The final deliverable is a one-page card (on-screen, printable, or saved as an image) containing:
@@ -62,7 +62,7 @@ Hand it to your stylist. They’ll know exactly what to do.
 
 - **Photos never leave your device.** Face analysis runs in-browser via WebAssembly (MediaPipe Face Landmarker). There is no upload endpoint because there is no server.
 - **All data lives in localStorage.** Your analysis results, preferences, and saved looks stay in your browser. Clear your browser data and they’re gone.
-- **Bring your own AI key (optional).** Style recommendations and previews use a generative AI provider through a key *you* supply (free tiers work fine). The key is stored only in your browser’s localStorage and calls go directly from your browser to the provider — never through us. The core face-shape analysis and rule-based recommendations work with no key at all.
+- **No API keys — yours or ours.** Every part of the app is free, open-source software running in your browser. There is no AI service to pay for, no key to supply, and no key hidden in the code that could be stolen.
 - **No analytics, no trackers, no cookies.**
 
 -----
@@ -71,7 +71,7 @@ Hand it to your stylist. They’ll know exactly what to do.
 
 - **Hosting:** GitHub Pages (100% static — no backend, no build step)
 - **Face analysis:** MediaPipe Face Landmarker (WASM, on-device)
-- **Recommendations:** rule-based face-shape engine + optional generative AI via user-supplied API key
+- **Recommendations:** rule-based face-shape engine — pure JavaScript, no AI service, no API keys
 - **Storage:** browser localStorage only
 - **UI:** single-page HTML/CSS/JS
 
@@ -99,11 +99,11 @@ These conventions exist to keep the codebase safely editable from the GitHub web
 
 ## Roadmap
 
-- [ ] v001 — Photo intake, on-device face shape analysis, rule-based recommendations
-- [ ] v002 — Optional AI-generated style previews (bring-your-own-key)
-- [ ] v003 — Stylist Card generator with print layout
-- [ ] v004 — Saved looks gallery and side-by-side comparison
-- [ ] v005 — PWA install support for offline use
+- [x] v001 — Photo intake, on-device face analysis, rule-based recommendations, printable Stylist Card
+- [ ] v002 — Illustrated style previews (local SVG art in the brand palette — no AI, no keys)
+- [ ] v003 — Saved looks gallery and side-by-side comparison
+- [ ] v004 — PWA install support for fully offline use
+- [ ] v005 — Expanded style library with community-contributed cuts
 
 -----
 

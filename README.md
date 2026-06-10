@@ -1,14 +1,29 @@
 <p align="center">
-  <img src="hair-apparent-logo.png" alt="Hair Apparent logo" width="420">
+  <img src="assets/hair-apparent-logo.png" alt="Hair Apparent logo" width="420">
 </p>
 
 # Hair Apparent
 
-**Build: 2026.06.10.004**
+**Build: 2026.06.10.005**
 
 **Hair Apparent** is a private, browser-first hairstyle recommendation studio concept. It helps a user upload several photos locally, answer a few style questions, review haircut/color recommendations, and generate a salon-ready brief they can take to a hairstylist.
 
-This version is designed to work immediately on GitHub Pages. The main `index.html` file is self-contained with inline CSS and JavaScript so the page still looks polished even if asset paths or folders are not copied correctly.
+This version is designed to work immediately on GitHub Pages. The main `index.html` file is self-contained with inline CSS and JavaScript so the page still looks polished even if external CSS or JavaScript paths are not copied correctly.
+
+## Logo path
+
+The README logo uses this relative path:
+
+```text
+assets/hair-apparent-logo.png
+```
+
+For the logo to show correctly on GitHub, the repository should contain:
+
+```text
+README.md
+assets/hair-apparent-logo.png
+```
 
 ## Privacy-first model
 
@@ -70,12 +85,12 @@ For truly realistic hair previews, the app should offer one or more clearly labe
 
 Upload the contents of the site folder to your repository and make sure `index.html` is at the root of the published branch.
 
-For the README logo to display correctly on GitHub, keep this file next to:
+For the README logo to display correctly on GitHub, keep the logo in the `assets` folder:
 
 ```text
-hair-apparent-logo.png
+assets/hair-apparent-logo.png
 ```
 
 ## License
 
-MIT. See `LICENSE.md`.
+This project is released under the MIT License. See `LICENSE.md`.

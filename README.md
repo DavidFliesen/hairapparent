@@ -1,96 +1,74 @@
-<p align="center">
-  <img src="assets/hair-apparent-logo.png" alt="Hair Apparent logo" width="420">
-</p>
-
 # Hair Apparent
 
-**Build: 2026.06.10.005**
+**Hair Apparent** is a free, open‑source web app that helps you explore new
+hairstyles on your own face using AI. Upload a handful of photos and the app
+will generate a curated set of photorealistic hairstyle previews. Pick your
+favorite, download the image, and print stylist directions—all without
+leaving your browser.
 
-**Hair Apparent** is a private, browser-first hairstyle recommendation studio concept. It helps a user upload several photos locally, answer a few style questions, review haircut/color recommendations, and generate a salon-ready brief they can take to a hairstylist.
+## ✨ Features
 
-This version is designed to work immediately on GitHub Pages. The main `index.html` file is self-contained with inline CSS and JavaScript so the page still looks polished even if external CSS or JavaScript paths are not copied correctly.
+* **Mobile‑first, app‑like workflow.** Each step (uploading photos, entering
+  your API key, generating looks, and choosing your favorite) lives on its own
+  full‑screen panel. This makes the experience feel like a native app rather
+  than a long, scrolling web page.
+* **Zero server storage.** All photos and API keys are processed locally in
+  your browser. Your images are only sent to OpenAI’s API when generating
+  previews—and only using your own API key.
+* **Automatic hairstyle curation.** Instead of asking you to choose from a
+  list of options, the app selects six styles based on a carefully curated
+  catalogue of classic cuts and colour techniques. Hit “Regenerate” to get a
+  fresh batch without repeats.
+* **Photorealistic previews.** Hair Apparent calls
+  [OpenAI’s image edits endpoint](https://platform.openai.com/docs/guides/images)
+  to blend each hairstyle onto your face. The result looks like a real salon
+  photograph—no stickers or cartoonish overlays.
+* **Print‑ready stylist brief.** Once you’ve chosen a look, the app can
+  produce a simple printout with your selected image, style name,
+  description, and cutting/styling suggestions.
 
-## Logo path
+## 🚀 Quick start
 
-The README logo uses this relative path:
+1. Clone or download this repository and serve the contents of
+   `hair_apparent_app` (for example with GitHub Pages or a static file host).
+2. Open `index.html` in your browser.
+3. Follow the on‑screen steps:
+   - Upload 5–10 clear, front‑facing photos.
+   - Enter your own OpenAI API key. New OpenAI accounts include free
+     image‑generation credits. You can find or create a key at
+     <https://platform.openai.com/account/api-keys>.
+   - Wait while the app generates six hairstyle ideas.
+   - Pick your favourite look. Download or print the stylist directions.
 
-```text
-assets/hair-apparent-logo.png
-```
+### Do I need to pay?
 
-For the logo to show correctly on GitHub, the repository should contain:
+Hair Apparent itself is completely free. However, generating photorealistic
+previews uses OpenAI’s hosted image models, which are charged per request. If
+you’re a new OpenAI user, you’ll receive free credits when you create your
+account. After that, usage is billed directly by OpenAI. Because the app uses
+your API key, your key is never exposed and your account is billed for any
+generation requests.
 
-```text
-README.md
-assets/hair-apparent-logo.png
-```
+### What happens to my photos?
 
-## Privacy-first model
+Your photos never leave your browser except when they’re sent to OpenAI to
+generate the previews. We don’t save them, upload them, or log them. The
+source images and your API key are stored in local memory only for the
+duration of your session.
 
-Hair Apparent is intended to keep the user’s images on their own device.
+## 🛠️ Development
 
-- No account required
-- No image upload server
-- No saved photos
-- No hidden API key in the public site
-- Browser-local interaction wherever possible
+* All HTML, CSS and JavaScript live under the `hair_apparent_app` folder. The
+  app is self‑contained and uses no frameworks. You can customise the
+  catalogue of hairstyles by editing the `hairstyleCatalog` array in
+  `app.js`.
+* To change the colour palette or typography, edit the CSS variables and
+  fonts in `styles.css`.
+* Build numbers appear in the footer to help you track versions. Update the
+  build string in `index.html` whenever you publish a new iteration.
 
-## What it does now
+## 📄 License
 
-- Presents a polished beauty-tech landing page
-- Lets the user select 5–10 photos locally in the browser
-- Keeps images on the user’s device only
-- Collects style preferences, hair texture, complexion, face-shape guess, and maintenance comfort
-- Generates practical hairstyle recommendation cards
-- Creates a salon-ready stylist brief the user can copy or print
-
-## What it does not do yet
-
-This MVP does **not** pretend to perform true photorealistic generative hair rendering. A real version of that feature would require one of the following:
-
-- Local WebGPU models when browser support and device performance are strong enough
-- A local desktop companion app
-- A user-provided API key
-- A server-side model with clear privacy controls
-
-Do **not** place a private API key into a public GitHub Pages project. Any key included in client-side JavaScript can be inspected and stolen.
-
-## Recommended future roadmap
-
-### Phase 1: Polished local-first MVP
-
-- Strong visual design
-- Local photo picker
-- Guided questionnaire
-- Hairstyle recommendation engine
-- Salon-ready stylist brief
-
-### Phase 2: Local computer vision
-
-- Face landmark detection
-- Face-shape guidance
-- Hairline and forehead proportion estimates
-- Photo quality scoring
-- Better recommendation ranking
-
-### Phase 3: Generative preview options
-
-For truly realistic hair previews, the app should offer one or more clearly labeled modes:
-
-1. **Local experimental mode** using WebGPU-capable open-source models when practical.
-2. **Bring-your-own-key mode** where the user supplies their own AI API key locally.
-3. **Desktop companion mode** for users who want local Stable Diffusion-style generation on their own computer.
-
-## Deploying on GitHub Pages
-
-Upload the contents of the site folder to your repository and make sure `index.html` is at the root of the published branch.
-
-For the README logo to display correctly on GitHub, keep the logo in the `assets` folder:
-
-```text
-assets/hair-apparent-logo.png
-```
-
-## License
-
-This project is released under the MIT License. See `LICENSE.md`.
+Hair Apparent is released under the [MIT License](LICENSE.md). You’re free
+to use, modify, and distribute it for personal or commercial projects. There
+are **no warranties**—this software is provided *as‑is*.

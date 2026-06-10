@@ -280,7 +280,10 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  cursor: zoom-in;
 }
+.rec-image-slot.is-clickable { cursor: zoom-in; }
+.image-tip { margin-top: .2rem; font-size: .82rem; color: var(--text-muted); }
 .progress-note {
   margin-top: 1rem;
   font-weight: 600;
@@ -365,6 +368,69 @@ body {
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
+}
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 10, 23, 0.82);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 9999;
+}
+.image-modal.open { display: flex; }
+.image-modal-dialog {
+  width: min(92vw, 960px);
+  max-height: 92vh;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,.28);
+  display: flex;
+  flex-direction: column;
+}
+.image-modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid #ece5ef;
+}
+.image-modal-title {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  color: var(--primary);
+  font-size: 1.45rem;
+}
+.image-modal-close {
+  background: #fff;
+  border: 1px solid #d9cfe0;
+  color: var(--primary);
+  border-radius: 999px;
+  padding: .65rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.image-modal-body {
+  padding: 1rem;
+  overflow: auto;
+}
+.image-modal-body img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  object-fit: contain;
+  background: #f7f3f8;
+}
+.image-modal-caption {
+  margin: .85rem 0 0;
+  font-size: .98rem;
+  color: var(--text-muted);
+  line-height: 1.45;
 }
 
 /* Footer */
@@ -458,7 +524,7 @@ body {
       <section id="screen-generating" class="screen">
         <h2 class="screen-title">Generating your looks...</h2>
         <p class="screen-desc">
-          Sit tight while we create a set of six unique hairstyles just for you. The app will show progress and move to the results screen as soon as your cards are ready.
+          Sit tight while we create a set of six unique hairstyles just for you. The app will lay out all six cards right away and fill the images in as they finish rendering.
         </p>
         <p id="generating-status" class="progress-note">Preparing your photos…</p>
         <div class="loader"></div>
@@ -486,8 +552,20 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.014</p>
+      <p>Build 2026.06.10.015</p>
     </footer>
+    <div id="image-modal" class="image-modal" aria-hidden="true">
+      <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
+        <div class="image-modal-topbar">
+          <h3 id="image-modal-title" class="image-modal-title">Preview</h3>
+          <button id="image-modal-close" class="image-modal-close" type="button">Close</button>
+        </div>
+        <div class="image-modal-body">
+          <img id="image-modal-img" src="" alt="Expanded hairstyle preview" />
+          <p id="image-modal-caption" class="image-modal-caption"></p>
+        </div>
+      </div>
+    </div>
     <!-- Inline script eliminates external dependency and ensures the app loads
          correctly on GitHub Pages when only index.html is deployed. -->
     <script>
@@ -527,6 +605,11 @@ body {
   const recContainer = document.getElementById('rec-container');
   const recsStatus = document.getElementById('recs-status');
   const styleExpressionInputs = document.querySelectorAll('input[name="style-expression"]');
+  const imageModal = document.getElementById('image-modal');
+  const imageModalImg = document.getElementById('image-modal-img');
+  const imageModalTitle = document.getElementById('image-modal-title');
+  const imageModalCaption = document.getElementById('image-modal-caption');
+  const imageModalClose = document.getElementById('image-modal-close');
   const finalLookDiv = document.getElementById('final-look');
   const savePhotoBtn = document.getElementById('btn-save-photo');
   const printBtn = document.getElementById('btn-print-brief');
@@ -540,6 +623,8 @@ body {
   let currentRecommendations = [];
   let selectedLook = null;
   let styleExpression = 'show-everything';
+  let normalizedReferenceImage = null;
+  const GENERATION_CONCURRENCY = 2;
 
   // Catalogue of hairstyle concepts.  Each entry contains a unique name, a
   // description, and a prompt fragment used when calling OpenAI’s image API.
@@ -769,6 +854,21 @@ body {
    * @param {File} file
    * @returns {Promise<File>}
    */
+  function openImageModal(src, title, caption) {
+    if (!src) return;
+    imageModalImg.src = src;
+    imageModalTitle.textContent = title || 'Preview';
+    imageModalCaption.textContent = caption || '';
+    imageModal.classList.add('open');
+    imageModal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeImageModal() {
+    imageModal.classList.remove('open');
+    imageModal.setAttribute('aria-hidden', 'true');
+    imageModalImg.src = '';
+  }
+
   function getPresentationInstruction(style) {
     if (styleExpression === 'masculine') {
       return 'Overall presentation must stay masculine. Do not feminize the person. Favor masculine haircut shapes and masculine styling. Do not add makeup or feminine presentation cues.';
@@ -842,12 +942,15 @@ body {
 
   async function generateImage(style, index, total) {
     const baseImg = selectedFiles[0];
-    let safeImage;
-    try {
-      safeImage = await normalizeImageForEdit(baseImg);
-    } catch (e) {
-      console.error('Unable to normalize photo for editing', e);
-      return { url: '', error: 'The uploaded photo could not be prepared. Try a clear JPG or PNG face photo.' };
+    let safeImage = normalizedReferenceImage;
+    if (!safeImage) {
+      try {
+        safeImage = await normalizeImageForEdit(baseImg);
+        normalizedReferenceImage = safeImage;
+      } catch (e) {
+        console.error('Unable to normalize photo for editing', e);
+        return { url: '', error: 'The uploaded photo could not be prepared. Try a clear JPG or PNG face photo.' };
+      }
     }
 
     const prompt =
@@ -858,44 +961,37 @@ body {
       `Preserve apparent age, identity, and facial structure. The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
       `Keep background simple and professional. No text, no watermark, no collage.`;
 
-    const modelsToTry = ['gpt-image-2', 'gpt-image-1'];
-    let lastError = '';
+    const formData = new FormData();
+    formData.append('model', 'gpt-image-1');
+    formData.append('image[]', safeImage, safeImage.name);
+    formData.append('prompt', prompt);
+    formData.append('size', '1024x1024');
+    formData.append('quality', 'medium');
+    formData.append('output_format', 'png');
 
-    for (const model of modelsToTry) {
-      const formData = new FormData();
-      formData.append('model', model);
-      formData.append('image[]', safeImage, safeImage.name);
-      formData.append('prompt', prompt);
-      formData.append('size', '1024x1024');
-      formData.append('quality', 'medium');
-      formData.append('output_format', 'png');
-
-      try {
-        if (generatingStatus) generatingStatus.textContent = `Generating look ${index + 1} of ${total} with ${model}…`;
-        const resp = await fetchWithTimeout('https://api.openai.com/v1/images/edits', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${apiKey}` },
-          body: formData
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) {
-          lastError = data?.error?.message || `OpenAI returned status ${resp.status}.`;
-          console.error('OpenAI API error', data);
-          continue;
-        }
-        const imageData = data.data?.[0]?.b64_json;
-        if (!imageData) {
-          lastError = 'OpenAI did not return an image.';
-          continue;
-        }
-        return { url: `data:image/png;base64,${imageData}`, error: '' };
-      } catch (err) {
-        lastError = err?.name === 'AbortError' ? 'The image request timed out after two minutes.' : (err?.message || 'The image request failed.');
-        console.error('Failed to call OpenAI', err);
+    try {
+      if (generatingStatus) generatingStatus.textContent = `Generating look ${index + 1} of ${total}…`;
+      const resp = await fetchWithTimeout('https://api.openai.com/v1/images/edits', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: formData
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        const lastError = data?.error?.message || `OpenAI returned status ${resp.status}.`;
+        console.error('OpenAI API error', data);
+        return { url: '', error: lastError };
       }
+      const imageData = data.data?.[0]?.b64_json;
+      if (!imageData) {
+        return { url: '', error: 'OpenAI did not return an image.' };
+      }
+      return { url: `data:image/png;base64,${imageData}`, error: '' };
+    } catch (err) {
+      const lastError = err?.name === 'AbortError' ? 'The image request timed out after two minutes.' : (err?.message || 'The image request failed.');
+      console.error('Failed to call OpenAI', err);
+      return { url: '', error: lastError };
     }
-
-    return { url: '', error: lastError || 'The image could not be generated.' };
   }
 
   /**
@@ -919,6 +1015,7 @@ body {
         <div class="rec-info">
           <h3>${style.name}</h3>
           <p>${style.description}</p>
+          <p class="image-tip">Tap the preview image to enlarge it.</p>
           <button class="primary-btn choose-btn" id="choose-${index}" disabled>Select this look</button>
         </div>
       `;
@@ -930,27 +1027,49 @@ body {
     }
     showScreen('recs');
 
-    for (let index = 0; index < currentRecommendations.length; index++) {
+    let completed = 0;
+    const updateOverallStatus = () => {
+      if (!recsStatus) return;
+      if (completed < currentRecommendations.length) {
+        recsStatus.textContent = `Rendering your looks… ${completed} of ${currentRecommendations.length} complete.`;
+      } else {
+        recsStatus.textContent = `Your 6 looks are ready. Tap any image to enlarge it, pick a favorite, or regenerate for a new set.`;
+      }
+    };
+    updateOverallStatus();
+
+    const renderOne = async (index) => {
       const style = currentRecommendations[index];
       const slot = document.getElementById(`rec-img-slot-${index}`);
       const btn = document.getElementById(`choose-${index}`);
-      if (recsStatus) {
-        recsStatus.textContent = `Generating look ${index + 1} of ${currentRecommendations.length}…`;
-      }
       if (slot) slot.innerHTML = `<span>Rendering image ${index + 1} of ${currentRecommendations.length}…</span>`;
       const result = await generateImage(style, index, currentRecommendations.length);
       if (result.url) {
+        slot.classList.add('is-clickable');
         slot.innerHTML = `<img src="${result.url}" alt="${style.name}" />`;
         btn.disabled = false;
+        slot.onclick = () => {
+          const currentImg = slot.querySelector('img');
+          if (currentImg) openImageModal(currentImg.src, style.name, style.description);
+        };
       } else {
+        slot.classList.remove('is-clickable');
         slot.innerHTML = `<span>Could not generate this look.<br><small>${result.error || 'Try Regenerate.'}</small></span>`;
         btn.disabled = true;
       }
-    }
+      completed += 1;
+      updateOverallStatus();
+    };
 
-    if (recsStatus) {
-      recsStatus.textContent = `Your 6 looks are ready. Pick a favorite or regenerate for a new set.`;
-    }
+    const queue = Array.from({ length: currentRecommendations.length }, (_, i) => i);
+    const workerCount = Math.min(GENERATION_CONCURRENCY, queue.length);
+    const workers = Array.from({ length: workerCount }, async () => {
+      while (queue.length > 0) {
+        const nextIndex = queue.shift();
+        await renderOne(nextIndex);
+      }
+    });
+    await Promise.all(workers);
 
     currentRecommendations.forEach((style, index) => {
       const btn = document.getElementById(`choose-${index}`);
@@ -1042,6 +1161,7 @@ body {
     }
     // Reset state
     selectedFiles = [];
+    normalizedReferenceImage = null;
     usedStyles.clear();
     currentRecommendations = [];
     selectedLook = null;
@@ -1104,6 +1224,9 @@ body {
     showScreen('recs');
   });
   startOverBtn.addEventListener('click', startOver);
+  imageModalClose.addEventListener('click', closeImageModal);
+  imageModal.addEventListener('click', (event) => { if (event.target === imageModal) closeImageModal(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && imageModal.classList.contains('open')) closeImageModal(); });
 
   // Initial setup
   loadStoredKey();

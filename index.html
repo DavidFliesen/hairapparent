@@ -9,58 +9,62 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* Hair Apparent v001 — palette: Ink Plum #2E2236, Champagne Gold #D9A84E,
-   Warm Ivory #F5EEE3, Rose Copper #C26E5A, Dusk Violet #6B5A78 */
+/* Hair Apparent v002 — one dark world.
+   Page #241A2B, surface #2E2236, raised #3A2C44, line #4A3A57,
+   ivory #F5EEE3, muted #B9A8C6, gold #D9A84E, copper #C26E5A */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
-  background: #F5EEE3;
-  color: #2E2236;
+  background: #241A2B;
+  color: #F5EEE3;
   line-height: 1.6;
   min-height: 100vh;
 }
 h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; line-height: 1.15; }
-.wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
 
 /* Header */
-header {
-  background: #2E2236;
-  padding: 14px 0;
-  position: sticky; top: 0; z-index: 50;
-  border-bottom: 3px solid #D9A84E;
-}
-.header-row { display: flex; align-items: center; gap: 12px; max-width: 860px; margin: 0 auto; padding: 0 20px; }
-.header-row svg { display: block; }
-.brand-name { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 22px; color: #F5EEE3; letter-spacing: 0.5px; }
-.brand-tag { font-size: 12px; color: #D9A84E; font-style: italic; margin-left: auto; }
+header { padding: 16px 0 14px 0; }
+.header-row { display: flex; align-items: center; gap: 12px; max-width: 880px; margin: 0 auto; padding: 0 20px; }
+.brand-name { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 23px; color: #F5EEE3; letter-spacing: 0.5px; }
+.brand-tag { font-size: 13px; color: #D9A84E; font-style: italic; margin-left: auto; }
+.gold-rule { height: 3px; background: #D9A84E; opacity: 0.85; max-width: 880px; margin: 0 auto; border-radius: 2px; }
 
 /* Progress crown dots */
-.steps { display: flex; gap: 8px; justify-content: center; padding: 22px 0 6px 0; }
-.step-dot { width: 11px; height: 11px; border-radius: 50%; background: #DACDB8; border: 2px solid #DACDB8; }
-.step-dot.done { background: #D9A84E; border-color: #D9A84E; }
-.step-dot.now { background: #C26E5A; border-color: #C26E5A; transform: scale(1.25); }
+.steps { display: flex; gap: 9px; justify-content: center; padding: 26px 0 4px 0; }
+.step-dot { width: 10px; height: 10px; border-radius: 50%; background: #4A3A57; }
+.step-dot.done { background: #D9A84E; }
+.step-dot.now { background: #C26E5A; transform: scale(1.3); }
 
 /* Screens */
-.screen { display: none; padding: 18px 0 70px 0; }
+.screen { display: none; padding: 18px 0 80px 0; }
 .screen.active { display: block; animation: fadein 0.35s ease; }
 @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-.hero-title { font-size: 42px; font-weight: 700; text-align: center; margin: 18px 0 10px 0; }
-.hero-title em { font-style: italic; color: #C26E5A; }
-.hero-sub { text-align: center; font-size: 18px; color: #6B5A78; max-width: 560px; margin: 0 auto 26px auto; }
-.screen h2 { font-size: 32px; text-align: center; margin: 10px 0 6px 0; }
-.screen .lede { text-align: center; color: #6B5A78; margin-bottom: 24px; }
+.hero-title { font-size: 44px; font-weight: 700; text-align: center; margin: 26px 0 12px 0; }
+.hero-title em { font-style: italic; color: #D9A84E; }
+.hero-sub { text-align: center; font-size: 18px; color: #B9A8C6; max-width: 580px; margin: 0 auto 30px auto; }
+.screen h2 { font-size: 33px; text-align: center; margin: 12px 0 6px 0; }
+.screen .lede { text-align: center; color: #B9A8C6; margin: 0 auto 26px auto; max-width: 620px; }
+.lede strong { color: #D9A84E; }
+
+/* Hero crown */
+.hero-crown { display: block; margin: 12px auto 0 auto; }
+.hero-crown .lock { animation: rise 1.6s ease both; transform-origin: bottom center; }
+.hero-crown .l2 { animation-delay: 0.18s; }
+.hero-crown .l3 { animation-delay: 0.36s; }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* Privacy ribbon */
 .privacy {
-  background: #2E2236; color: #F5EEE3; border-radius: 14px;
+  background: #2E2236; border: 1px solid #4A3A57; border-radius: 14px;
   padding: 16px 20px; margin: 26px auto; max-width: 640px;
   display: flex; gap: 14px; align-items: flex-start;
 }
 .privacy strong { color: #D9A84E; }
 .privacy .lock { font-size: 26px; line-height: 1; }
-.privacy p { font-size: 14px; }
+.privacy p { font-size: 14px; color: #D8CCE3; }
 
 /* Buttons */
 .btn {
@@ -68,116 +72,123 @@ header {
   font-weight: 700; font-size: 17px; border: none; cursor: pointer;
   border-radius: 999px; padding: 14px 34px; transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.btn-gold { background: #D9A84E; color: #2E2236; }
-.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(217,168,78,0.45); }
-.btn-plum { background: #2E2236; color: #F5EEE3; }
-.btn-plum:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(46,34,54,0.35); }
-.btn-ghost { background: transparent; color: #6B5A78; border: 2px solid #DACDB8; }
-.btn-ghost:hover { border-color: #6B5A78; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-gold { background: #D9A84E; color: #241A2B; }
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(217,168,78,0.35); }
+.btn-copper { background: #C26E5A; color: #FFF6EC; }
+.btn-copper:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(194,110,90,0.35); }
+.btn-ghost { background: transparent; color: #B9A8C6; border: 2px solid #4A3A57; }
+.btn-ghost:hover { border-color: #B9A8C6; color: #F5EEE3; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
 
 /* Photo grid */
 .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin: 20px 0; }
 .photo-slot {
   position: relative; aspect-ratio: 1/1; border-radius: 14px; overflow: hidden;
-  background: #EAE0CF; border: 2px dashed #C9B89B;
+  background: #2E2236; border: 1px solid #4A3A57;
 }
 .photo-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .photo-slot .x {
   position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
-  border-radius: 50%; background: #2E2236; color: #F5EEE3; border: none;
-  font-size: 14px; cursor: pointer; line-height: 1;
+  border-radius: 50%; background: #241A2B; color: #F5EEE3; border: 1px solid #4A3A57;
+  font-size: 13px; cursor: pointer; line-height: 1;
 }
 .drop {
-  border: 3px dashed #C9B89B; border-radius: 18px; background: #FBF7EE;
+  border: 2px dashed #6B5A78; border-radius: 18px; background: #2E2236;
   padding: 38px 20px; text-align: center; cursor: pointer; transition: border-color 0.15s;
 }
 .drop:hover, .drop.over { border-color: #D9A84E; }
 .drop .big { font-size: 40px; }
-.drop p { color: #6B5A78; }
-.hint { text-align: center; font-size: 14px; color: #6B5A78; margin-top: 8px; }
-.counter { text-align: center; font-weight: 700; margin-top: 14px; }
-.counter span { color: #C26E5A; }
+.drop p { color: #B9A8C6; }
+.drop p strong { color: #F5EEE3; }
+.counter { text-align: center; font-weight: 700; margin-top: 14px; color: #F5EEE3; }
+.counter span { color: #D9A84E; }
 
 /* Analyze screen */
 .analyzing { text-align: center; padding: 30px 0; }
-.crown-load { margin: 0 auto 18px auto; width: 120px; }
-.crown-load .tine { animation: bob 1.1s ease-in-out infinite; transform-origin: bottom center; }
-.crown-load .t2 { animation-delay: 0.15s; }
-.crown-load .t3 { animation-delay: 0.3s; }
-.crown-load .t4 { animation-delay: 0.45s; }
+.crown-load .lock { animation: bob 1.1s ease-in-out infinite; transform-origin: bottom center; }
+.crown-load .l2 { animation-delay: 0.18s; }
+.crown-load .l3 { animation-delay: 0.36s; }
 @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
-.analyze-status { font-size: 16px; color: #6B5A78; min-height: 24px; }
-.bar { width: 100%; max-width: 420px; height: 10px; border-radius: 5px; background: #EAE0CF; margin: 16px auto; overflow: hidden; }
+.analyze-status { font-size: 16px; color: #B9A8C6; min-height: 24px; }
+.bar { width: 100%; max-width: 420px; height: 10px; border-radius: 5px; background: #2E2236; border: 1px solid #4A3A57; margin: 16px auto; overflow: hidden; }
 .bar i { display: block; height: 100%; width: 0%; background: #D9A84E; border-radius: 5px; transition: width 0.3s ease; }
 
 /* Confirm chips */
-.attr-group { background: #FBF7EE; border: 1px solid #EADBC2; border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; }
-.attr-group h3 { font-size: 19px; margin-bottom: 4px; }
-.attr-note { font-size: 13px; color: #6B5A78; margin-bottom: 12px; }
+.attr-group { background: #2E2236; border: 1px solid #4A3A57; border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; }
+.attr-group h3 { font-size: 19px; margin-bottom: 4px; color: #F5EEE3; }
+.attr-note { font-size: 13px; color: #B9A8C6; margin-bottom: 12px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
-  border: 2px solid #DACDB8; background: #F5EEE3; color: #2E2236;
+  border: 1px solid #4A3A57; background: #3A2C44; color: #E8DEF0;
   border-radius: 999px; padding: 8px 16px; font-size: 15px; cursor: pointer;
   font-family: 'Public Sans', Arial, sans-serif; transition: all 0.12s;
 }
 .chip:hover { border-color: #C26E5A; }
-.chip.on { background: #2E2236; color: #D9A84E; border-color: #2E2236; font-weight: 700; }
-.chip .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0,0,0,0.18); }
-.detected { display: inline-block; background: #C26E5A; color: #FFFFFF; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; margin-left: 8px; vertical-align: 2px; }
+.chip.on { background: #D9A84E; color: #241A2B; border-color: #D9A84E; font-weight: 700; }
+.chip .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0,0,0,0.25); }
+.detected { display: inline-block; background: #C26E5A; color: #FFF6EC; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; margin-left: 8px; vertical-align: 2px; }
 
 /* Results */
 .style-card {
-  background: #FBF7EE; border: 1px solid #EADBC2; border-radius: 18px;
-  padding: 20px 22px; margin-bottom: 16px; position: relative;
+  background: #2E2236; border: 1px solid #4A3A57; border-radius: 18px;
+  padding: 20px; margin-bottom: 18px; position: relative;
+  display: flex; gap: 20px; align-items: flex-start;
 }
-.style-card.top-pick { border: 2px solid #D9A84E; box-shadow: 0 8px 24px rgba(217,168,78,0.18); }
+.style-card.top-pick { border: 2px solid #D9A84E; box-shadow: 0 10px 30px rgba(217,168,78,0.12); }
 .rank-badge {
-  position: absolute; top: -12px; left: 18px; background: #D9A84E; color: #2E2236;
+  position: absolute; top: -12px; left: 18px; background: #D9A84E; color: #241A2B;
   font-weight: 700; font-size: 12px; border-radius: 999px; padding: 3px 12px;
 }
-.style-card h3 { font-size: 23px; margin-bottom: 2px; }
-.style-meta { font-size: 13px; color: #6B5A78; margin-bottom: 10px; }
-.style-meta b { color: #C26E5A; }
-.style-why { font-size: 15px; margin-bottom: 12px; }
-.match-pct { float: right; font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700; color: #C26E5A; }
+.tryon-box { flex: 0 0 190px; }
+.tryon-box canvas, .tryon-box img { width: 190px; height: 216px; border-radius: 12px; display: block; background: #3A2C44; object-fit: cover; }
+.tryon-cap { font-size: 11px; color: #6B5A78; text-align: center; margin-top: 5px; }
+.style-body { flex: 1; min-width: 0; }
+.style-card h3 { font-size: 23px; margin-bottom: 2px; color: #F5EEE3; }
+.style-meta { font-size: 13px; color: #B9A8C6; margin-bottom: 10px; }
+.style-meta b { color: #D9A84E; }
+.style-why { font-size: 15px; margin-bottom: 14px; color: #E8DEF0; }
+.match-pct { float: right; font-family: 'Fraunces', Georgia, serif; font-size: 27px; font-weight: 700; color: #C26E5A; margin-left: 10px; }
 
-/* Stylist Card */
+/* Stylist Card — intentionally light, like a physical card on the dark table */
 .stylist-card {
-  background: #FFFFFF; border: 2px solid #2E2236; border-radius: 18px;
-  padding: 28px; margin: 18px 0; box-shadow: 0 10px 30px rgba(46,34,54,0.12);
+  background: #F5EEE3; color: #2E2236; border-radius: 18px;
+  padding: 28px; margin: 18px 0; box-shadow: 0 18px 50px rgba(0,0,0,0.45);
 }
-.sc-head { display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #D9A84E; padding-bottom: 14px; margin-bottom: 18px; }
-.sc-head h3 { font-size: 26px; }
+.sc-head { display: flex; align-items: center; gap: 14px; border-bottom: 3px solid #D9A84E; padding-bottom: 14px; margin-bottom: 18px; }
+.sc-head h3 { font-size: 26px; color: #2E2236; }
 .sc-head .sc-sub { font-size: 13px; color: #6B5A78; }
 .sc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.sc-look { grid-row: span 2; }
+.sc-look canvas, .sc-look img { width: 100%; max-width: 300px; border-radius: 12px; display: block; background: #EAE0CF; }
 .sc-block h4 { font-family: 'Public Sans', Arial, sans-serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #C26E5A; margin-bottom: 6px; }
-.sc-block p, .sc-block li { font-size: 14px; }
-.sc-block ul { padding-left: 18px; }
-.sc-zone { display: flex; justify-content: space-between; border-bottom: 1px dotted #DACDB8; padding: 4px 0; font-size: 14px; }
-.sc-zone b { font-weight: 700; }
-.sc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid #EADBC2; font-size: 12px; color: #6B5A78; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.sc-block p { font-size: 14px; color: #2E2236; }
+.sc-zone { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dotted #C9B89B; padding: 4px 0; font-size: 14px; color: #2E2236; }
+.sc-zone b { font-weight: 700; text-align: right; }
+.sc-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid #DACDB8; font-size: 12px; color: #6B5A78; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
 
-footer { background: #2E2236; color: #B9A8C6; text-align: center; padding: 26px 20px; font-size: 13px; }
-footer a { color: #D9A84E; }
+footer { color: #8E7B9E; text-align: center; padding: 26px 20px 34px 20px; font-size: 13px; }
+footer b { color: #D9A84E; font-weight: 600; }
 
-.error-box { background: #C26E5A; color: #FFFFFF; border-radius: 12px; padding: 14px 18px; margin: 14px 0; font-size: 14px; display: none; }
+.error-box { background: #C26E5A; color: #FFF6EC; border-radius: 12px; padding: 14px 18px; margin: 14px 0; font-size: 14px; display: none; }
 
-@media (max-width: 620px) {
-  .hero-title { font-size: 32px; }
+@media (max-width: 660px) {
+  .hero-title { font-size: 33px; }
+  .style-card { flex-direction: column; }
+  .tryon-box { flex: none; width: 100%; }
+  .tryon-box canvas, .tryon-box img { width: 100%; height: auto; aspect-ratio: 19/21; }
   .sc-grid { grid-template-columns: 1fr; }
   .brand-tag { display: none; }
 }
 @media print {
-  header, footer, .steps, .btn-row, .no-print { display: none !important; }
+  header, footer, .steps, .btn-row, .no-print, .gold-rule { display: none !important; }
   body { background: #FFFFFF; }
   .screen { display: none !important; }
   #screen-card { display: block !important; padding: 0; }
-  .stylist-card { border: 2px solid #000000; box-shadow: none; margin: 0; }
+  .stylist-card { box-shadow: none; border: 2px solid #2E2236; margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .crown-load .tine { animation: none; }
+  .crown-load .lock, .hero-crown .lock { animation: none; }
   .screen.active { animation: none; }
 }
 </style>
@@ -186,23 +197,20 @@ footer a { color: #D9A84E; }
 
 <header>
   <div class="header-row">
-    <svg width="40" height="40" viewBox="0 0 240 240" aria-hidden="true">
-      <rect x="0" y="0" width="240" height="240" rx="48" fill="#2E2236"/>
-      <rect x="48" y="162" width="144" height="16" rx="8" fill="#D9A84E"/>
-      <path d="M68,158 L68,92" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
-      <circle cx="68" cy="82" r="6" fill="#C26E5A"/>
-      <path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
-      <circle cx="104" cy="66" r="6" fill="#C26E5A"/>
-      <path d="M138,158 L138,116" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/>
-      <circle cx="138" cy="99" r="13" fill="none" stroke="#D9A84E" stroke-width="9"/>
-      <circle cx="138" cy="99" r="6" fill="#C26E5A"/>
-      <path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="173" cy="88" r="6" fill="#C26E5A"/>
+    <svg width="42" height="42" viewBox="0 0 240 240" aria-hidden="true">
+      <rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/>
+      <path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/>
+      <path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/>
+      <path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/>
+      <path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/>
+      <rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/>
+      <circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/>
     </svg>
     <span class="brand-name">Hair Apparent</span>
     <span class="brand-tag">Find your crowning look.</span>
   </div>
 </header>
+<div class="gold-rule"></div>
 
 <div class="steps" id="stepDots" aria-hidden="true"></div>
 
@@ -210,12 +218,20 @@ footer a { color: #D9A84E; }
 
 <!-- ============ SCREEN 1: WELCOME ============ -->
 <section class="screen active" id="screen-welcome">
+  <svg class="hero-crown" width="150" height="150" viewBox="0 0 240 240" aria-hidden="true">
+    <g class="lock l1"><path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/></g>
+    <g class="lock l2"><path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/>
+    <path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/></g>
+    <g class="lock l3"><path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/></g>
+    <rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/>
+    <circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/>
+  </svg>
   <h1 class="hero-title">The look that's <em>rightfully yours.</em></h1>
-  <p class="hero-sub">Add a few photos. Your browser studies your face shape and features, then recommends hairstyles that genuinely suit you — and writes the instructions your stylist needs to make it happen.</p>
+  <p class="hero-sub">Add a few photos. Your browser studies your face shape and features, recommends styles that genuinely suit you, and shows each one <strong style="color:#D9A84E">on your own photo</strong> — then writes the instructions your stylist needs.</p>
 
   <div class="privacy">
     <div class="lock">&#128274;</div>
-    <p><strong>Your photos never leave this device.</strong> All analysis runs locally in your browser. Nothing is uploaded, no account is needed, and your results are saved only in this browser's local storage. This app is free and open source.</p>
+    <p><strong>Your photos never leave this device.</strong> All analysis and previews happen locally in your browser. Nothing is uploaded, no account is needed, no API keys, no cost. Free and open source.</p>
   </div>
 
   <div class="btn-row">
@@ -227,12 +243,12 @@ footer a { color: #D9A84E; }
 <!-- ============ SCREEN 2: PHOTOS ============ -->
 <section class="screen" id="screen-photos">
   <h2>Add 5&ndash;10 photos</h2>
-  <p class="lede">Clear, well-lit, face visible. Mix it up: straight-on, slight angles, hair pulled back if you can.</p>
+  <p class="lede">Clear, well-lit, face visible. The most frontal photo becomes your try-on model.</p>
 
   <div class="drop" id="dropZone" onclick="document.getElementById('fileInput').click()">
     <div class="big">&#128247;</div>
     <p><strong>Tap to choose photos</strong> or drag them here</p>
-    <p style="font-size:13px">JPG, PNG, or HEIC-converted &middot; stays on your device</p>
+    <p style="font-size:13px">JPG or PNG &middot; stays on your device</p>
   </div>
   <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
 
@@ -250,12 +266,13 @@ footer a { color: #D9A84E; }
 <section class="screen" id="screen-analyze">
   <div class="analyzing">
     <div class="crown-load">
-      <svg width="120" height="120" viewBox="0 0 240 240">
-        <rect x="48" y="162" width="144" height="16" rx="8" fill="#2E2236"/>
-        <g class="tine t1"><path d="M68,158 L68,92" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/><circle cx="68" cy="82" r="6" fill="#C26E5A"/></g>
-        <g class="tine t2"><path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/><circle cx="104" cy="66" r="6" fill="#C26E5A"/></g>
-        <g class="tine t3"><path d="M138,158 L138,116" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round"/><circle cx="138" cy="99" r="13" fill="none" stroke="#2E2236" stroke-width="9"/><circle cx="138" cy="99" r="6" fill="#C26E5A"/></g>
-        <g class="tine t4"><path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#2E2236" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="173" cy="88" r="6" fill="#C26E5A"/></g>
+      <svg width="130" height="130" viewBox="0 0 240 240">
+        <g class="lock l1"><path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/></g>
+        <g class="lock l2"><path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/>
+        <path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/></g>
+        <g class="lock l3"><path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/></g>
+        <rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/>
+        <circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/>
       </svg>
     </div>
     <h2>Studying your features&hellip;</h2>
@@ -303,32 +320,33 @@ footer a { color: #D9A84E; }
   <div id="cardHolder"></div>
   <div class="btn-row">
     <button class="btn btn-ghost" onclick="goTo('results')">Back to styles</button>
-    <button class="btn btn-plum" onclick="window.print()">Print / Save as PDF</button>
+    <button class="btn btn-gold" onclick="window.print()">Print / Save as PDF</button>
   </div>
 </section>
 
 </div>
 
 <footer>
-  Hair Apparent &middot; free &amp; open source (MIT) &middot; your photos never leave your device &middot; created by David Fliesen
+  <b>Hair Apparent</b> &middot; free &amp; open source (MIT) &middot; your photos never leave your device &middot; created by David Fliesen
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script>
 /* ============================================================
-   Hair Apparent v001 — all logic, ES5 only
+   Hair Apparent v002 — ES5 only, hardcoded hex, fully on-device
    ============================================================ */
 
 var SCREENS = ['welcome', 'photos', 'analyze', 'confirm', 'prefs', 'results', 'card'];
-var STORE_KEY = 'hairApparent_v001';
+var STORE_KEY = 'hairApparent_v002';
 var MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
 
 var state = {
-  photos: [],          // array of { dataUrl }
-  analysis: null,      // { faceShape, skinTone, hairColor, eyeColor, detected:{} }
-  attrs: {},           // confirmed attributes
-  prefs: {},           // user preferences
-  chosenStyle: null
+  photos: [],
+  analysis: null,
+  attrs: {},
+  prefs: {},
+  chosenStyle: null,
+  basePhoto: null   /* { dataUrl, pts: [[x,y]x68] } — the best frontal photo for try-on */
 };
 
 /* ---------- navigation ---------- */
@@ -383,7 +401,6 @@ function addFiles(files) {
 function readOne(file) {
   var reader = new FileReader();
   reader.onload = function (e) {
-    // Downscale large photos so analysis is fast and memory stays low
     var img = new Image();
     img.onload = function () {
       var maxSide = 900;
@@ -400,10 +417,7 @@ function readOne(file) {
   reader.readAsDataURL(file);
 }
 
-function removePhoto(idx) {
-  state.photos.splice(idx, 1);
-  renderPhotos();
-}
+function removePhoto(idx) { state.photos.splice(idx, 1); renderPhotos(); }
 
 function renderPhotos() {
   var grid = document.getElementById('photoGrid');
@@ -442,8 +456,9 @@ function startAnalysis() {
   setProgress(5, 'Loading face analysis engine&hellip;');
   loadModels(function (ok) {
     if (!ok) {
-      // Graceful fallback: manual selection
       state.analysis = manualFallback();
+      state.basePhoto = null;
+      seedAttrs();
       setProgress(100, 'Engine unavailable — switching to manual selection.');
       setTimeout(function () { goTo('confirm'); }, 900);
       return;
@@ -458,13 +473,12 @@ function loadModels(cb) {
   Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
     faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL)
-  ]).then(function () {
-    modelsReady = true; cb(true);
-  })['catch'](function () { cb(false); });
+  ]).then(function () { modelsReady = true; cb(true); })['catch'](function () { cb(false); });
 }
 
 function analyzeAll() {
   var results = [];
+  var best = null; /* { score, dataUrl, pts } */
   var idx = 0;
 
   function next() {
@@ -472,38 +486,66 @@ function analyzeAll() {
     var pct = 10 + Math.round((idx / state.photos.length) * 80);
     setProgress(pct, 'Analyzing photo ' + (idx + 1) + ' of ' + state.photos.length + '&hellip;');
     var img = new Image();
+    var myUrl = state.photos[idx].dataUrl;
     img.onload = function () {
       var opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 });
       faceapi.detectSingleFace(img, opts).withFaceLandmarks(true).then(function (det) {
         if (det && det.landmarks) {
-          results.push(measureFace(det.landmarks.positions, img));
+          var pts = det.landmarks.positions;
+          results.push(measureFace(pts, img));
+          var score = (det.detection && det.detection.score) ? det.detection.score : 0.5;
+          /* prefer frontal: penalize tilted eye lines */
+          var le = eyeCenter(pts, 36), re = eyeCenter(pts, 42);
+          var tilt = Math.abs(Math.atan2(re.y - le.y, re.x - le.x));
+          var frontScore = score - tilt * 0.5;
+          if (!best || frontScore > best.score) {
+            best = { score: frontScore, dataUrl: myUrl, pts: flattenPts(pts) };
+          }
         }
         idx++; next();
       })['catch'](function () { idx++; next(); });
     };
     img.onerror = function () { idx++; next(); };
-    img.src = state.photos[idx].dataUrl;
+    img.src = myUrl;
   }
 
   function finish() {
     setProgress(95, 'Combining results across photos&hellip;');
     if (results.length === 0) {
       state.analysis = manualFallback();
-      state.analysis.note = 'We could not find a clear face in these photos — pick your features below.';
+      state.analysis.note = 'We could not find a clear face in these photos — pick your features below. Previews will use a mannequin until a face is found.';
+      state.basePhoto = null;
     } else {
       state.analysis = combineMeasurements(results);
+      state.basePhoto = best ? { dataUrl: best.dataUrl, pts: best.pts } : null;
     }
-    state.attrs = {
-      faceShape: state.analysis.faceShape,
-      skinTone: state.analysis.skinTone,
-      hairColor: state.analysis.hairColor,
-      eyeColor: state.analysis.eyeColor,
-      texture: ''
-    };
+    seedAttrs();
     setProgress(100, 'Done!');
     setTimeout(function () { goTo('confirm'); }, 600);
   }
   next();
+}
+
+function seedAttrs() {
+  state.attrs = {
+    faceShape: state.analysis.faceShape,
+    skinTone: state.analysis.skinTone,
+    hairColor: state.analysis.hairColor,
+    eyeColor: state.analysis.eyeColor,
+    texture: state.attrs.texture || ''
+  };
+}
+
+function eyeCenter(pts, startIdx) {
+  var x = 0, y = 0, i;
+  for (i = startIdx; i < startIdx + 6; i++) { x += pts[i].x; y += pts[i].y; }
+  return { x: x / 6, y: y / 6 };
+}
+
+function flattenPts(pts) {
+  var out = [], i;
+  for (i = 0; i < pts.length; i++) { out.push([Math.round(pts[i].x * 10) / 10, Math.round(pts[i].y * 10) / 10]); }
+  return out;
 }
 
 function dist(a, b) {
@@ -511,41 +553,31 @@ function dist(a, b) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/* Measure one face: ratios + color samples */
 function measureFace(pts, img) {
-  // 68-landmark indices: 0-16 jawline, 17-26 brows, 36-47 eyes, 8 chin
   var cheekW = dist(pts[1], pts[15]);
   var jawW = dist(pts[4], pts[12]);
   var foreheadW = dist(pts[17], pts[26]);
   var midBrow = { x: (pts[21].x + pts[22].x) / 2, y: (pts[21].y + pts[22].y) / 2 };
-  var faceLen = dist(pts[8], midBrow) * 1.42; // estimate up to hairline
+  var faceLen = dist(pts[8], midBrow) * 1.42;
 
   var canvas = document.createElement('canvas');
   canvas.width = img.width; canvas.height = img.height;
   var ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0);
 
-  // Skin: midpoint between cheek edge and nose, both sides
   var skin = avgRegion(ctx, (pts[2].x + pts[30].x) / 2, (pts[2].y + pts[30].y) / 2, 6);
   var skin2 = avgRegion(ctx, (pts[14].x + pts[30].x) / 2, (pts[14].y + pts[30].y) / 2, 6);
   skin = mixRGB(skin, skin2);
 
-  // Eye: center of left eye (36-41)
   var ex = (pts[37].x + pts[38].x + pts[40].x + pts[41].x) / 4;
   var ey = (pts[37].y + pts[38].y + pts[40].y + pts[41].y) / 4;
   var eye = avgRegion(ctx, ex, ey, 2);
 
-  // Hair: sample above the forehead, ~70% of brow-to-chin distance upward from brows
   var browChin = dist(midBrow, pts[8]);
   var hy = midBrow.y - browChin * 0.55;
   var hair = avgRegion(ctx, midBrow.x, Math.max(4, hy), 8);
 
-  return {
-    lenRatio: faceLen / cheekW,
-    jawRatio: jawW / cheekW,
-    fhRatio: foreheadW / cheekW,
-    skin: skin, eye: eye, hair: hair
-  };
+  return { lenRatio: faceLen / cheekW, jawRatio: jawW / cheekW, fhRatio: foreheadW / cheekW, skin: skin, eye: eye, hair: hair };
 }
 
 function avgRegion(ctx, x, y, r) {
@@ -578,10 +610,8 @@ function combineMeasurements(arr) {
     hair: { r: sum.hair.r / n, g: sum.hair.g / n, b: sum.hair.b / n }
   };
   return {
-    faceShape: classifyShape(m),
-    skinTone: classifySkin(m.skin),
-    eyeColor: classifyEye(m.eye),
-    hairColor: classifyHair(m.hair),
+    faceShape: classifyShape(m), skinTone: classifySkin(m.skin),
+    eyeColor: classifyEye(m.eye), hairColor: classifyHair(m.hair),
     detected: { faceShape: true, skinTone: true, eyeColor: true, hairColor: true },
     photosUsed: n
   };
@@ -641,9 +671,9 @@ var ATTR_DEFS = [
     options: ['oval', 'round', 'square', 'heart', 'diamond', 'oblong'] },
   { key: 'texture', label: 'Natural hair texture', note: 'Photos can hide texture (product, styling) — confirm it here.',
     options: ['straight', 'wavy', 'curly', 'coily'] },
-  { key: 'hairColor', label: 'Natural hair color', note: 'Sampled from your photos.',
+  { key: 'hairColor', label: 'Natural hair color', note: 'Sampled from your photos. Previews use this color.',
     options: ['blonde', 'brown', 'brunette', 'black', 'auburn', 'gray'],
-    swatch: { blonde: '#D9B380', brown: '#7A4A2B', brunette: '#4A3220', black: '#1C1812', auburn: '#8A3B1E', gray: '#9C9C9C' } },
+    swatch: { blonde: '#C9A35F', brown: '#6B4326', brunette: '#46301C', black: '#221C16', auburn: '#7E3A1D', gray: '#A8A4A0' } },
   { key: 'skinTone', label: 'Skin tone', note: 'Used to judge contrast between hair color and complexion.',
     options: ['fair', 'light', 'medium', 'olive', 'brown', 'deep'],
     swatch: { fair: '#F3D9C4', light: '#EAC3A3', medium: '#D29E7C', olive: '#B98860', brown: '#8C5A3B', deep: '#5A3A26' } },
@@ -654,30 +684,13 @@ var ATTR_DEFS = [
 
 var PREF_DEFS = [
   { key: 'presentation', label: 'Which styles should we show you?', note: 'This just filters the style library.',
-    options: [
-      { v: 'masc', t: 'Masculine styles' },
-      { v: 'fem', t: 'Feminine styles' },
-      { v: 'all', t: 'Show me everything' }
-    ] },
+    options: [ { v: 'masc', t: 'Masculine styles' }, { v: 'fem', t: 'Feminine styles' }, { v: 'all', t: 'Show me everything' } ] },
   { key: 'length', label: 'How long do you want to go?', note: 'Pick the range you would actually wear.',
-    options: [
-      { v: 'short', t: 'Short' },
-      { v: 'medium', t: 'Medium' },
-      { v: 'long', t: 'Long' },
-      { v: 'any', t: 'Surprise me' }
-    ] },
+    options: [ { v: 'short', t: 'Short' }, { v: 'medium', t: 'Medium' }, { v: 'long', t: 'Long' }, { v: 'any', t: 'Surprise me' } ] },
   { key: 'maintenance', label: 'How much daily effort are you up for?', note: 'Be honest — the best haircut is one you can live with.',
-    options: [
-      { v: 1, t: 'Wash and go' },
-      { v: 2, t: 'A few minutes' },
-      { v: 3, t: 'I enjoy styling' }
-    ] },
+    options: [ { v: 1, t: 'Wash and go' }, { v: 2, t: 'A few minutes' }, { v: 3, t: 'I enjoy styling' } ] },
   { key: 'vibe', label: 'What is the goal?', note: 'Helps break ties between equally good styles.',
-    options: [
-      { v: 'professional', t: 'Polished / professional' },
-      { v: 'lowkey', t: 'Easy / low-key' },
-      { v: 'bold', t: 'Bold / a real change' }
-    ] }
+    options: [ { v: 'professional', t: 'Polished / professional' }, { v: 'lowkey', t: 'Easy / low-key' }, { v: 'bold', t: 'Bold / a real change' } ] }
 ];
 
 function renderConfirm() {
@@ -725,18 +738,161 @@ function renderPrefs() {
   document.getElementById('prefGroups').innerHTML = html;
 }
 
-function setPref(key, val) {
-  state.prefs[key] = val;
-  renderPrefs();
-  saveSession();
-}
+function setPref(key, val) { state.prefs[key] = val; renderPrefs(); saveSession(); }
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-/* ---------- style library ---------- */
-/* shape scores: 0 = avoid, 1 = okay, 2 = good, 3 = excellent */
+/* ============================================================
+   TRY-ON ENGINE — hairstyle overlays drawn onto the user's photo
+   Normalized head space: viewBox 0 0 240 300, eye line y=150,
+   anchor (mid-eyes) at (120,150), cheek width = 112 units.
+   ============================================================ */
+
+var OPEN_HIGH = "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z";
+var OPEN_MID = "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z";
+var OPEN_FRINGE = "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z";
+
+var HAIR_SHAPES = {
+  buzz: { open: OPEN_MID, body: '<path d="M64,152 C58,74 182,74 176,152 C176,162 170,166 164,160 L76,160 C70,166 64,162 64,152 Z" fill="{C}"/>' },
+  crop: { open: OPEN_MID, body: '<path d="M58,156 C50,68 190,68 182,156 C180,178 170,188 150,184 L90,184 C70,188 60,178 58,156 Z" fill="{C}"/>' },
+  quiff: { open: OPEN_MID, body: '<path d="M58,156 C54,92 60,42 104,50 C150,30 188,80 182,156 C180,178 170,188 150,184 L90,184 C70,188 60,178 58,156 Z" fill="{C}"/>' },
+  slick: { open: OPEN_HIGH, body: '<path d="M60,148 C58,90 86,52 124,54 C168,56 186,96 180,150 C180,160 174,164 168,158 L72,158 C66,164 60,158 60,148 Z" fill="{C}"/>' },
+  curlshort: { open: OPEN_FRINGE, body: '<path d="M60,154 C52,100 70,66 120,64 C170,66 188,100 180,154 C178,172 168,182 150,180 L90,180 C72,182 62,172 60,154 Z" fill="{C}"/><circle cx="74" cy="106" r="17" fill="{C}"/><circle cx="98" cy="82" r="18" fill="{C}"/><circle cx="126" cy="74" r="18" fill="{C}"/><circle cx="152" cy="84" r="17" fill="{C}"/><circle cx="170" cy="108" r="16" fill="{C}"/><circle cx="62" cy="134" r="13" fill="{C}"/><circle cx="178" cy="136" r="13" fill="{C}"/>' },
+  afro: { open: OPEN_FRINGE, body: '<circle cx="120" cy="104" r="92" fill="{C}"/><circle cx="52" cy="120" r="26" fill="{C}"/><circle cx="188" cy="120" r="26" fill="{C}"/><circle cx="70" cy="56" r="24" fill="{C}"/><circle cx="170" cy="56" r="24" fill="{C}"/><circle cx="120" cy="36" r="26" fill="{C}"/>' },
+  twa: { open: OPEN_FRINGE, body: '<path d="M66,150 C60,108 76,84 96,78 L146,78 C166,84 180,108 174,150 C172,164 164,172 152,168 L88,168 C76,172 68,164 66,150 Z" fill="{C}"/><circle cx="92" cy="64" r="20" fill="{C}"/><circle cx="120" cy="56" r="22" fill="{C}"/><circle cx="148" cy="64" r="20" fill="{C}"/><circle cx="74" cy="92" r="16" fill="{C}"/><circle cx="166" cy="92" r="16" fill="{C}"/>' },
+  bob: { open: OPEN_MID, body: '<path d="M58,150 C50,66 190,66 182,150 C186,190 184,214 176,232 C168,242 152,240 150,228 C156,196 154,170 150,150 L90,150 C86,170 84,196 90,228 C88,240 72,242 64,232 C56,214 54,190 58,150 Z" fill="{C}"/>' },
+  lob: { open: OPEN_MID, body: '<path d="M58,150 C50,66 190,66 182,150 C188,200 186,236 178,260 C170,272 152,268 152,256 C158,216 156,182 150,150 L90,150 C84,182 82,216 88,256 C88,268 70,272 62,260 C54,236 52,200 58,150 Z" fill="{C}"/>' },
+  longstraight: { open: OPEN_MID, body: '<path d="M58,150 C50,64 190,64 182,150 C190,210 190,258 182,290 C174,300 154,297 155,284 C160,236 158,190 150,150 L90,150 C82,190 80,236 85,284 C86,297 66,300 58,290 C50,258 50,210 58,150 Z" fill="{C}"/>' },
+  shag: { open: OPEN_FRINGE, body: '<path d="M58,148 C50,64 190,64 182,148 C188,176 192,202 184,224 L172,212 L174,240 L158,226 L156,248 C150,250 146,244 146,236 L142,150 L98,150 L94,236 C94,244 90,250 84,248 L82,226 L66,240 L68,212 L56,224 C48,202 52,176 58,148 Z" fill="{C}"/>' },
+  curllong: { open: OPEN_FRINGE, body: '<path d="M60,150 C52,70 188,70 180,150 C178,166 170,176 154,172 L86,172 C70,176 62,166 60,150 Z" fill="{C}"/><circle cx="76" cy="96" r="18" fill="{C}"/><circle cx="120" cy="80" r="20" fill="{C}"/><circle cx="164" cy="96" r="18" fill="{C}"/><circle cx="64" cy="150" r="17" fill="{C}"/><circle cx="62" cy="184" r="17" fill="{C}"/><circle cx="64" cy="218" r="17" fill="{C}"/><circle cx="70" cy="250" r="16" fill="{C}"/><circle cx="176" cy="150" r="17" fill="{C}"/><circle cx="178" cy="184" r="17" fill="{C}"/><circle cx="176" cy="218" r="17" fill="{C}"/><circle cx="170" cy="250" r="16" fill="{C}"/>' }
+};
+
+var HAIR_COLORS = {
+  blonde: '#C9A35F', brown: '#6B4326', brunette: '#46301C',
+  black: '#221C16', auburn: '#7E3A1D', gray: '#A8A4A0'
+};
+
+/* style id -> overlay shape */
+var STYLE_SHAPE = {
+  txcrop: 'crop', classictaper: 'crop', sidepart: 'crop', crew: 'crop', pixie: 'crop',
+  quiff: 'quiff', buzz: 'buzz', slickunder: 'slick', flow: 'slick',
+  curlyfringe: 'curlshort', spongetwist: 'curlshort', twa: 'twa', washngo: 'afro',
+  bob: 'bob', bluntlob: 'lob', curtainlob: 'lob',
+  longlayers: 'longstraight', butterfly: 'longstraight', sideswept: 'longstraight',
+  shag: 'shag', wolf: 'shag', curlylayers: 'curllong'
+};
+
+var hairImgCache = {};
+var basePhotoImg = null;
+
+function hairSvgString(shapeKey, colorHex) {
+  var s = HAIR_SHAPES[shapeKey];
+  var inv = 'M-20,-20 H260 V320 H-20 Z ' + s.open;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
+    '<defs><clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
+    '<g clip-path="url(#fc)">' + s.body.split('{C}').join(colorHex) + '</g></svg>';
+}
+
+function getHairImage(shapeKey, colorHex, cb) {
+  var key = shapeKey + '_' + colorHex;
+  if (hairImgCache[key]) { cb(hairImgCache[key]); return; }
+  var img = new Image();
+  img.onload = function () { hairImgCache[key] = img; cb(img); };
+  img.onerror = function () { cb(null); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(hairSvgString(shapeKey, colorHex));
+}
+
+function getBasePhotoImage(cb) {
+  if (!state.basePhoto) { cb(null); return; }
+  if (basePhotoImg && basePhotoImg.src === state.basePhoto.dataUrl) { cb(basePhotoImg); return; }
+  var img = new Image();
+  img.onload = function () { basePhotoImg = img; cb(img); };
+  img.onerror = function () { cb(null); };
+  img.src = state.basePhoto.dataUrl;
+}
+
+function pt(arr) { return { x: arr[0], y: arr[1] }; }
+
+/* Draw composite (user photo + hair overlay) into target canvas, cropped around the head */
+function renderTryOn(canvas, styleId, done) {
+  var shapeKey = STYLE_SHAPE[styleId] || 'crop';
+  var colorHex = HAIR_COLORS[state.attrs.hairColor] || '#6B4326';
+
+  if (!state.basePhoto || !state.basePhoto.pts) {
+    renderMannequin(canvas, shapeKey, colorHex);
+    if (done) { done(); }
+    return;
+  }
+
+  getBasePhotoImage(function (photo) {
+    if (!photo) { renderMannequin(canvas, shapeKey, colorHex); if (done) { done(); } return; }
+    getHairImage(shapeKey, colorHex, function (hairImg) {
+      if (!hairImg) { renderMannequin(canvas, shapeKey, colorHex); if (done) { done(); } return; }
+
+      var P = state.basePhoto.pts;
+      var le = avgPts(P, 36, 6), re = avgPts(P, 42, 6);
+      var anchor = { x: (le.x + re.x) / 2, y: (le.y + re.y) / 2 };
+      var angle = Math.atan2(re.y - le.y, re.x - le.x);
+      var cheekW = dist(pt(P[1]), pt(P[15]));
+      var s = cheekW / 112;
+
+      /* composite at photo resolution */
+      var off = document.createElement('canvas');
+      off.width = photo.width; off.height = photo.height;
+      var ctx = off.getContext('2d');
+      ctx.drawImage(photo, 0, 0);
+      ctx.save();
+      ctx.translate(anchor.x, anchor.y);
+      ctx.rotate(angle);
+      ctx.scale(s, s);
+      ctx.globalAlpha = 0.96;
+      ctx.drawImage(hairImg, -120, -150, 240, 300);
+      ctx.restore();
+
+      /* crop a head-centered window */
+      var cw = cheekW * 3.0, chh = cheekW * 3.4;
+      var sx = anchor.x - cw / 2;
+      var sy = anchor.y - cheekW * 1.55;
+      sx = Math.max(0, Math.min(sx, off.width - 10));
+      sy = Math.max(0, Math.min(sy, off.height - 10));
+      cw = Math.min(cw, off.width - sx);
+      chh = Math.min(chh, off.height - sy);
+
+      canvas.width = 380; canvas.height = Math.round(380 * (chh / cw));
+      canvas.getContext('2d').drawImage(off, sx, sy, cw, chh, 0, 0, canvas.width, canvas.height);
+      if (done) { done(); }
+    });
+  });
+}
+
+function avgPts(P, start, n) {
+  var x = 0, y = 0, i;
+  for (i = start; i < start + n; i++) { x += P[i][0]; y += P[i][1]; }
+  return { x: x / n, y: y / n };
+}
+
+/* Mannequin fallback: style drawn on a neutral face using the user's skin tone */
+function renderMannequin(canvas, shapeKey, colorHex) {
+  var skinHex = { fair: '#F3D9C4', light: '#EAC3A3', medium: '#D29E7C', olive: '#B98860', brown: '#8C5A3B', deep: '#5A3A26' }[state.attrs.skinTone] || '#D29E7C';
+  var s = HAIR_SHAPES[shapeKey];
+  var inv = 'M-20,-20 H260 V320 H-20 Z ' + s.open;
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
+    '<rect width="240" height="300" fill="#3A2C44"/>' +
+    '<ellipse cx="120" cy="168" rx="58" ry="76" fill="' + skinHex + '"/>' +
+    '<circle cx="97" cy="150" r="6" fill="#2E2236"/><circle cx="143" cy="150" r="6" fill="#2E2236"/>' +
+    '<path d="M104,206 C114,212 126,212 136,206" stroke="#9C5B47" stroke-width="4" fill="none"/>' +
+    '<defs><clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
+    '<g clip-path="url(#fc)">' + s.body.split('{C}').join(colorHex) + '</g></svg>';
+  var img = new Image();
+  img.onload = function () {
+    canvas.width = 240; canvas.height = 300;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ---------- style library (unchanged engine from v001) ---------- */
 var STYLES = [
-  /* ----- masculine ----- */
   { id: 'txcrop', name: 'Textured Crop', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy', 'curly'], maint: 1, vibe: 'lowkey',
     shapes: { oval: 3, round: 3, square: 2, heart: 3, diamond: 2, oblong: 2 },
     desc: 'Short, choppy length on top with a clean taper — modern and forgiving.',
@@ -797,7 +953,6 @@ var STYLES = [
     cut: [['Top', '4–6 in, layered'], ['Sides', 'Over the ear or tucked'], ['Back', 'Collar length, layered'], ['Layers', 'Long layers for movement']],
     tech: 'Long layering throughout so it flows back without bulk. No clippers — all scissor.',
     products: 'Sea-salt spray, air dry pushed back', trim: 8 },
-  /* ----- feminine ----- */
   { id: 'longlayers', name: 'Long Layers', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
     shapes: { oval: 3, round: 3, square: 3, heart: 2, diamond: 2, oblong: 1 },
     desc: 'Face-framing layers through long hair — universally flattering movement.',
@@ -872,7 +1027,6 @@ var STYLES = [
     products: 'Light mousse at roots for the sweep', trim: 9 }
 ];
 
-/* shape-specific reasoning lines */
 var SHAPE_WHY = {
   oval:    'Your oval proportions are the most versatile — this style simply shows them off.',
   round:   'This adds height and keeps weight off the cheeks, which lengthens a rounder face.',
@@ -882,29 +1036,20 @@ var SHAPE_WHY = {
   oblong:  'This adds width and keeps vertical height in check, balancing a longer face.'
 };
 
-/* ---------- scoring + results ---------- */
 function scoreStyle(s) {
   var a = state.attrs, p = state.prefs;
   var score = 0;
-
   var shapeFit = (s.shapes[a.faceShape] !== undefined) ? s.shapes[a.faceShape] : 1;
-  if (shapeFit === 0) { return -1; } // never recommend an "avoid"
-  score += shapeFit * 5;                                            // 0–15
-
+  if (shapeFit === 0) { return -1; }
+  score += shapeFit * 5;
   if (a.texture && s.textures.indexOf(a.texture) > -1) { score += 6; }
   else if (a.texture) { score -= 4; }
-
   if (p.length && p.length !== 'any') {
-    if (s.lengths.indexOf(p.length) > -1) { score += 5; }
-    else { score -= 5; }
+    if (s.lengths.indexOf(p.length) > -1) { score += 5; } else { score -= 5; }
   } else { score += 2; }
-
   var pm = parseInt(p.maintenance || 2, 10);
-  var diff = Math.abs(pm - s.maint);
-  score += (2 - diff) * 2;                                          // -2..+4
-
+  score += (2 - Math.abs(pm - s.maint)) * 2;
   if (p.vibe && p.vibe === s.vibe) { score += 3; }
-
   return score;
 }
 
@@ -924,29 +1069,36 @@ function showResults() {
   pool = pool.slice(0, 6);
 
   var maxSc = pool.length ? pool[0].sc : 1;
-  var minSc = 0;
   var html = '';
   for (i = 0; i < pool.length; i++) {
     var st = pool[i].s;
-    var pct = Math.round(60 + 38 * ((pool[i].sc - minSc) / Math.max(1, (maxSc - minSc))));
+    var pct = Math.round(60 + 38 * (pool[i].sc / Math.max(1, maxSc)));
     if (pct > 98) { pct = 98; }
     var why = SHAPE_WHY[a.faceShape] || '';
     var texNote = (st.textures.indexOf(a.texture) > -1) ? ' Works with your natural ' + a.texture + ' texture as-is.' : '';
+    var capLabel = state.basePhoto ? 'Illustrated preview on your photo' : 'Illustrated preview';
     html += '<div class="style-card' + (i === 0 ? ' top-pick' : '') + '">' +
       (i === 0 ? '<span class="rank-badge">TOP PICK FOR YOUR FACE</span>' : '') +
+      '<div class="tryon-box"><canvas id="tryon-' + st.id + '"></canvas><div class="tryon-cap">' + capLabel + '</div></div>' +
+      '<div class="style-body">' +
       '<span class="match-pct">' + pct + '%</span>' +
       '<h3>' + st.name + '</h3>' +
       '<div class="style-meta">Length: <b>' + st.lengths.join(' / ') + '</b> &middot; Effort: <b>' + ['', 'wash & go', 'a few minutes', 'daily styling'][st.maint] + '</b> &middot; Trim every <b>' + st.trim + ' weeks</b></div>' +
       '<p class="style-why">' + st.desc + ' ' + why + texNote + '</p>' +
-      '<button class="btn btn-plum" style="padding:10px 24px;font-size:15px" onclick="chooseStyle(\'' + st.id + '\')">This is the one &rarr;</button>' +
-      '</div>';
+      '<button class="btn btn-copper" style="padding:10px 24px;font-size:15px" onclick="chooseStyle(\'' + st.id + '\')">This is the one &rarr;</button>' +
+      '</div></div>';
   }
   if (!html) { html = '<p style="text-align:center">No matches with those filters — try widening your length or presentation choices.</p>'; }
   document.getElementById('resultsList').innerHTML = html;
   document.getElementById('resultsLede').innerHTML =
-    'Ranked for your <strong>' + a.faceShape + '</strong> face shape, <strong>' + a.texture + '</strong> texture, and your preferences. Tap one to build your Stylist Card.';
+    'Ranked for your <strong>' + a.faceShape + '</strong> face shape and <strong>' + a.texture + '</strong> texture — each shown in your <strong>' + a.hairColor + '</strong>.';
   saveSession();
   goTo('results');
+
+  /* render previews after the canvases exist */
+  for (i = 0; i < pool.length; i++) {
+    (function (sid) { renderTryOn(document.getElementById('tryon-' + sid), sid); })(pool[i].s.id);
+  }
 }
 
 /* ---------- stylist card ---------- */
@@ -968,10 +1120,11 @@ function chooseStyle(id) {
   var html =
     '<div class="stylist-card">' +
       '<div class="sc-head">' +
-        '<svg width="44" height="44" viewBox="0 0 240 240"><rect x="0" y="0" width="240" height="240" rx="48" fill="#2E2236"/><rect x="48" y="162" width="144" height="16" rx="8" fill="#D9A84E"/><path d="M68,158 L68,92" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/><circle cx="68" cy="82" r="6" fill="#C26E5A"/><path d="M103,158 C93,140 113,128 103,110 C95,96 109,88 104,76" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/><circle cx="104" cy="66" r="6" fill="#C26E5A"/><path d="M138,158 L138,116" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round"/><circle cx="138" cy="99" r="13" fill="none" stroke="#D9A84E" stroke-width="9"/><circle cx="138" cy="99" r="6" fill="#C26E5A"/><path d="M173,158 L168,144 L178,132 L168,120 L178,108 L173,98" fill="none" stroke="#D9A84E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="173" cy="88" r="6" fill="#C26E5A"/></svg>' +
+        '<svg width="46" height="46" viewBox="0 0 240 240"><rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/><path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/><path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/><path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/><path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/><rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/><circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/></svg>' +
         '<div><h3>' + st.name + '</h3><div class="sc-sub">Stylist Card &middot; generated by Hair Apparent &middot; ' + dateStr + '</div></div>' +
       '</div>' +
       '<div class="sc-grid">' +
+        '<div class="sc-block sc-look"><h4>The Look</h4><canvas id="cardTryon"></canvas><p style="font-size:11px;color:#6B5A78;margin-top:5px">Illustrated preview — shape and color reference</p></div>' +
         '<div class="sc-block"><h4>The Client</h4>' +
           '<div class="sc-zone"><span>Face shape</span><b>' + cap(a.faceShape) + '</b></div>' +
           '<div class="sc-zone"><span>Natural texture</span><b>' + cap(a.texture) + '</b></div>' +
@@ -986,19 +1139,28 @@ function chooseStyle(id) {
           '<div class="sc-zone"><span>Daily effort</span><b>' + ['', 'Wash & go', 'A few minutes', 'Styled daily'][st.maint] + '</b></div>' +
         '</div>' +
       '</div>' +
-      '<div class="sc-foot"><span>Why this works: ' + (SHAPE_WHY[a.faceShape] || '') + '</span><span>hairapparent &middot; free &amp; open source</span></div>' +
+      '<div class="sc-foot"><span>Why this works: ' + (SHAPE_WHY[a.faceShape] || '') + '</span><span>Hair Apparent &middot; free &amp; open source</span></div>' +
     '</div>';
 
   document.getElementById('cardHolder').innerHTML = html;
   goTo('card');
+  renderTryOn(document.getElementById('cardTryon'), id);
 }
 
 /* ---------- session persistence (localStorage only) ---------- */
 function saveSession() {
   try {
-    var save = { attrs: state.attrs, prefs: state.prefs, chosenStyle: state.chosenStyle, when: new Date().getTime() };
+    var save = {
+      attrs: state.attrs, prefs: state.prefs, chosenStyle: state.chosenStyle,
+      basePhoto: state.basePhoto, when: new Date().getTime()
+    };
     localStorage.setItem(STORE_KEY, JSON.stringify(save));
-  } catch (e) { /* storage full or blocked — fine, app still works */ }
+  } catch (e) {
+    /* photo may exceed quota — retry without it so settings still persist */
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ attrs: state.attrs, prefs: state.prefs, chosenStyle: state.chosenStyle }));
+    } catch (e2) { /* storage blocked — fine */ }
+  }
 }
 
 function resumeSession() {
@@ -1009,6 +1171,7 @@ function resumeSession() {
     state.attrs = save.attrs || {};
     state.prefs = save.prefs || {};
     state.chosenStyle = save.chosenStyle || null;
+    state.basePhoto = save.basePhoto || null;
     state.analysis = { detected: {}, note: '' };
     if (state.attrs.faceShape) { showResults(); } else { goTo('confirm'); }
   } catch (e) { goTo('photos'); }
@@ -1019,7 +1182,7 @@ function resumeSession() {
     if (localStorage.getItem(STORE_KEY)) {
       document.getElementById('resumeBtn').style.display = 'inline-block';
     }
-  } catch (e) { /* private mode — no resume offered */ }
+  } catch (e) { /* private mode */ }
   drawSteps('welcome');
 })();
 </script>

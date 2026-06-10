@@ -693,7 +693,7 @@ body::before {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.022</p>
+      <p>Build 2026.06.10.023</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -789,8 +789,8 @@ body::before {
   let modalRecommendationIndex = -1;
   let touchStartX = 0;
   const generationProfiles = {
-    fast: { quality: 'low', concurrency: 3, label: 'Fast' },
-    balanced: { quality: 'medium', concurrency: 2, label: 'Balanced' },
+    fast: { quality: 'low', concurrency: 1, label: 'Fast' },
+    balanced: { quality: 'medium', concurrency: 1, label: 'Balanced' },
     best: { quality: 'high', concurrency: 1, label: 'Best' }
   };
 
@@ -1292,11 +1292,11 @@ body::before {
 
   async function generateImage(style, index, total) {
     const baseImg = selectedFiles[0];
-    let safeImage = normalizedReferenceImage;
+    let safeReference = normalizedReferenceImage;
     if (!safeReference) {
       try {
         safeReference = await normalizeImageForEdit(baseImg);
-        normalizedReferenceImage = safeImage;
+        normalizedReferenceImage = safeReference;
       } catch (e) {
         console.error('Unable to normalize photo for editing', e);
         return { url: '', error: 'The uploaded photo could not be prepared. Try a clear JPG or PNG face photo.' };
@@ -1397,7 +1397,7 @@ body::before {
     });
 
     if (recsStatus) {
-      recsStatus.textContent = `Preparing 6 ${styleExpression === 'show-everything' ? 'mixed' : styleExpression} looks for you in ${(generationProfiles[generationMode] || generationProfiles.balanced).label} mode with ${lengthPreference === 'surprise' ? 'varied lengths' : lengthPreference + ' length'}…`;
+      recsStatus.textContent = `Preparing 6 ${styleExpression === 'show-everything' ? 'mixed' : styleExpression} looks for you in ${(generationProfiles[generationMode] || generationProfiles.balanced).label} mode with ${lengthPreference === 'surprise' ? 'varied lengths' : lengthPreference + ' length'}… Rendering is intentionally one at a time for reliability.`;
     }
     showScreen('recs');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1408,7 +1408,7 @@ body::before {
       if (recsProgressFill) recsProgressFill.style.width = `${percent}%`;
       if (!recsStatus) return;
       if (completed < currentRecommendations.length) {
-        recsStatus.textContent = `Rendering your looks… ${completed} of ${currentRecommendations.length} complete. You can select any look as soon as its image is ready.`;
+        recsStatus.textContent = `Rendering your looks one at a time for reliability… ${completed} of ${currentRecommendations.length} complete. You can select any look as soon as its image is ready.`;
       } else {
         recsStatus.textContent = `Your 6 looks are ready. Tap any image to enlarge it, pick a favorite, or regenerate for a new set.`;
       }
@@ -1458,7 +1458,24 @@ body::before {
     const workers = Array.from({ length: workerCount }, async () => {
       while (queue.length > 0) {
         const nextIndex = queue.shift();
-        await renderOne(nextIndex);
+        try {
+          await renderOne(nextIndex);
+        } catch (err) {
+          console.error('Rendering worker failed for look', nextIndex, err);
+          const style = currentRecommendations[nextIndex];
+          const slot = document.getElementById(`rec-img-slot-${nextIndex}`);
+          const btn = document.getElementById(`choose-${nextIndex}`);
+          const badge = document.getElementById(`rec-badge-${nextIndex}`);
+          if (style) style.error = err?.message || 'Unexpected rendering error.';
+          if (slot) slot.innerHTML = `<span>Could not generate this look.<br><small>${style?.error || 'Unexpected rendering error.'}</small></span>`;
+          if (btn) btn.disabled = true;
+          if (badge) {
+            badge.textContent = 'Error';
+            badge.className = 'rec-status-badge error';
+          }
+          completed += 1;
+          updateOverallStatus();
+        }
       }
     });
     await Promise.all(workers);

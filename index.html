@@ -435,7 +435,7 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.010</p>
+      <p>Build 2026.06.10.011</p>
     </footer>
     <!-- Inline script eliminates external dependency and ensures the app loads
          correctly on GitHub Pages when only index.html is deployed. -->
@@ -587,7 +587,7 @@ body {
   function saveApiKey() {
     const key = apiKeyInput.value.trim();
     // A very basic check: OpenAI keys start with "sk-" and are 20+ characters
-    if (!/^sk-\w{20,}/.test(key)) {
+    if (!/^sk-[A-Za-z0-9_-]{20,}/.test(key)) {
       apiWarning.hidden = false;
       return;
     }

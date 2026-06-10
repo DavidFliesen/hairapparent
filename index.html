@@ -303,7 +303,7 @@ body {
 .remember-row input { width: auto; }
 .choice-group { margin: 1rem 0 1.25rem; text-align: left; }
 .choice-title { margin: 0 0 .35rem; font-weight: 700; color: var(--text-dark); }
-.segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin-top: .5rem; }
+.segmented { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: .65rem; margin-top: .5rem; }
 .segment-option input { display: none; }
 .segment-option span { display: block; padding: .8rem .7rem; border: 1px solid #d9cfe0; border-radius: 999px; background: #fff; color: var(--primary); text-align: center; font-weight: 600; cursor: pointer; transition: .2s ease; }
 .segment-option input:checked + span { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 8px 18px rgba(75,43,91,.18); }
@@ -502,15 +502,14 @@ body {
       <section id="screen-upload" class="screen">
         <h2 class="screen-title">Step&nbsp;1: Upload your photos</h2>
         <p class="screen-desc">
-          For best results, upload 5–10 clear, front‑facing photos. Good lighting,
-          neutral background, no hats or sunglasses. We'll use the first photo to
-          generate your looks.
+          For the strongest identity match, upload one clear primary face photo.
+          Use a chest-up or shoulders-up photo with the full head visible, good lighting,
+          neutral expression, no hats, and no sunglasses.
         </p>
         <input
           type="file"
           id="photo-input"
           accept="image/*"
-          multiple
           class="file-input"
         />
         <div id="photo-previews" class="preview-grid"></div>
@@ -523,8 +522,36 @@ body {
             <label class="segment-option"><input type="radio" name="style-expression" value="show-everything" checked /><span>Show everything</span></label>
           </div>
         </div>
+        <div class="choice-group">
+          <p class="choice-title">Length preference?</p>
+          <p class="screen-desc small">Pick what you would actually wear.</p>
+          <div class="segmented">
+            <label class="segment-option"><input type="radio" name="length-preference" value="short" /><span>Short</span></label>
+            <label class="segment-option"><input type="radio" name="length-preference" value="medium" /><span>Medium</span></label>
+            <label class="segment-option"><input type="radio" name="length-preference" value="long" /><span>Long</span></label>
+            <label class="segment-option"><input type="radio" name="length-preference" value="surprise" checked /><span>Surprise me</span></label>
+          </div>
+        </div>
+        <div class="choice-group">
+          <p class="choice-title">Daily effort?</p>
+          <p class="screen-desc small">Be honest about your mornings.</p>
+          <div class="segmented">
+            <label class="segment-option"><input type="radio" name="daily-effort" value="wash-and-go" checked /><span>Wash and go</span></label>
+            <label class="segment-option"><input type="radio" name="daily-effort" value="few-minutes" /><span>A few minutes</span></label>
+            <label class="segment-option"><input type="radio" name="daily-effort" value="enjoy-styling" /><span>I enjoy styling</span></label>
+          </div>
+        </div>
+        <div class="choice-group">
+          <p class="choice-title">Goal?</p>
+          <p class="screen-desc small">This helps Hair Apparent break ties between similar choices.</p>
+          <div class="segmented">
+            <label class="segment-option"><input type="radio" name="style-goal" value="polished" checked /><span>Polished</span></label>
+            <label class="segment-option"><input type="radio" name="style-goal" value="easy" /><span>Easy / low-key</span></label>
+            <label class="segment-option"><input type="radio" name="style-goal" value="bold" /><span>Bold change</span></label>
+          </div>
+        </div>
         <div id="upload-warning" class="warning" hidden>
-          Please select at least one suitable face photo before continuing.
+          Please select one suitable face photo before continuing.
         </div>
         <button id="btn-to-api" class="primary-btn" disabled>Continue</button>
       </section>
@@ -605,7 +632,7 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.019</p>
+      <p>Build 2026.06.10.020</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -666,6 +693,9 @@ body {
   const previousRenders = document.getElementById('previous-renders');
   const previousRendersList = document.getElementById('previous-renders-list');
   const styleExpressionInputs = document.querySelectorAll('input[name="style-expression"]');
+  const lengthPreferenceInputs = document.querySelectorAll('input[name="length-preference"]');
+  const dailyEffortInputs = document.querySelectorAll('input[name="daily-effort"]');
+  const styleGoalInputs = document.querySelectorAll('input[name="style-goal"]');
   const imageModal = document.getElementById('image-modal');
   const imageModalImg = document.getElementById('image-modal-img');
   const imageModalTitle = document.getElementById('image-modal-title');
@@ -690,6 +720,9 @@ body {
   let previousBatchCount = 0;
   let selectedLook = null;
   let styleExpression = 'show-everything';
+  let lengthPreference = 'surprise';
+  let dailyEffort = 'wash-and-go';
+  let styleGoal = 'polished';
   let generationMode = 'balanced';
   let normalizedReferenceImage = null;
   let modalRecommendationIndex = -1;
@@ -703,127 +736,58 @@ body {
   // Catalogue of hairstyle concepts.  Each entry contains a unique name, a
   // description, and a prompt fragment used when calling OpenAI’s image API.
   const hairstyleCatalog = [
-    {
-      name: 'Classic Side-Part Taper',
-      description: 'A clean barbershop-style cut with a neat side part and gradual taper for a polished masculine finish.',
-      prompt: 'classic side part taper haircut, masculine, polished, barbershop clean lines',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Textured Crop',
-      description: 'A modern textured crop with soft movement on top and tidy sides for easy daily wear.',
-      prompt: 'textured crop haircut, masculine, modern, easy styling, soft texture on top',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Ivy League Shape',
-      description: 'A refined Ivy League cut with a little length on top and a crisp, confident silhouette.',
-      prompt: 'ivy league haircut, masculine, refined, classic shape, slightly longer top',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Soft Executive Layers',
-      description: 'Softly layered medium-short hair with a professional finish that stays masculine and flattering.',
-      prompt: 'soft executive layered haircut, masculine, polished, professional, medium short length',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Modern Quiff',
-      description: 'A subtle lifted quiff with clean sides and natural fullness through the front.',
-      prompt: 'modern quiff haircut, masculine, subtle lift, clean sides, natural fullness',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Tailored Crew Cut',
-      description: 'A neat crew-cut inspired style with a more tailored finish for strong facial structure.',
-      prompt: 'tailored crew cut, masculine, neat, flattering, polished texture',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Relaxed Medium Flow',
-      description: 'A slightly longer masculine cut that keeps movement while staying easy and wearable.',
-      prompt: 'relaxed medium flow hairstyle, masculine, easy wearable movement, salon quality',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Clean Tapered Shape',
-      description: 'A tapered masculine style with balanced volume on top and easy day-to-day maintenance.',
-      prompt: 'clean tapered masculine haircut, balanced volume on top, low maintenance, polished',
-      presentation: 'masculine'
-    },
-    {
-      name: 'Soft Sculpted Layers',
-      description: 'Chic layers that add movement while maintaining length. This look frames the face softly and can be worn polished or tousled.',
-      prompt: 'soft sculpted layers hairstyle, polished and classic, salon quality, natural movement',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Dimensional Color Polish',
-      description: 'Multi-tonal color and soft shaping create a polished salon look with extra radiance and depth.',
-      prompt: 'dimensional color hairstyle, feminine, polished and classic, salon color depth and shine',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Modern French Bob',
-      description: 'A chin-length bob with subtle texture and a sophisticated, fashion-forward silhouette.',
-      prompt: 'modern french bob hairstyle, feminine, sophisticated, polished, salon quality',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Sleek Side-Swept Lob',
-      description: 'A long bob with side-swept layers that elongate the face and offer versatile styling options.',
-      prompt: 'sleek side swept lob hairstyle, feminine, polished, classic salon finish',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Voluminous Curtain Bangs',
-      description: 'Curtain bangs paired with soft layers bring movement, framing, and bounce.',
-      prompt: 'voluminous curtain bangs hairstyle, feminine, soft layers, salon quality',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Classic Shoulder-Skimming Cut',
-      description: 'A shoulder-length cut with light shaping for an elegant and timeless feminine result.',
-      prompt: 'classic shoulder length hairstyle, feminine, elegant, timeless, polished',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Glossy Face-Framing Layers',
-      description: 'Longer layers around the face add subtle definition and a glossy, salon-finished softness.',
-      prompt: 'glossy face framing layers hairstyle, feminine, polished, flattering',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Timeless Pixie Crop',
-      description: 'A soft pixie with refined shape and a confident, stylish finish.',
-      prompt: 'timeless pixie crop hairstyle, feminine, stylish, refined, salon quality',
-      presentation: 'feminine'
-    },
-    {
-      name: 'Textured Shag Balance',
-      description: 'A softly textured shape that can lean masculine, feminine, or neutral depending on the wearer.',
-      prompt: 'textured shag hairstyle, versatile, modern, balanced, salon quality',
-      presentation: 'universal'
-    },
-    {
-      name: 'Minimal Polished Crop',
-      description: 'A clean, minimal cut with polished finish that stays versatile and wearable.',
-      prompt: 'minimal polished crop hairstyle, gender neutral, clean salon styling',
-      presentation: 'universal'
-    },
-    {
-      name: 'Soft Natural Volume',
-      description: 'A balanced style focused on healthy-looking volume and natural movement.',
-      prompt: 'soft natural volume hairstyle, versatile, flattering, salon quality',
-      presentation: 'universal'
-    },
-    {
-      name: 'Refined Shape Control',
-      description: 'A controlled, refined silhouette designed to flatter the face without feeling extreme.',
-      prompt: 'refined shape control hairstyle, versatile, flattering, polished',
-      presentation: 'universal'
-    }
+    { name:'Classic Side-Part Taper', description:'A polished barbershop shape with a neat side part, controlled top, and tapered sides.', prompt:'classic side-part taper haircut with controlled top and clean tapered sides', presentation:'masculine', length:'short', effort:'few-minutes', goal:'polished' },
+    { name:'Textured Crop', description:'A short, modern crop with natural texture on top and tidy sides for easy daily wear.', prompt:'modern textured crop haircut, short textured top, tidy sides, natural masculine finish', presentation:'masculine', length:'short', effort:'wash-and-go', goal:'easy' },
+    { name:'Ivy League Shape', description:'A refined short-to-medium cut with enough length to part or brush up for a confident look.', prompt:'ivy league haircut, short to medium length, refined and masculine, slight side part', presentation:'masculine', length:'short', effort:'few-minutes', goal:'polished' },
+    { name:'Soft Executive Layers', description:'Medium-short layers with a professional finish, softer than a hard taper but still clean.', prompt:'soft executive layered masculine haircut, medium short, professional, natural layers', presentation:'masculine', length:'medium', effort:'few-minutes', goal:'polished' },
+    { name:'Modern Quiff', description:'A lifted front with clean sides for a more styled, confident masculine change.', prompt:'modern quiff haircut, lifted front, clean sides, masculine salon finish', presentation:'masculine', length:'medium', effort:'enjoy-styling', goal:'bold' },
+    { name:'Tailored Crew Cut', description:'A neat crew-inspired shape with a touch of texture and strong, practical structure.', prompt:'tailored crew cut, short masculine haircut, strong structure, neat texture', presentation:'masculine', length:'short', effort:'wash-and-go', goal:'easy' },
+    { name:'Relaxed Medium Flow', description:'A longer masculine shape with natural movement around the sides and top.', prompt:'relaxed medium flow masculine hairstyle, natural movement, medium length, wearable', presentation:'masculine', length:'medium', effort:'few-minutes', goal:'easy' },
+    { name:'Clean Tapered Shape', description:'Balanced volume on top with a clean taper for a flattering, low-maintenance finish.', prompt:'clean tapered masculine haircut, balanced volume on top, low maintenance, polished', presentation:'masculine', length:'short', effort:'wash-and-go', goal:'polished' },
+    { name:'Silver Fox Brush Back', description:'A medium brushed-back look with refined volume and a classic mature-salon feel.', prompt:'medium brushed back masculine hairstyle, refined volume, mature classic salon look', presentation:'masculine', length:'medium', effort:'few-minutes', goal:'polished' },
+    { name:'Short Textured Caesar', description:'A short Caesar-inspired cut with light fringe and practical texture.', prompt:'short textured caesar haircut, subtle fringe, masculine, easy low-key style', presentation:'masculine', length:'short', effort:'wash-and-go', goal:'easy' },
+    { name:'Layered Surfer Flow', description:'A longer, relaxed masculine shape with movement and personality.', prompt:'longer layered surfer flow hairstyle, masculine, relaxed movement, bold but wearable', presentation:'masculine', length:'long', effort:'enjoy-styling', goal:'bold' },
+    { name:'Modern Bro Flow', description:'A medium-to-long swept-back shape with natural volume and soft edges.', prompt:'modern bro flow hairstyle, medium long masculine hair, swept back natural volume', presentation:'masculine', length:'long', effort:'few-minutes', goal:'polished' },
+    { name:'Soft Sculpted Layers', description:'Chic layers that add movement while maintaining a soft, face-framing shape.', prompt:'soft sculpted layers hairstyle, face framing, polished salon movement', presentation:'feminine', length:'medium', effort:'few-minutes', goal:'polished' },
+    { name:'Dimensional Color Polish', description:'A polished salon shape with multi-tonal color, shine, and subtle depth.', prompt:'dimensional color polish hairstyle, multi tonal salon color, glossy flattering layers', presentation:'feminine', length:'medium', effort:'few-minutes', goal:'polished' },
+    { name:'Modern French Bob', description:'A chin-to-jaw bob with clean shape, subtle texture, and a fashion-forward finish.', prompt:'modern french bob hairstyle, chin length, subtle texture, sophisticated salon cut', presentation:'feminine', length:'short', effort:'few-minutes', goal:'bold' },
+    { name:'Sleek Side-Swept Lob', description:'A long bob with side-swept movement that feels polished but wearable.', prompt:'sleek side swept lob hairstyle, shoulder length, polished classic salon finish', presentation:'feminine', length:'medium', effort:'few-minutes', goal:'polished' },
+    { name:'Voluminous Curtain Bangs', description:'Curtain bangs with layered movement and soft bounce around the face.', prompt:'voluminous curtain bangs hairstyle, soft layers, feminine salon volume', presentation:'feminine', length:'medium', effort:'enjoy-styling', goal:'bold' },
+    { name:'Classic Shoulder-Skimming Cut', description:'A shoulder-length shape with light layering for timeless softness.', prompt:'classic shoulder length hairstyle, light layers, elegant timeless salon result', presentation:'feminine', length:'medium', effort:'wash-and-go', goal:'easy' },
+    { name:'Glossy Face-Framing Layers', description:'Longer face-framing layers with glossy movement and soft dimension.', prompt:'glossy face framing layers hairstyle, long layers, polished flattering movement', presentation:'feminine', length:'long', effort:'few-minutes', goal:'polished' },
+    { name:'Timeless Pixie Crop', description:'A refined pixie with soft edges and confident salon shape.', prompt:'timeless pixie crop hairstyle, refined soft edges, confident stylish finish', presentation:'feminine', length:'short', effort:'wash-and-go', goal:'bold' },
+    { name:'Butterfly Layers', description:'Longer layered movement with airy face-framing pieces and volume.', prompt:'butterfly layered haircut, long airy layers, face framing volume, salon finish', presentation:'feminine', length:'long', effort:'enjoy-styling', goal:'bold' },
+    { name:'Soft Shag with Fringe', description:'A layered shag with soft fringe and texture for a more expressive change.', prompt:'soft shag hairstyle with fringe, layered texture, expressive salon look', presentation:'feminine', length:'medium', effort:'enjoy-styling', goal:'bold' },
+    { name:'Rounded Layered Bob', description:'A rounded bob with subtle layers for fullness and easy polish.', prompt:'rounded layered bob hairstyle, short to medium, fuller shape, polished', presentation:'feminine', length:'short', effort:'few-minutes', goal:'polished' },
+    { name:'Long Soft Waves', description:'Long, soft layers with gentle wave and romantic movement.', prompt:'long soft waves hairstyle, long layers, polished salon movement', presentation:'feminine', length:'long', effort:'enjoy-styling', goal:'polished' },
+    { name:'Textured Shag Balance', description:'A softly textured shape that can lean masculine, feminine, or neutral depending on styling.', prompt:'textured shag hairstyle, versatile, modern, balanced, salon quality', presentation:'universal', length:'medium', effort:'few-minutes', goal:'bold' },
+    { name:'Minimal Polished Crop', description:'A clean, minimal crop with a versatile, wearable finish.', prompt:'minimal polished crop hairstyle, gender neutral, clean salon styling', presentation:'universal', length:'short', effort:'wash-and-go', goal:'easy' },
+    { name:'Soft Natural Volume', description:'A balanced style focused on healthy-looking volume and natural movement.', prompt:'soft natural volume hairstyle, versatile, flattering, salon quality', presentation:'universal', length:'medium', effort:'wash-and-go', goal:'easy' },
+    { name:'Refined Shape Control', description:'A controlled silhouette designed to flatter the face without feeling extreme.', prompt:'refined shape control hairstyle, versatile, flattering, polished', presentation:'universal', length:'short', effort:'few-minutes', goal:'polished' },
+    { name:'Layered Collar-Length Cut', description:'A collar-length shape with soft movement and flexible styling options.', prompt:'collar length layered hairstyle, versatile, medium length, balanced polish', presentation:'universal', length:'medium', effort:'few-minutes', goal:'polished' },
+    { name:'Long Natural Layers', description:'A longer, low-key shape that keeps length while adding face-friendly movement.', prompt:'long natural layers hairstyle, versatile, long length, low key natural movement', presentation:'universal', length:'long', effort:'wash-and-go', goal:'easy' },
+    { name:'Bold Tapered Undercut', description:'A sharper silhouette with contrast at the sides for a confident change.', prompt:'bold tapered undercut hairstyle, versatile, high contrast sides, modern change', presentation:'universal', length:'short', effort:'enjoy-styling', goal:'bold' },
+    { name:'Medium Textured Sweep', description:'A medium-length swept shape with texture and natural direction.', prompt:'medium textured sweep hairstyle, versatile, natural direction, salon finish', presentation:'universal', length:'medium', effort:'few-minutes', goal:'easy' },
+    { name:'Long Layered Transformation', description:'A fuller long-layered makeover with stronger movement and styling impact.', prompt:'long layered transformation hairstyle, versatile, long length, dramatic salon makeover', presentation:'universal', length:'long', effort:'enjoy-styling', goal:'bold' }
   ];
+
+  const salonBackgrounds = [
+    'upscale modern salon with warm walnut stations, soft mirror lighting, and a neutral beige wall',
+    'bright luxury salon suite with marble counter, diffused daylight, and elegant cream backdrop',
+    'classic barber-salon interior with leather chair, subtle mirror highlights, and warm professional lighting',
+    'minimal Scandinavian salon with pale wood, white walls, and soft natural light',
+    'boutique salon with champagne gold fixtures, blurred product shelves, and flattering studio light',
+    'high-end hair studio with black-framed mirrors, soft gray wall, and cinematic salon lighting',
+    'cozy upscale salon corner with plants, warm sconces, and neutral textured background',
+    'editorial salon portrait set with seamless taupe backdrop and softbox lighting',
+    'clean modern grooming studio with matte charcoal accents and warm rim light',
+    'bright airy salon with cream curtains, subtle mirror reflections, and premium makeover atmosphere'
+  ];
+
+  function randomSalonBackground() {
+    return salonBackgrounds[Math.floor(Math.random() * salonBackgrounds.length)];
+  }
+
 
   /**
    * Show a screen by id and hide all others.
@@ -841,18 +805,25 @@ body {
    * size and type. In production you might incorporate face detection here.
    */
   function handleFilesSelected() {
-    selectedFiles = Array.from(photoInput.files || []);
+    const files = Array.from(photoInput.files || []);
+    selectedFiles = files.length ? [files[0]] : [];
+    normalizedReferenceImage = null;
     photoPreviews.innerHTML = '';
     uploadWarning.hidden = true;
     if (selectedFiles.length === 0) {
       toApiBtn.disabled = true;
       return;
     }
-    selectedFiles.forEach((file) => {
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      photoPreviews.appendChild(img);
-    });
+    const file = selectedFiles[0];
+    if (!file.type || !file.type.startsWith('image/')) {
+      uploadWarning.hidden = false;
+      uploadWarning.textContent = 'Please upload one clear image file, such as a JPG, PNG, or HEIC photo.';
+      toApiBtn.disabled = true;
+      return;
+    }
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    photoPreviews.appendChild(img);
     toApiBtn.disabled = false;
   }
 
@@ -891,32 +862,41 @@ body {
    */
   function getFilteredCatalog() {
     return hairstyleCatalog.filter((style) => {
-      if (styleExpression === 'masculine') {
-        return style.presentation === 'masculine' || style.presentation === 'universal';
-      }
-      if (styleExpression === 'feminine') {
-        return style.presentation === 'feminine' || style.presentation === 'universal';
-      }
+      if (styleExpression === 'masculine' && !(style.presentation === 'masculine' || style.presentation === 'universal')) return false;
+      if (styleExpression === 'feminine' && !(style.presentation === 'feminine' || style.presentation === 'universal')) return false;
+      if (lengthPreference !== 'surprise' && style.length !== lengthPreference) return false;
       return true;
     });
   }
 
+  function styleScore(style) {
+    let score = 0;
+    if (style.effort === dailyEffort) score += 3;
+    if (style.goal === styleGoal) score += 3;
+    if (lengthPreference !== 'surprise' && style.length === lengthPreference) score += 4;
+    if (styleExpression !== 'show-everything' && style.presentation === styleExpression) score += 2;
+    if (style.presentation === 'universal') score += 1;
+    return score;
+  }
+
   function pickRandomStyles(count) {
-    const sourceCatalog = getFilteredCatalog();
+    const sourceCatalog = getFilteredCatalog().length ? getFilteredCatalog() : hairstyleCatalog;
     const available = sourceCatalog.filter(
-      (style) => !usedStyles.has(`${styleExpression}:${style.name}`)
+      (style) => !usedStyles.has(`${styleExpression}:${lengthPreference}:${dailyEffort}:${styleGoal}:${style.name}`)
     );
-    let pool = available;
-    if (pool.length < count) {
-      usedStyles.clear();
-      pool = [...sourceCatalog];
-    }
+    let pool = available.length >= count ? available : [...sourceCatalog];
+    pool = pool
+      .map((style) => ({ style, score: styleScore(style) + Math.random() * 2 }))
+      .sort((a, b) => b.score - a.score)
+      .map((item) => item.style);
     const chosen = [];
     while (chosen.length < count && pool.length > 0) {
-      const idx = Math.floor(Math.random() * pool.length);
-      const style = pool.splice(idx, 1)[0];
+      const takeFrom = pool.slice(0, Math.min(pool.length, 10));
+      const idx = Math.floor(Math.random() * takeFrom.length);
+      const style = takeFrom[idx];
+      pool = pool.filter((item) => item.name !== style.name);
       chosen.push(style);
-      usedStyles.add(`${styleExpression}:${style.name}`);
+      usedStyles.add(`${styleExpression}:${lengthPreference}:${dailyEffort}:${styleGoal}:${style.name}`);
     }
     return chosen;
   }
@@ -1150,13 +1130,14 @@ body {
 
     const profile = generationProfiles[generationMode] || generationProfiles.balanced;
     const prompt =
-      `Create a photorealistic hairstyle makeover preview using the uploaded person as the identity reference. ` +
-      `Preserve the person's face, age, facial expression, skin tone, head angle, and overall identity. Change only the hairstyle and hair color. ` +
-      `Desired hairstyle direction: ${style.prompt}. ` +
+      `Create a photorealistic hairstyle makeover preview using the uploaded person as the single identity reference. ` +
+      `Preserve the person's face, age, facial expression, skin tone, head angle, facial proportions, eye spacing, nose, mouth, cheeks, jawline, and overall identity. Do not beautify into a different person. Change only the hairstyle, grooming, and hair color when needed. ` +
+      `Desired hairstyle direction: ${style.prompt}. Length preference: ${lengthPreference}. Daily effort preference: ${dailyEffort}. Style goal: ${styleGoal}. ` +
       `${getPresentationInstruction(style)} ` +
+      `Place the person in this salon setting: ${style.salonBackground}. Keep the background softly blurred and secondary to the person. ` +
       `Preserve apparent age, identity, and facial structure. Compose this like a professional salon headshot from the breasts / mid-chest upward, not a tight face crop. The full head and full head of hair must be visible: crown, top of hair, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave about one fist of empty background above the highest hair point, roughly 15 to 20 percent of the image height. If necessary, zoom the portrait out to include the whole hairstyle. Never crop, cut off, touch, or hide the top of the hair. Prioritize showing the full hairstyle over making the face large in the frame. ` +
-      `The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
-      `Keep background simple and professional. No text, no watermark, no collage.`;
+      `The result must look like a real salon makeover photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
+      `No text, no watermark, no collage.`;
 
     const formData = new FormData();
     formData.append('model', 'gpt-image-1');
@@ -1199,8 +1180,14 @@ body {
    */
   async function generateRecommendations(regenerate) {
     const checkedStyle = document.querySelector('input[name="style-expression"]:checked');
+    const checkedLength = document.querySelector('input[name="length-preference"]:checked');
+    const checkedEffort = document.querySelector('input[name="daily-effort"]:checked');
+    const checkedGoal = document.querySelector('input[name="style-goal"]:checked');
     const checkedSpeed = document.querySelector('input[name="speed-mode"]:checked');
     styleExpression = checkedStyle ? checkedStyle.value : 'show-everything';
+    lengthPreference = checkedLength ? checkedLength.value : 'surprise';
+    dailyEffort = checkedEffort ? checkedEffort.value : 'wash-and-go';
+    styleGoal = checkedGoal ? checkedGoal.value : 'polished';
     generationMode = checkedSpeed ? checkedSpeed.value : 'balanced';
 
     if (regenerate) {
@@ -1217,6 +1204,7 @@ body {
       ...style,
       imageUrl: '',
       error: '',
+      salonBackground: randomSalonBackground(),
       galleryId: `look-${Date.now()}-${Math.random().toString(36).slice(2)}`
     }));
     if (recsProgressFill) recsProgressFill.style.width = '0%';
@@ -1232,7 +1220,7 @@ body {
     });
 
     if (recsStatus) {
-      recsStatus.textContent = `Preparing 6 ${styleExpression === 'show-everything' ? 'mixed' : styleExpression} looks for you in ${(generationProfiles[generationMode] || generationProfiles.balanced).label} mode…`;
+      recsStatus.textContent = `Preparing 6 ${styleExpression === 'show-everything' ? 'mixed' : styleExpression} looks for you in ${(generationProfiles[generationMode] || generationProfiles.balanced).label} mode with ${lengthPreference === 'surprise' ? 'varied lengths' : lengthPreference + ' length'}…`;
     }
     showScreen('recs');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1452,6 +1440,7 @@ body {
       'Preserve the same overall silhouette while adjusting for the client\'s actual hair density, texture, growth pattern, and face shape.',
       'Discuss length, taper, layering, color, and daily styling comfort before cutting.',
       `Requested style direction in the app: ${styleExpression}.`,
+      `Length preference: ${lengthPreference}. Daily effort: ${dailyEffort}. Goal: ${styleGoal}.`,
       `Preview mode used: ${generationMode}.`
     ].forEach((paragraph) => {
       wrapText(paragraph, 80).forEach((line) => addText(line, 10.5, 14));

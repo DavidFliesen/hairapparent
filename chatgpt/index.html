@@ -601,11 +601,11 @@ body {
           <button id="btn-back" class="secondary-btn">Back to previous menu</button>
           <button id="btn-start-over" class="danger-btn">Start over</button>
         </div>
-        <p class="final-note">On phones and tablets, “Save / share photo” opens the system share sheet when supported, where users can save to Photos. “Save PDF stylist directions” creates a real PDF file and opens the device share sheet when supported.</p>
+        <p class="final-note">On phones and tablets, “Save / share photo” opens the system share sheet when supported, where users can save to Photos. “Save PDF stylist directions” creates one PDF file only; no extra TXT companion file is intentionally created.</p>
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.018</p>
+      <p>Build 2026.06.10.019</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -1071,27 +1071,42 @@ body {
       reader.onload = () => {
         const img = new Image();
         img.onload = () => {
+          // Build a padded square reference instead of passing a tight crop.
+          // This gives the image model room above the head so generated hair
+          // is less likely to be cut off at the top of the frame.
+          const canvasSize = 1024;
           const canvas = document.createElement('canvas');
-          const maxDim = 1024;
-          let width = img.width;
-          let height = img.height;
-          if (width > maxDim || height > maxDim) {
-            const scale = Math.min(maxDim / width, maxDim / height);
-            width = Math.floor(width * scale);
-            height = Math.floor(height * scale);
-          }
-          canvas.width = width;
-          canvas.height = height;
+          canvas.width = canvasSize;
+          canvas.height = canvasSize;
           const ctx = canvas.getContext('2d', { alpha: false });
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, width, height);
-          ctx.drawImage(img, 0, 0, width, height);
+
+          // Soft salon-neutral background.
+          const gradient = ctx.createLinearGradient(0, 0, canvasSize, canvasSize);
+          gradient.addColorStop(0, '#f7f3f0');
+          gradient.addColorStop(1, '#ece6e1');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+          // Fit the user photo into a portrait-safe region with generous top space.
+          // Target: mid-chest/up headshot with about a fist of space above hair.
+          const maxDrawWidth = canvasSize * 0.84;
+          const maxDrawHeight = canvasSize * 0.72;
+          const scale = Math.min(maxDrawWidth / img.width, maxDrawHeight / img.height, 1);
+          const drawWidth = Math.max(1, Math.round(img.width * scale));
+          const drawHeight = Math.max(1, Math.round(img.height * scale));
+          const drawX = Math.round((canvasSize - drawWidth) / 2);
+          let drawY = Math.round(canvasSize * 0.18);
+          if (drawY + drawHeight > canvasSize - 36) {
+            drawY = Math.max(Math.round(canvasSize * 0.12), canvasSize - drawHeight - 36);
+          }
+
+          ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
           canvas.toBlob((blob) => {
             if (!blob) {
               reject(new Error('Could not normalize the uploaded image.'));
               return;
             }
-            const name = (file.name || 'reference').replace(/\.[^.]+$/, '') + '.png';
+            const name = (file.name || 'reference').replace(/\.[^.]+$/, '') + '-padded-headshot.png';
             resolve(new File([blob], name, { type: 'image/png' }));
           }, 'image/png');
         };
@@ -1139,7 +1154,7 @@ body {
       `Preserve the person's face, age, facial expression, skin tone, head angle, and overall identity. Change only the hairstyle and hair color. ` +
       `Desired hairstyle direction: ${style.prompt}. ` +
       `${getPresentationInstruction(style)} ` +
-      `Preserve apparent age, identity, and facial structure. This must be a waist-up salon portrait, not a tight head crop. The entire head must be visible, including the top of the hair, crown, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave at least 15 percent empty background space above the top of the hair. Do not crop, cut off, or hide the top of the hairstyle. ` +
+      `Preserve apparent age, identity, and facial structure. Compose this like a professional salon headshot from the breasts / mid-chest upward, not a tight face crop. The full head and full head of hair must be visible: crown, top of hair, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave about one fist of empty background above the highest hair point, roughly 15 to 20 percent of the image height. If necessary, zoom the portrait out to include the whole hairstyle. Never crop, cut off, touch, or hide the top of the hair. Prioritize showing the full hairstyle over making the face large in the frame. ` +
       `The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
       `Keep background simple and professional. No text, no watermark, no collage.`;
 
@@ -1512,11 +1527,9 @@ body {
       const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
       if (navigator.canShare && navigator.canShare({ files: [pdfFile] }) && navigator.share) {
-        await navigator.share({
-          files: [pdfFile],
-          title: `${selectedLook.name} stylist directions`,
-          text: 'Hair Apparent stylist directions PDF'
-        });
+        // Share only the PDF file. Do not include title/text, because some
+        // mobile browsers create a second .txt file from the text payload.
+        await navigator.share({ files: [pdfFile] });
         return;
       }
 

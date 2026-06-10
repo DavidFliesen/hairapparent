@@ -395,6 +395,7 @@ body {
   justify-content: center;
 }
 .final-note { max-width: 720px; margin: .75rem auto 0; color: var(--text-muted); font-size: .9rem; line-height: 1.4; text-align: center; }
+.final-note strong { color: var(--primary); }
 
 .image-modal {
   position: fixed;
@@ -408,8 +409,8 @@ body {
 }
 .image-modal.open { display: flex; }
 .image-modal-dialog {
-  width: min(92vw, 960px);
-  max-height: 92vh;
+  width: min(96vw, 1040px);
+  max-height: 96vh;
   background: #fff;
   border-radius: 18px;
   overflow: hidden;
@@ -450,7 +451,7 @@ body {
 .image-modal-body img {
   display: block;
   width: 100%;
-  max-height: 72vh;
+  max-height: 76vh;
   height: auto;
   border-radius: 14px;
   object-fit: contain;
@@ -596,15 +597,15 @@ body {
         <div id="final-look" class="final-look-card"></div>
         <div id="final-actions" class="final-actions">
           <button id="btn-save-photo" class="primary-btn">Save / share photo</button>
-          <button id="btn-print-brief" class="secondary-btn">Save PDF / print stylist directions</button>
+          <button id="btn-print-brief" class="secondary-btn">Save PDF stylist directions</button>
           <button id="btn-back" class="secondary-btn">Back to previous menu</button>
           <button id="btn-start-over" class="danger-btn">Start over</button>
         </div>
-        <p class="final-note">On phones and tablets, “Save / share photo” opens the system share sheet when supported, where users can save to Photos. “Save PDF / print” opens the print dialog so users can choose Save as PDF.</p>
+        <p class="final-note">On phones and tablets, “Save / share photo” opens the system share sheet when supported, where users can save to Photos. “Save PDF stylist directions” creates a real PDF file and opens the device share sheet when supported.</p>
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.017</p>
+      <p>Build 2026.06.10.018</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -685,6 +686,7 @@ body {
   let apiKey = '';
   let usedStyles = new Set();
   let currentRecommendations = [];
+  let allRenderedLooks = [];
   let previousBatchCount = 0;
   let selectedLook = null;
   let styleExpression = 'show-everything';
@@ -945,43 +947,43 @@ body {
     imageModalImg.src = '';
   }
 
-  function getRenderableRecommendationIndices() {
-    return currentRecommendations
-      .map((style, index) => ({ style, index }))
-      .filter((item) => !!item.style.imageUrl)
-      .map((item) => item.index);
+  function getRenderableLooks() {
+    return allRenderedLooks.filter((style) => !!style.imageUrl);
   }
 
   function syncModalRecommendation() {
-    if (modalRecommendationIndex < 0 || !currentRecommendations[modalRecommendationIndex]) return;
-    const rec = currentRecommendations[modalRecommendationIndex];
-    if (!rec.imageUrl) return;
+    const renderable = getRenderableLooks();
+    if (!renderable.length) return;
+    let currentPos = renderable.findIndex((style) => style.galleryId === modalRecommendationIndex);
+    if (currentPos < 0) currentPos = 0;
+    const rec = renderable[currentPos];
+    modalRecommendationIndex = rec.galleryId;
     imageModalImg.src = rec.imageUrl;
     imageModalTitle.textContent = rec.name || 'Preview';
     imageModalCaption.textContent = rec.description || '';
-    const renderable = getRenderableRecommendationIndices();
-    const visiblePosition = Math.max(0, renderable.indexOf(modalRecommendationIndex));
-    imageModalCounter.textContent = `${visiblePosition + 1} / ${renderable.length || 1}`;
+    imageModalCounter.textContent = `${currentPos + 1} / ${renderable.length}`;
     const canBrowse = renderable.length > 1;
     imageModalPrev.disabled = !canBrowse;
     imageModalNext.disabled = !canBrowse;
   }
 
-  function openRecommendationModal(index) {
-    if (index == null || !currentRecommendations[index] || !currentRecommendations[index].imageUrl) return;
-    modalRecommendationIndex = index;
+  function openRecommendationModal(galleryId) {
+    const renderable = getRenderableLooks();
+    if (!renderable.length) return;
+    const exists = renderable.some((style) => style.galleryId === galleryId);
+    modalRecommendationIndex = exists ? galleryId : renderable[0].galleryId;
     imageModal.classList.add('open');
     imageModal.setAttribute('aria-hidden', 'false');
     syncModalRecommendation();
   }
 
   function stepModalRecommendation(direction) {
-    const renderable = getRenderableRecommendationIndices();
+    const renderable = getRenderableLooks();
     if (!renderable.length) return;
-    let currentPos = renderable.indexOf(modalRecommendationIndex);
+    let currentPos = renderable.findIndex((style) => style.galleryId === modalRecommendationIndex);
     if (currentPos < 0) currentPos = 0;
     currentPos = (currentPos + direction + renderable.length) % renderable.length;
-    modalRecommendationIndex = renderable[currentPos];
+    modalRecommendationIndex = renderable[currentPos].galleryId;
     syncModalRecommendation();
   }
 
@@ -1000,14 +1002,15 @@ body {
       : `<span>${style.error ? 'Could not generate this look.' : 'Image will appear here soon.'}</span>`;
     const badgeClass = style.imageUrl ? 'ready' : (style.error ? 'error' : 'queued');
     const badgeText = style.imageUrl ? 'Ready' : (style.error ? 'Error' : 'Queued');
+    const safeIndex = String(index);
     return `
-      <div class="rec-image-slot ${style.imageUrl ? 'is-clickable' : ''}" id="${isHistorical ? 'old' : 'rec'}-img-slot-${index}">${imgMarkup}</div>
+      <div class="rec-image-slot ${style.imageUrl ? 'is-clickable' : ''}" id="${isHistorical ? 'old' : 'rec'}-img-slot-${safeIndex}">${imgMarkup}</div>
       <div class="rec-info">
-        <span class="rec-status-badge ${badgeClass}" id="${isHistorical ? 'old' : 'rec'}-badge-${index}">${badgeText}</span>
+        <span class="rec-status-badge ${badgeClass}" id="${isHistorical ? 'old' : 'rec'}-badge-${safeIndex}">${badgeText}</span>
         <h3>${style.name}</h3>
         <p>${style.description}</p>
         <p class="image-tip">${style.imageUrl ? 'Tap the preview image to enlarge it.' : 'Tap the preview image to enlarge it when it is ready.'}</p>
-        ${isHistorical ? '' : `<button class="primary-btn choose-btn" id="choose-${index}" ${style.imageUrl ? '' : 'disabled'}>Select this look</button>`}
+        <button class="primary-btn choose-btn" id="${isHistorical ? 'old-choose' : 'choose'}-${safeIndex}" ${style.imageUrl ? '' : 'disabled'}>Select this look</button>
       </div>
     `;
   }
@@ -1028,12 +1031,17 @@ body {
     const grid = batch.querySelector('.rec-grid');
 
     successful.forEach((style, index) => {
+      const historyIndex = `history-${previousBatchCount}-${index}`;
       const card = document.createElement('div');
       card.className = 'rec-card';
-      card.innerHTML = createCardMarkup(style, `history-${previousBatchCount}-${index}`, true);
+      card.innerHTML = createCardMarkup(style, historyIndex, true);
       const slot = card.querySelector('.rec-image-slot');
+      const btn = card.querySelector(`#old-choose-${CSS.escape(historyIndex)}`);
       if (slot && style.imageUrl) {
-        slot.onclick = () => openImageModal(style.imageUrl, style.name, style.description);
+        slot.onclick = () => openRecommendationModal(style.galleryId);
+      }
+      if (btn) {
+        btn.addEventListener('click', () => selectLook(style));
       }
       grid.appendChild(card);
     });
@@ -1131,7 +1139,7 @@ body {
       `Preserve the person's face, age, facial expression, skin tone, head angle, and overall identity. Change only the hairstyle and hair color. ` +
       `Desired hairstyle direction: ${style.prompt}. ` +
       `${getPresentationInstruction(style)} ` +
-      `Preserve apparent age, identity, and facial structure. Show the full head including the top of the hair, sides of the hair, forehead, face, neck, and upper chest with comfortable space above the head. Do not crop off the top of the hairstyle. ` +
+      `Preserve apparent age, identity, and facial structure. This must be a waist-up salon portrait, not a tight head crop. The entire head must be visible, including the top of the hair, crown, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave at least 15 percent empty background space above the top of the hair. Do not crop, cut off, or hide the top of the hairstyle. ` +
       `The result must look like a real salon photo, with realistic hairline, believable strands, natural shadows, correct head shape, and no wig-like blob. ` +
       `Keep background simple and professional. No text, no watermark, no collage.`;
 
@@ -1184,12 +1192,18 @@ body {
       archiveCurrentBatch();
     } else {
       usedStyles.clear();
+      allRenderedLooks = [];
       previousBatchCount = 0;
       previousRenders.hidden = true;
       previousRendersList.innerHTML = '';
     }
 
-    currentRecommendations = pickRandomStyles(6).map((style) => ({ ...style, imageUrl: '', error: '' }));
+    currentRecommendations = pickRandomStyles(6).map((style) => ({
+      ...style,
+      imageUrl: '',
+      error: '',
+      galleryId: `look-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    }));
     if (recsProgressFill) recsProgressFill.style.width = '0%';
 
     recContainer.innerHTML = '';
@@ -1234,10 +1248,13 @@ body {
       const result = await generateImage(style, index, currentRecommendations.length);
       if (result.url) {
         style.imageUrl = result.url;
+        if (!allRenderedLooks.some((look) => look.galleryId === style.galleryId)) {
+          allRenderedLooks.push(style);
+        }
         slot.classList.add('is-clickable');
         slot.innerHTML = `<img src="${result.url}" alt="${style.name}" />`;
         btn.disabled = false;
-        slot.onclick = () => openRecommendationModal(index);
+        slot.onclick = () => openRecommendationModal(style.galleryId);
         if (badge) {
           badge.textContent = 'Ready';
           badge.className = 'rec-status-badge ready';
@@ -1274,7 +1291,7 @@ body {
    * @param {number} idx Index of the recommendation (for retrieving image)
    */
   function selectLook(style, idx) {
-    if (!style.imageUrl) {
+    if (!style.imageUrl && Number.isInteger(idx)) {
       const imgSrc = document.getElementById(`rec-img-slot-${idx}`)?.querySelector('img')?.src || '';
       style.imageUrl = imgSrc;
     }
@@ -1338,59 +1355,183 @@ body {
    * containing the selected style name, description, and image. Invokes
    * window.print() from the new window after it loads.
    */
-  function printBrief() {
-    if (!selectedLook || !selectedLook.imageUrl) return;
-    const html = `<!DOCTYPE html>
-      <html><head><title>${selectedLook.name} – Hair Apparent Stylist Directions</title>
-        <style>
-          @page { margin: 0.6in; }
-          body { font-family: Arial, sans-serif; color: #222; line-height: 1.45; }
-          h1 { color: #4b2b5b; margin-bottom: .2rem; }
-          h2 { color: #4b2b5b; margin-top: 1.25rem; }
-          img { display: block; max-width: 6.5in; max-height: 6.5in; width: auto; height: auto; object-fit: contain; margin: 1rem 0; border-radius: 10px; }
-          .desc { font-size: 1.05rem; color: #555; }
-          .meta { color: #777; font-size: .9rem; margin-bottom: 1rem; }
-        </style>
-      </head><body>
-        <p class="meta">Hair Apparent stylist brief</p>
-        <h1>${selectedLook.name}</h1>
-        <p class="desc">${selectedLook.description}</p>
-        <img src="${selectedLook.imageUrl}" alt="${selectedLook.name}" />
-        <h2>Cutting & Styling Instructions</h2>
-        <p>Bring this page to your hairstylist as a visual direction, not an exact prescription. Ask for a shape that preserves the same overall silhouette, keeps the hairline realistic, and fits your natural density, face shape, and daily styling comfort.</p>
-        <p>Discuss length, taper, layering, color, and styling products before cutting. The final style should look natural from all angles and be adjusted to your hair texture.</p>
-        <h2>Client Notes</h2>
-        <p>Desired look: ${selectedLook.name}. Style direction selected in the app: ${styleExpression}. Preview mode: ${generationMode}.</p>
-      </body></html>`;
+  function escapePdfText(value) {
+    return String(value || '')
+      .replace(/\\/g, '\\\\')
+      .replace(/\(/g, '\\(')
+      .replace(/\)/g, '\\)')
+      .replace(/\r?\n/g, ' ');
+  }
 
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(html);
-    doc.close();
-
-    const cleanup = () => setTimeout(() => iframe.remove(), 1000);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-      cleanup();
-    };
-    setTimeout(() => {
-      try {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      } finally {
-        cleanup();
+  function wrapText(value, maxChars = 82) {
+    const words = String(value || '').split(/\s+/).filter(Boolean);
+    const lines = [];
+    let line = '';
+    words.forEach((word) => {
+      const next = line ? `${line} ${word}` : word;
+      if (next.length > maxChars) {
+        if (line) lines.push(line);
+        line = word;
+      } else {
+        line = next;
       }
-    }, 500);
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  async function imageDataUrlToJpegBytes(dataUrl, maxWidth = 420, maxHeight = 420) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
+        const width = Math.max(1, Math.round(img.width * scale));
+        const height = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d', { alpha: false });
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            reject(new Error('Could not prepare image for PDF.'));
+            return;
+          }
+          const buffer = await blob.arrayBuffer();
+          resolve({ bytes: new Uint8Array(buffer), width, height });
+        }, 'image/jpeg', 0.9);
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+  }
+
+  async function createStylistPdfBlob() {
+    const image = await imageDataUrlToJpegBytes(selectedLook.imageUrl);
+    const pageW = 612;
+    const pageH = 792;
+    const margin = 54;
+    const imageW = Math.min(330, image.width);
+    const imageH = image.height * (imageW / image.width);
+    const imageX = (pageW - imageW) / 2;
+    let y = 740;
+
+    const lines = [];
+    const addText = (textValue, size = 11, leading = 15) => {
+      lines.push({ text: textValue, size, y });
+      y -= leading;
+    };
+
+    addText('Hair Apparent Stylist Brief', 18, 26);
+    addText(selectedLook.name, 16, 22);
+    wrapText(selectedLook.description, 78).forEach((line) => addText(line, 11, 14));
+    y -= 8;
+    const imageY = Math.max(330, y - imageH);
+    y = imageY - 24;
+
+    addText('Cutting and Styling Directions', 14, 20);
+    [
+      'Use this page as visual direction, not an exact prescription.',
+      'Preserve the same overall silhouette while adjusting for the client\'s actual hair density, texture, growth pattern, and face shape.',
+      'Discuss length, taper, layering, color, and daily styling comfort before cutting.',
+      `Requested style direction in the app: ${styleExpression}.`,
+      `Preview mode used: ${generationMode}.`
+    ].forEach((paragraph) => {
+      wrapText(paragraph, 80).forEach((line) => addText(line, 10.5, 14));
+      y -= 4;
+    });
+
+    const textOps = [
+      'BT',
+      '/F1 18 Tf',
+      `1 0 0 1 ${margin} 740 Tm`,
+      `(Hair Apparent Stylist Brief) Tj`,
+      'ET'
+    ];
+
+    let content = 'q\n';
+    content += `${imageW.toFixed(2)} 0 0 ${imageH.toFixed(2)} ${imageX.toFixed(2)} ${imageY.toFixed(2)} cm\n`;
+    content += '/Im1 Do\nQ\n';
+
+    lines.forEach((line) => {
+      content += `BT /F1 ${line.size} Tf 1 0 0 1 ${margin} ${line.y} Tm (${escapePdfText(line.text)}) Tj ET\n`;
+    });
+
+    const encoder = new TextEncoder();
+    const objects = [];
+    objects[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+    objects[2] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+    objects[3] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /Font << /F1 4 0 R >> /XObject << /Im1 5 0 R >> >> /Contents 6 0 R >>`;
+    objects[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+    objects[5] = { streamBytes: image.bytes, dict: `<< /Type /XObject /Subtype /Image /Width ${image.width} /Height ${image.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${image.bytes.length} >>` };
+    const contentBytes = encoder.encode(content);
+    objects[6] = { streamBytes: contentBytes, dict: `<< /Length ${contentBytes.length} >>` };
+
+    const chunks = [];
+    const offsets = [0];
+    const pushString = (s) => chunks.push(encoder.encode(s));
+    const pushBytes = (b) => chunks.push(b);
+
+    pushString('%PDF-1.4\n%Hair Apparent\n');
+    let offset = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    for (let i = 1; i < objects.length; i++) {
+      offsets[i] = offset;
+      const header = `${i} 0 obj\n`;
+      pushString(header); offset += encoder.encode(header).length;
+      const obj = objects[i];
+      if (typeof obj === 'string') {
+        pushString(`${obj}\nendobj\n`);
+        offset += encoder.encode(`${obj}\nendobj\n`).length;
+      } else {
+        const start = `${obj.dict}\nstream\n`;
+        const end = '\nendstream\nendobj\n';
+        pushString(start); offset += encoder.encode(start).length;
+        pushBytes(obj.streamBytes); offset += obj.streamBytes.length;
+        pushString(end); offset += encoder.encode(end).length;
+      }
+    }
+
+    const xrefOffset = offset;
+    let xref = `xref\n0 ${objects.length}\n0000000000 65535 f \n`;
+    for (let i = 1; i < objects.length; i++) {
+      xref += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+    }
+    xref += `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    pushString(xref);
+
+    return new Blob(chunks, { type: 'application/pdf' });
+  }
+
+  async function printBrief() {
+    if (!selectedLook || !selectedLook.imageUrl) return;
+    try {
+      const pdfBlob = await createStylistPdfBlob();
+      const fileName = `${selectedLook.name.replace(/\s+/g, '_')}_stylist_brief.pdf`;
+      const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] }) && navigator.share) {
+        await navigator.share({
+          files: [pdfFile],
+          title: `${selectedLook.name} stylist directions`,
+          text: 'Hair Apparent stylist directions PDF'
+        });
+        return;
+      }
+
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 2500);
+    } catch (err) {
+      console.error('Could not create PDF', err);
+      alert('Could not create the PDF. Please try again.');
+    }
   }
 
   /**
@@ -1405,6 +1546,7 @@ body {
     normalizedReferenceImage = null;
     usedStyles.clear();
     currentRecommendations = [];
+    allRenderedLooks = [];
     previousBatchCount = 0;
     previousRenders.hidden = true;
     previousRendersList.innerHTML = '';

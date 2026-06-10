@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* Hair Apparent v003 — one dark world.
+/* Hair Apparent v004 — one dark world.
    Page #241A2B, surface #2E2236, raised #3A2C44, line #4A3A57,
    ivory #F5EEE3, muted #B9A8C6, gold #D9A84E, copper #C26E5A */
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -172,6 +172,19 @@ footer b { color: #D9A84E; font-weight: 600; }
 
 .error-box { background: #C26E5A; color: #FFF6EC; border-radius: 12px; padding: 14px 18px; margin: 14px 0; font-size: 14px; display: none; }
 
+.gear-btn { background: none; border: none; cursor: pointer; padding: 6px; margin-left: 6px; border-radius: 8px; }
+.gear-btn:hover { background: #3A2C44; }
+.token-overlay { display: none; position: fixed; inset: 0; background: rgba(20,12,28,0.85); z-index: 100; align-items: center; justify-content: center; }
+.token-card { background: #2E2236; border: 1px solid #4A3A57; border-radius: 20px; padding: 28px 26px; max-width: 500px; width: 90%; }
+.token-card h3 { font-family: 'Fraunces', Georgia, serif; font-size: 22px; color: #F5EEE3; margin-bottom: 8px; }
+.token-card p { font-size: 14px; color: #B9A8C6; margin-bottom: 18px; line-height: 1.5; }
+.token-card a { color: #D9A84E; }
+.token-input { width: 100%; background: #241A2B; border: 1px solid #4A3A57; border-radius: 10px; padding: 12px 14px; color: #F5EEE3; font-size: 15px; font-family: 'JetBrains Mono', monospace; }
+.token-input:focus { outline: none; border-color: #D9A84E; }
+.hf-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #B9A8C6; margin-left: auto; }
+.hf-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #4A3A57; }
+.hf-badge .dot.active { background: #5CB85C; }
+.gen-status { font-size: 11px; color: #D9A84E; text-align: center; margin-top: 5px; min-height: 16px; }
 @media (max-width: 660px) {
   .hero-title { font-size: 33px; }
   .style-card { flex-direction: column; }
@@ -199,15 +212,21 @@ footer b { color: #D9A84E; font-weight: 600; }
   <div class="header-row">
     <svg width="42" height="42" viewBox="0 0 240 240" aria-hidden="true">
       <rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/>
-      <path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/>
-      <path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/>
-      <path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/>
-      <path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/>
-      <rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/>
-      <circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/>
+      <path d="M52,164 L68,84 C70,74 82,74 84,84 L100,164 Z" fill="#D9A84E"/>
+      <path d="M98,164 L112,64 C114,52 126,52 128,64 L142,164 Z" fill="#D9A84E"/>
+      <path d="M140,164 L156,84 C158,74 170,74 172,84 L188,164 Z" fill="#D9A84E"/>
+      <rect x="44" y="164" width="152" height="24" rx="12" fill="#D9A84E"/>
+      <circle cx="82" cy="176" r="6" fill="#C26E5A"/>
+      <circle cx="120" cy="176" r="6" fill="#C26E5A"/>
+      <circle cx="158" cy="176" r="6" fill="#C26E5A"/>
     </svg>
     <span class="brand-name">Hair Apparent</span>
     <span class="brand-tag">Find your crowning look.</span>
+    <button class="gear-btn" onclick="showTokenOverlay()" title="AI settings" aria-label="AI settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B9A8C6" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </div>
 </header>
 <div class="gold-rule"></div>
@@ -219,13 +238,15 @@ footer b { color: #D9A84E; font-weight: 600; }
 <!-- ============ SCREEN 1: WELCOME ============ -->
 <section class="screen active" id="screen-welcome">
   <svg class="hero-crown" width="150" height="150" viewBox="0 0 240 240" aria-hidden="true">
-    <g class="lock l1"><path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/></g>
-    <g class="lock l2"><path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/>
-    <path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/></g>
-    <g class="lock l3"><path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/></g>
-    <rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/>
-    <circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/>
-  </svg>
+      <rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/>
+      <path d="M52,164 L68,84 C70,74 82,74 84,84 L100,164 Z" fill="#D9A84E"/>
+      <path d="M98,164 L112,64 C114,52 126,52 128,64 L142,164 Z" fill="#D9A84E"/>
+      <path d="M140,164 L156,84 C158,74 170,74 172,84 L188,164 Z" fill="#D9A84E"/>
+      <rect x="44" y="164" width="152" height="24" rx="12" fill="#D9A84E"/>
+      <circle cx="82" cy="176" r="6" fill="#C26E5A"/>
+      <circle cx="120" cy="176" r="6" fill="#C26E5A"/>
+      <circle cx="158" cy="176" r="6" fill="#C26E5A"/>
+    </svg>
   <h1 class="hero-title">The look that's <em>rightfully yours.</em></h1>
   <p class="hero-sub">Add a few photos. Your browser studies your face shape and features, recommends styles that genuinely suit you, and shows each one <strong style="color:#D9A84E">on your own photo</strong> — then writes the instructions your stylist needs.</p>
 
@@ -234,6 +255,7 @@ footer b { color: #D9A84E; font-weight: 600; }
     <p><strong>Your photos never leave this device.</strong> All analysis and previews happen locally in your browser. Nothing is uploaded, no account is needed, no API keys, no cost. Free and open source.</p>
   </div>
 
+  <p id="hfWelcomeStatus" style="text-align:center;font-size:14px;color:#B9A8C6;margin-bottom:4px"></p>
   <div class="btn-row">
     <button class="btn btn-gold" onclick="goTo('photos')">Get started</button>
     <button class="btn btn-ghost" id="resumeBtn" style="display:none" onclick="resumeSession()">Resume my last session</button>
@@ -265,16 +287,16 @@ footer b { color: #D9A84E; font-weight: 600; }
 <!-- ============ SCREEN 3: ANALYZING ============ -->
 <section class="screen" id="screen-analyze">
   <div class="analyzing">
-    <div class="crown-load">
-      <svg width="130" height="130" viewBox="0 0 240 240">
-        <g class="lock l1"><path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/></g>
-        <g class="lock l2"><path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/>
-        <path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/></g>
-        <g class="lock l3"><path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/></g>
-        <rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/>
-        <circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/>
-      </svg>
-    </div>
+    <div class="crown-load"><svg width="130" height="130" viewBox="0 0 240 240" aria-hidden="true">
+      <rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/>
+      <path d="M52,164 L68,84 C70,74 82,74 84,84 L100,164 Z" fill="#D9A84E"/>
+      <path d="M98,164 L112,64 C114,52 126,52 128,64 L142,164 Z" fill="#D9A84E"/>
+      <path d="M140,164 L156,84 C158,74 170,74 172,84 L188,164 Z" fill="#D9A84E"/>
+      <rect x="44" y="164" width="152" height="24" rx="12" fill="#D9A84E"/>
+      <circle cx="82" cy="176" r="6" fill="#C26E5A"/>
+      <circle cx="120" cy="176" r="6" fill="#C26E5A"/>
+      <circle cx="158" cy="176" r="6" fill="#C26E5A"/>
+    </svg></div>
     <h2>Studying your features&hellip;</h2>
     <div class="bar"><i id="progressBar"></i></div>
     <p class="analyze-status" id="analyzeStatus">Loading face analysis engine&hellip;</p>
@@ -326,6 +348,21 @@ footer b { color: #D9A84E; font-weight: 600; }
 
 </div>
 
+<!-- Token Overlay -->
+<div class="token-overlay" id="tokenOverlay" onclick="hideTokenOverlayIfBg(event)">
+  <div class="token-card">
+    <h3>AI Try-On Setup</h3>
+    <p>Paste your free <a href="https://huggingface.co/settings/tokens" target="_blank">HuggingFace token</a> (hf_...) to enable AI-generated hairstyles on your actual photo. Your token stays in your browser only &mdash; it never touches this app&rsquo;s code or servers.</p>
+    <input class="token-input" id="tokenInput" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+    <div class="btn-row" style="margin-top:16px; justify-content:flex-start; gap:10px;">
+      <button class="btn btn-gold" style="padding:10px 22px;font-size:15px" onclick="saveToken()">Save token</button>
+      <button class="btn btn-ghost" style="padding:10px 22px;font-size:15px" onclick="clearToken()">Remove</button>
+      <button class="btn btn-ghost" style="padding:10px 22px;font-size:15px" onclick="hideTokenOverlay()">Cancel</button>
+    </div>
+    <p style="margin-top:14px;font-size:12px">HuggingFace accounts are free. No credit card needed. The model used is <code style="color:#D9A84E">stabilityai/stable-diffusion-2-inpainting</code>.</p>
+  </div>
+</div>
+
 <footer>
   <b>Hair Apparent</b> &middot; free &amp; open source (MIT) &middot; your photos never leave your device &middot; created by David Fliesen
 </footer>
@@ -333,23 +370,22 @@ footer b { color: #D9A84E; font-weight: 600; }
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script>
 /* ============================================================
-   Hair Apparent v003 — ES5 only, hardcoded hex, fully on-device
+   Hair Apparent v004 — ES5 only, hardcoded hex
+   New: HuggingFace inpainting for photorealistic AI try-on
    ============================================================ */
 
 var SCREENS = ['welcome', 'photos', 'analyze', 'confirm', 'prefs', 'results', 'card'];
-var STORE_KEY = 'hairApparent_v003';
+var STORE_KEY = 'hairApparent_v004';
+var HF_TOKEN_KEY = 'hairApparent_hfToken';
+var HF_MODEL = 'stabilityai/stable-diffusion-2-inpainting';
 var MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
 
 var state = {
-  photos: [],
-  analysis: null,
-  attrs: {},
-  prefs: {},
-  chosenStyle: null,
-  basePhoto: null   /* { dataUrl, pts: [[x,y]x68] } — the best frontal photo for try-on */
+  photos: [], analysis: null, attrs: {}, prefs: {},
+  chosenStyle: null, basePhoto: null
 };
 
-/* ---------- navigation ---------- */
+/* ── navigation ─────────────────────────────────────────────────────────── */
 function goTo(name) {
   var i;
   for (i = 0; i < SCREENS.length; i++) {
@@ -377,10 +413,49 @@ function drawSteps(current) {
   document.getElementById('stepDots').innerHTML = (current === 'welcome') ? '' : html;
 }
 
-/* ---------- photo intake ---------- */
+/* ── HF token management ─────────────────────────────────────────────────── */
+function getHFToken() {
+  try { return localStorage.getItem(HF_TOKEN_KEY) || ''; } catch(e) { return ''; }
+}
+function setHFToken(t) {
+  try { localStorage.setItem(HF_TOKEN_KEY, t.trim()); } catch(e) {}
+}
+function showTokenOverlay() {
+  document.getElementById('tokenOverlay').style.display = 'flex';
+  document.getElementById('tokenInput').value = getHFToken();
+}
+function hideTokenOverlay() {
+  document.getElementById('tokenOverlay').style.display = 'none';
+}
+function hideTokenOverlayIfBg(e) {
+  if (e.target.id === 'tokenOverlay') { hideTokenOverlay(); }
+}
+function saveToken() {
+  var t = document.getElementById('tokenInput').value.trim();
+  if (!t || t.indexOf('hf_') !== 0) { alert('Please enter a valid HuggingFace token starting with hf_'); return; }
+  setHFToken(t);
+  hideTokenOverlay();
+  updateHFStatus();
+}
+function clearToken() {
+  setHFToken('');
+  hideTokenOverlay();
+  updateHFStatus();
+}
+function updateHFStatus() {
+  var el = document.getElementById('hfWelcomeStatus');
+  if (!el) { return; }
+  var tok = getHFToken();
+  if (tok) {
+    el.innerHTML = '<span style="color:#5CB85C">&#10003;</span> AI photo try-on ready &mdash; <button class="btn btn-ghost" style="padding:4px 12px;font-size:12px;display:inline-block" onclick="showTokenOverlay()">change token</button>';
+  } else {
+    el.innerHTML = 'No AI token &mdash; previews will be illustrated. <button class="btn btn-ghost" style="padding:4px 12px;font-size:12px;display:inline-block" onclick="showTokenOverlay()">Add free HF token</button>';
+  }
+}
+
+/* ── photo intake ────────────────────────────────────────────────────────── */
 var fileInput = document.getElementById('fileInput');
 var dropZone = document.getElementById('dropZone');
-
 fileInput.addEventListener('change', function (e) { addFiles(e.target.files); fileInput.value = ''; });
 dropZone.addEventListener('dragover', function (e) { e.preventDefault(); dropZone.className = 'drop over'; });
 dropZone.addEventListener('dragleave', function () { dropZone.className = 'drop'; });
@@ -392,22 +467,19 @@ dropZone.addEventListener('drop', function (e) {
 function addFiles(files) {
   var i;
   for (i = 0; i < files.length; i++) {
-    if (state.photos.length >= 10) { showPhotoError('Maximum of 10 photos — quality over quantity!'); break; }
+    if (state.photos.length >= 10) { showPhotoError('Maximum 10 photos'); break; }
     if (files[i].type.indexOf('image') !== 0) { continue; }
     readOne(files[i]);
   }
 }
-
 function readOne(file) {
   var reader = new FileReader();
   reader.onload = function (e) {
     var img = new Image();
     img.onload = function () {
-      var maxSide = 900;
-      var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      var maxSide = 900, scale = Math.min(1, maxSide / Math.max(img.width, img.height));
       var canvas = document.createElement('canvas');
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
+      canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
       state.photos.push({ dataUrl: canvas.toDataURL('image/jpeg', 0.85) });
       renderPhotos();
@@ -416,57 +488,45 @@ function readOne(file) {
   };
   reader.readAsDataURL(file);
 }
-
 function removePhoto(idx) { state.photos.splice(idx, 1); renderPhotos(); }
-
 function renderPhotos() {
-  var grid = document.getElementById('photoGrid');
-  var html = '', i;
+  var grid = document.getElementById('photoGrid'), html = '', i;
   for (i = 0; i < state.photos.length; i++) {
-    html += '<div class="photo-slot"><img src="' + state.photos[i].dataUrl + '" alt="Your photo ' + (i + 1) + '">' +
-            '<button class="x" onclick="removePhoto(' + i + ')" aria-label="Remove photo">&#10005;</button></div>';
+    html += '<div class="photo-slot"><img src="' + state.photos[i].dataUrl + '" alt="Photo ' + (i+1) + '"><button class="x" onclick="removePhoto(' + i + ')">&#10005;</button></div>';
   }
   grid.innerHTML = html;
   var n = state.photos.length;
-  var msg;
-  if (n < 3) { msg = n + ' photo' + (n === 1 ? '' : 's') + ' added &middot; <span>add at least 3</span>'; }
-  else if (n < 5) { msg = n + ' photos added &middot; <span>good — 5+ is even better</span>'; }
-  else { msg = n + ' photos added &middot; <span>perfect</span>'; }
+  var msg = n < 3 ? n + ' photo' + (n===1?'':'s') + ' &mdash; <span>need at least 3</span>' :
+            n < 5 ? n + ' photos &mdash; <span>5+ works even better</span>' :
+                    n + ' photos &mdash; <span>great</span>';
   document.getElementById('photoCount').innerHTML = msg;
   document.getElementById('analyzeBtn').disabled = (n < 3);
   document.getElementById('photoError').style.display = 'none';
 }
-
 function showPhotoError(msg) {
   var box = document.getElementById('photoError');
-  box.innerHTML = msg;
-  box.style.display = 'block';
+  box.innerHTML = msg; box.style.display = 'block';
 }
 
-/* ---------- face analysis ---------- */
+/* ── face analysis ───────────────────────────────────────────────────────── */
 var modelsReady = false;
-
 function setProgress(pct, msg) {
   document.getElementById('progressBar').style.width = pct + '%';
   if (msg) { document.getElementById('analyzeStatus').innerHTML = msg; }
 }
-
 function startAnalysis() {
-  goTo('analyze');
-  setProgress(5, 'Loading face analysis engine&hellip;');
+  goTo('analyze'); setProgress(5, 'Loading face analysis engine&hellip;');
   loadModels(function (ok) {
     if (!ok) {
       state.analysis = manualFallback();
-      state.basePhoto = null;
-      seedAttrs();
-      setProgress(100, 'Engine unavailable — switching to manual selection.');
+      state.basePhoto = null; seedAttrs();
+      setProgress(100, 'Engine unavailable &mdash; pick features manually.');
       setTimeout(function () { goTo('confirm'); }, 900);
       return;
     }
     analyzeAll();
   });
 }
-
 function loadModels(cb) {
   if (modelsReady) { cb(true); return; }
   if (typeof faceapi === 'undefined') { cb(false); return; }
@@ -475,18 +535,12 @@ function loadModels(cb) {
     faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL)
   ]).then(function () { modelsReady = true; cb(true); })['catch'](function () { cb(false); });
 }
-
 function analyzeAll() {
-  var results = [];
-  var best = null; /* { score, dataUrl, pts } */
-  var idx = 0;
-
+  var results = [], best = null, idx = 0;
   function next() {
     if (idx >= state.photos.length) { finish(); return; }
-    var pct = 10 + Math.round((idx / state.photos.length) * 80);
-    setProgress(pct, 'Analyzing photo ' + (idx + 1) + ' of ' + state.photos.length + '&hellip;');
-    var img = new Image();
-    var myUrl = state.photos[idx].dataUrl;
+    setProgress(10 + Math.round((idx/state.photos.length)*80), 'Analyzing photo ' + (idx+1) + ' of ' + state.photos.length + '&hellip;');
+    var img = new Image(), myUrl = state.photos[idx].dataUrl;
     img.onload = function () {
       var opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.4 });
       faceapi.detectSingleFace(img, opts).withFaceLandmarks(true).then(function (det) {
@@ -494,7 +548,6 @@ function analyzeAll() {
           var pts = det.landmarks.positions;
           results.push(measureFace(pts, img));
           var score = (det.detection && det.detection.score) ? det.detection.score : 0.5;
-          /* prefer frontal: penalize tilted eye lines */
           var le = eyeCenter(pts, 36), re = eyeCenter(pts, 42);
           var tilt = Math.abs(Math.atan2(re.y - le.y, re.x - le.x));
           var frontScore = score - tilt * 0.5;
@@ -508,735 +561,643 @@ function analyzeAll() {
     img.onerror = function () { idx++; next(); };
     img.src = myUrl;
   }
-
   function finish() {
-    setProgress(95, 'Combining results across photos&hellip;');
+    setProgress(95, 'Combining results&hellip;');
     if (results.length === 0) {
       state.analysis = manualFallback();
-      state.analysis.note = 'We could not find a clear face in these photos — pick your features below. Previews will use a mannequin until a face is found.';
+      state.analysis.note = 'No face detected in these photos &mdash; pick features manually below.';
       state.basePhoto = null;
     } else {
       state.analysis = combineMeasurements(results);
       state.basePhoto = best ? { dataUrl: best.dataUrl, pts: best.pts } : null;
     }
-    seedAttrs();
-    setProgress(100, 'Done!');
+    seedAttrs(); setProgress(100, 'Done!');
     setTimeout(function () { goTo('confirm'); }, 600);
   }
   next();
 }
-
 function seedAttrs() {
   state.attrs = {
-    faceShape: state.analysis.faceShape,
-    skinTone: state.analysis.skinTone,
-    hairColor: state.analysis.hairColor,
-    eyeColor: state.analysis.eyeColor,
+    faceShape: state.analysis.faceShape, skinTone: state.analysis.skinTone,
+    hairColor: state.analysis.hairColor, eyeColor: state.analysis.eyeColor,
     texture: state.attrs.texture || ''
   };
 }
-
-function eyeCenter(pts, startIdx) {
+function eyeCenter(pts, si) {
   var x = 0, y = 0, i;
-  for (i = startIdx; i < startIdx + 6; i++) { x += pts[i].x; y += pts[i].y; }
-  return { x: x / 6, y: y / 6 };
+  for (i = si; i < si+6; i++) { x += pts[i].x; y += pts[i].y; }
+  return { x: x/6, y: y/6 };
 }
-
 function flattenPts(pts) {
   var out = [], i;
-  for (i = 0; i < pts.length; i++) { out.push([Math.round(pts[i].x * 10) / 10, Math.round(pts[i].y * 10) / 10]); }
+  for (i = 0; i < pts.length; i++) { out.push([Math.round(pts[i].x*10)/10, Math.round(pts[i].y*10)/10]); }
   return out;
 }
-
-function dist(a, b) {
-  var dx = a.x - b.x, dy = a.y - b.y;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
+function dist(a, b) { var dx=a.x-b.x, dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy); }
+function distPt(a, b) { var dx=a[0]-b[0], dy=a[1]-b[1]; return Math.sqrt(dx*dx+dy*dy); }
 function measureFace(pts, img) {
-  var cheekW = dist(pts[1], pts[15]);
-  var jawW = dist(pts[4], pts[12]);
-  var foreheadW = dist(pts[17], pts[26]);
-  var midBrow = { x: (pts[21].x + pts[22].x) / 2, y: (pts[21].y + pts[22].y) / 2 };
-  var faceLen = dist(pts[8], midBrow) * 1.42;
-
-  var canvas = document.createElement('canvas');
-  canvas.width = img.width; canvas.height = img.height;
-  var ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0);
-
-  var skin = avgRegion(ctx, (pts[2].x + pts[30].x) / 2, (pts[2].y + pts[30].y) / 2, 6);
-  var skin2 = avgRegion(ctx, (pts[14].x + pts[30].x) / 2, (pts[14].y + pts[30].y) / 2, 6);
-  skin = mixRGB(skin, skin2);
-
-  var ex = (pts[37].x + pts[38].x + pts[40].x + pts[41].x) / 4;
-  var ey = (pts[37].y + pts[38].y + pts[40].y + pts[41].y) / 4;
-  var eye = avgRegion(ctx, ex, ey, 2);
-
-  var browChin = dist(midBrow, pts[8]);
-  var hy = midBrow.y - browChin * 0.55;
-  var hy2 = midBrow.y - browChin * 0.40;
-  var skinLum = 0.299 * skin.r + 0.587 * skin.g + 0.114 * skin.b;
+  var cheekW = dist(pts[1],pts[15]), jawW = dist(pts[4],pts[12]), fhW = dist(pts[17],pts[26]);
+  var midBrow = { x:(pts[21].x+pts[22].x)/2, y:(pts[21].y+pts[22].y)/2 };
+  var faceLen = dist(pts[8],midBrow)*1.42;
+  var canvas = document.createElement('canvas'); canvas.width=img.width; canvas.height=img.height;
+  var ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0);
+  var skin = avgRegion(ctx,(pts[2].x+pts[30].x)/2,(pts[2].y+pts[30].y)/2,6);
+  var skin2 = avgRegion(ctx,(pts[14].x+pts[30].x)/2,(pts[14].y+pts[30].y)/2,6);
+  skin = mixRGB(skin,skin2);
+  var ex=(pts[37].x+pts[38].x+pts[40].x+pts[41].x)/4, ey=(pts[37].y+pts[38].y+pts[40].y+pts[41].y)/4;
+  var eye = avgRegion(ctx,ex,ey,2);
+  var skinLum = 0.299*skin.r + 0.587*skin.g + 0.114*skin.b;
+  var browChin = dist(midBrow,pts[8]);
+  var hy = midBrow.y - browChin*0.55, hy2 = midBrow.y - browChin*0.40;
   var candidates = [
-    avgRegion(ctx, midBrow.x, Math.max(4, hy), 8),
-    avgRegion(ctx, midBrow.x - cheekW * 0.28, Math.max(4, hy2), 8),
-    avgRegion(ctx, midBrow.x + cheekW * 0.28, Math.max(4, hy2), 8),
-    avgRegion(ctx, midBrow.x - cheekW * 0.42, Math.max(4, midBrow.y - browChin * 0.2), 8),
-    avgRegion(ctx, midBrow.x + cheekW * 0.42, Math.max(4, midBrow.y - browChin * 0.2), 8)
+    avgRegion(ctx,midBrow.x,Math.max(4,hy),8),
+    avgRegion(ctx,midBrow.x - cheekW*0.28,Math.max(4,hy2),8),
+    avgRegion(ctx,midBrow.x + cheekW*0.28,Math.max(4,hy2),8),
+    avgRegion(ctx,midBrow.x - cheekW*0.42,Math.max(4,midBrow.y-browChin*0.2),8),
+    avgRegion(ctx,midBrow.x + cheekW*0.42,Math.max(4,midBrow.y-browChin*0.2),8)
   ];
-  /* drop samples that look like skin (forehead) or blown-out background */
   var kept = [], ci;
-  for (ci = 0; ci < candidates.length; ci++) {
-    var cl = 0.299 * candidates[ci].r + 0.587 * candidates[ci].g + 0.114 * candidates[ci].b;
-    if (Math.abs(cl - skinLum) < 26) { continue; }
-    if (cl > 238) { continue; }
+  for (ci=0;ci<candidates.length;ci++) {
+    var cl=0.299*candidates[ci].r+0.587*candidates[ci].g+0.114*candidates[ci].b;
+    if(Math.abs(cl-skinLum)<26||cl>238) continue;
     kept.push(candidates[ci]);
   }
-  if (kept.length === 0) { kept = candidates; }
-  var hair = { r: 0, g: 0, b: 0 };
-  for (ci = 0; ci < kept.length; ci++) { hair.r += kept[ci].r; hair.g += kept[ci].g; hair.b += kept[ci].b; }
-  hair.r /= kept.length; hair.g /= kept.length; hair.b /= kept.length;
-
-  return { lenRatio: faceLen / cheekW, jawRatio: jawW / cheekW, fhRatio: foreheadW / cheekW, skin: skin, eye: eye, hair: hair };
+  if(kept.length===0) kept=candidates;
+  var hair={r:0,g:0,b:0};
+  for(ci=0;ci<kept.length;ci++){hair.r+=kept[ci].r;hair.g+=kept[ci].g;hair.b+=kept[ci].b;}
+  hair.r/=kept.length; hair.g/=kept.length; hair.b/=kept.length;
+  return { lenRatio:faceLen/cheekW, jawRatio:jawW/cheekW, fhRatio:fhW/cheekW, skin:skin, eye:eye, hair:hair };
 }
-
-function avgRegion(ctx, x, y, r) {
-  x = Math.round(x); y = Math.round(y);
-  var w = ctx.canvas.width, h = ctx.canvas.height;
-  var x0 = Math.max(0, x - r), y0 = Math.max(0, y - r);
-  var size = Math.min(r * 2 + 1, w - x0, h - y0);
-  if (size < 1) { return { r: 128, g: 128, b: 128 }; }
-  var data = ctx.getImageData(x0, y0, size, size).data;
-  var rr = 0, gg = 0, bb = 0, n = 0, i;
-  for (i = 0; i < data.length; i += 4) { rr += data[i]; gg += data[i + 1]; bb += data[i + 2]; n++; }
-  return { r: rr / n, g: gg / n, b: bb / n };
+function avgRegion(ctx,x,y,r) {
+  x=Math.round(x);y=Math.round(y);
+  var w=ctx.canvas.width,h=ctx.canvas.height;
+  var x0=Math.max(0,x-r),y0=Math.max(0,y-r);
+  var size=Math.min(r*2+1,w-x0,h-y0);
+  if(size<1) return {r:128,g:128,b:128};
+  var data=ctx.getImageData(x0,y0,size,size).data;
+  var rr=0,gg=0,bb=0,n=0,i;
+  for(i=0;i<data.length;i+=4){rr+=data[i];gg+=data[i+1];bb+=data[i+2];n++;}
+  return {r:rr/n,g:gg/n,b:bb/n};
 }
-
-function mixRGB(a, b) { return { r: (a.r + b.r) / 2, g: (a.g + b.g) / 2, b: (a.b + b.b) / 2 }; }
-
+function mixRGB(a,b){return{r:(a.r+b.r)/2,g:(a.g+b.g)/2,b:(a.b+b.b)/2};}
 function combineMeasurements(arr) {
-  var sum = { lenRatio: 0, jawRatio: 0, fhRatio: 0, skin: { r: 0, g: 0, b: 0 }, eye: { r: 0, g: 0, b: 0 }, hair: { r: 0, g: 0, b: 0 } };
-  var i, n = arr.length;
-  for (i = 0; i < n; i++) {
-    sum.lenRatio += arr[i].lenRatio; sum.jawRatio += arr[i].jawRatio; sum.fhRatio += arr[i].fhRatio;
-    sum.skin.r += arr[i].skin.r; sum.skin.g += arr[i].skin.g; sum.skin.b += arr[i].skin.b;
-    sum.eye.r += arr[i].eye.r; sum.eye.g += arr[i].eye.g; sum.eye.b += arr[i].eye.b;
-    sum.hair.r += arr[i].hair.r; sum.hair.g += arr[i].hair.g; sum.hair.b += arr[i].hair.b;
+  var sum={lenRatio:0,jawRatio:0,fhRatio:0,skin:{r:0,g:0,b:0},eye:{r:0,g:0,b:0},hair:{r:0,g:0,b:0}};
+  var i,n=arr.length;
+  for(i=0;i<n;i++){
+    sum.lenRatio+=arr[i].lenRatio;sum.jawRatio+=arr[i].jawRatio;sum.fhRatio+=arr[i].fhRatio;
+    sum.skin.r+=arr[i].skin.r;sum.skin.g+=arr[i].skin.g;sum.skin.b+=arr[i].skin.b;
+    sum.eye.r+=arr[i].eye.r;sum.eye.g+=arr[i].eye.g;sum.eye.b+=arr[i].eye.b;
+    sum.hair.r+=arr[i].hair.r;sum.hair.g+=arr[i].hair.g;sum.hair.b+=arr[i].hair.b;
   }
-  var m = {
-    lenRatio: sum.lenRatio / n, jawRatio: sum.jawRatio / n, fhRatio: sum.fhRatio / n,
-    skin: { r: sum.skin.r / n, g: sum.skin.g / n, b: sum.skin.b / n },
-    eye: { r: sum.eye.r / n, g: sum.eye.g / n, b: sum.eye.b / n },
-    hair: { r: sum.hair.r / n, g: sum.hair.g / n, b: sum.hair.b / n }
-  };
-  return {
-    faceShape: classifyShape(m), skinTone: classifySkin(m.skin),
-    eyeColor: classifyEye(m.eye), hairColor: classifyHair(m.hair),
-    detected: { faceShape: true, skinTone: true, eyeColor: true, hairColor: true },
-    photosUsed: n
-  };
+  var m={lenRatio:sum.lenRatio/n,jawRatio:sum.jawRatio/n,fhRatio:sum.fhRatio/n,
+    skin:{r:sum.skin.r/n,g:sum.skin.g/n,b:sum.skin.b/n},
+    eye:{r:sum.eye.r/n,g:sum.eye.g/n,b:sum.eye.b/n},
+    hair:{r:sum.hair.r/n,g:sum.hair.g/n,b:sum.hair.b/n}};
+  return {faceShape:classifyShape(m),skinTone:classifySkin(m.skin),eyeColor:classifyEye(m.eye),hairColor:classifyHair(m.hair),detected:{faceShape:true,skinTone:true,eyeColor:true,hairColor:true},photosUsed:n};
 }
-
 function classifyShape(m) {
-  if (m.lenRatio > 1.58) { return 'oblong'; }
-  if (m.jawRatio > 0.93 && m.lenRatio < 1.42) { return 'square'; }
-  if (m.lenRatio < 1.28 && m.jawRatio > 0.86) { return 'round'; }
-  if (m.fhRatio > 0.99 && m.jawRatio < 0.82) { return 'heart'; }
-  if (m.fhRatio < 0.90 && m.jawRatio < 0.84) { return 'diamond'; }
+  if(m.lenRatio>1.58) return 'oblong';
+  if(m.jawRatio>0.93&&m.lenRatio<1.42) return 'square';
+  if(m.lenRatio<1.28&&m.jawRatio>0.86) return 'round';
+  if(m.fhRatio>0.99&&m.jawRatio<0.82) return 'heart';
+  if(m.fhRatio<0.90&&m.jawRatio<0.84) return 'diamond';
   return 'oval';
 }
-
 function classifySkin(c) {
-  var lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-  if (lum > 200) { return 'fair'; }
-  if (lum > 172) { return 'light'; }
-  if (lum > 140) { return 'medium'; }
-  if (lum > 110) { return 'olive'; }
-  if (lum > 80) { return 'brown'; }
-  return 'deep';
+  var l=0.299*c.r+0.587*c.g+0.114*c.b;
+  if(l>200) return 'fair'; if(l>172) return 'light'; if(l>140) return 'medium';
+  if(l>110) return 'olive'; if(l>80) return 'brown'; return 'deep';
 }
-
 function classifyEye(c) {
-  var lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-  if (c.b > c.r + 14 && c.b > c.g + 6) { return 'blue'; }
-  if (c.g > c.r + 6 && c.g > c.b + 6) { return 'green'; }
-  if (lum > 150) { return 'gray'; }
-  if (c.r > 90 && c.g > 60 && lum > 95 && c.r > c.b + 25) { return 'hazel'; }
-  if (c.r > c.g + 18 && lum > 70) { return 'amber'; }
+  if(c.b>c.r+14&&c.b>c.g+6) return 'blue';
+  if(c.g>c.r+6&&c.g>c.b+6) return 'green';
+  var l=0.299*c.r+0.587*c.g+0.114*c.b;
+  if(l>150) return 'gray';
+  if(c.r>90&&c.g>60&&l>95&&c.r>c.b+25) return 'hazel';
+  if(c.r>c.g+18&&l>70) return 'amber';
   return 'brown';
 }
-
 function classifyHair(c) {
-  var lum = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-  var rg = c.r - c.b;
-  if (lum > 165 && Math.abs(c.r - c.b) < 24) { return 'gray'; }
-  if (lum > 150) { return 'blonde'; }
-  if (rg > 42 && lum > 78) { return 'auburn'; }
-  if (lum > 95) { return 'brown'; }
-  if (lum > 55) { return 'brunette'; }
-  return 'black';
+  var l=0.299*c.r+0.587*c.g+0.114*c.b, rg=c.r-c.b;
+  if(l>165&&Math.abs(c.r-c.b)<24) return 'gray';
+  if(l>150) return 'blonde'; if(rg>42&&l>78) return 'auburn';
+  if(l>95) return 'brown'; if(l>55) return 'brunette'; return 'black';
 }
-
 function manualFallback() {
-  return {
-    faceShape: 'oval', skinTone: 'medium', eyeColor: 'brown', hairColor: 'brown',
-    detected: {}, photosUsed: 0,
-    note: 'The analysis engine could not load (you may be offline) — pick your features below and everything else still works.'
-  };
+  return {faceShape:'oval',skinTone:'medium',eyeColor:'brown',hairColor:'brunette',detected:{},photosUsed:0};
 }
 
-/* ---------- attribute / preference options ---------- */
+/* ── attribute / preference options ─────────────────────────────────────── */
 var ATTR_DEFS = [
-  { key: 'faceShape', label: 'Face shape', note: 'Measured from jaw, cheekbone, forehead, and length ratios across your photos.',
-    options: ['oval', 'round', 'square', 'heart', 'diamond', 'oblong'] },
-  { key: 'texture', label: 'Natural hair texture', note: 'Photos can hide texture (product, styling) — confirm it here.',
-    options: ['straight', 'wavy', 'curly', 'coily'] },
-  { key: 'hairColor', label: 'Natural hair color', note: 'Sampled from your photos. Previews use this color.',
-    options: ['blonde', 'brown', 'brunette', 'black', 'auburn', 'gray'],
-    swatch: { blonde: '#C9A35F', brown: '#6B4326', brunette: '#46301C', black: '#221C16', auburn: '#7E3A1D', gray: '#A8A4A0' } },
-  { key: 'skinTone', label: 'Skin tone', note: 'Used to judge contrast between hair color and complexion.',
-    options: ['fair', 'light', 'medium', 'olive', 'brown', 'deep'],
-    swatch: { fair: '#F3D9C4', light: '#EAC3A3', medium: '#D29E7C', olive: '#B98860', brown: '#8C5A3B', deep: '#5A3A26' } },
-  { key: 'eyeColor', label: 'Eye color', note: 'A small detail, but it helps with color harmony notes.',
-    options: ['brown', 'blue', 'green', 'hazel', 'gray', 'amber'],
-    swatch: { brown: '#5B3A21', blue: '#5B83A6', green: '#5E7D4F', hazel: '#8A6B3A', gray: '#8D949B', amber: '#A86A2A' } }
+  {key:'faceShape',label:'Face shape',note:'Measured from jaw, cheekbone, forehead, and length ratios.',
+   options:['oval','round','square','heart','diamond','oblong']},
+  {key:'texture',label:'Natural hair texture',note:'Photos can hide texture from styling. Confirm here.',
+   options:['straight','wavy','curly','coily']},
+  {key:'hairColor',label:'Natural hair color',note:'Used for AI-generated previews and illustrations.',
+   options:['blonde','brown','brunette','black','auburn','gray'],
+   swatch:{blonde:'#C9A35F',brown:'#6B4326',brunette:'#46301C',black:'#221C16',auburn:'#7E3A1D',gray:'#A8A4A0'}},
+  {key:'skinTone',label:'Skin tone',note:'Used to judge contrast between hair and complexion.',
+   options:['fair','light','medium','olive','brown','deep'],
+   swatch:{fair:'#F3D9C4',light:'#EAC3A3',medium:'#D29E7C',olive:'#B98860',brown:'#8C5A3B',deep:'#5A3A26'}},
+  {key:'eyeColor',label:'Eye color',note:'Used for color harmony notes.',
+   options:['brown','blue','green','hazel','gray','amber'],
+   swatch:{brown:'#5B3A21',blue:'#5B83A6',green:'#5E7D4F',hazel:'#8A6B3A',gray:'#8D949B',amber:'#A86A2A'}}
 ];
-
 var PREF_DEFS = [
-  { key: 'presentation', label: 'Which styles should we show you?', note: 'This just filters the style library.',
-    options: [ { v: 'masc', t: 'Masculine styles' }, { v: 'fem', t: 'Feminine styles' }, { v: 'all', t: 'Show me everything' } ] },
-  { key: 'length', label: 'How long do you want to go?', note: 'Pick the range you would actually wear.',
-    options: [ { v: 'short', t: 'Short' }, { v: 'medium', t: 'Medium' }, { v: 'long', t: 'Long' }, { v: 'any', t: 'Surprise me' } ] },
-  { key: 'maintenance', label: 'How much daily effort are you up for?', note: 'Be honest — the best haircut is one you can live with.',
-    options: [ { v: 1, t: 'Wash and go' }, { v: 2, t: 'A few minutes' }, { v: 3, t: 'I enjoy styling' } ] },
-  { key: 'vibe', label: 'What is the goal?', note: 'Helps break ties between equally good styles.',
-    options: [ { v: 'professional', t: 'Polished / professional' }, { v: 'lowkey', t: 'Easy / low-key' }, { v: 'bold', t: 'Bold / a real change' } ] }
+  {key:'presentation',label:'Which styles?',note:'Filters the style library.',
+   options:[{v:'masc',t:'Masculine'},{v:'fem',t:'Feminine'},{v:'all',t:'Show everything'}]},
+  {key:'length',label:'Length preference?',note:'Pick what you would actually wear.',
+   options:[{v:'short',t:'Short'},{v:'medium',t:'Medium'},{v:'long',t:'Long'},{v:'any',t:'Surprise me'}]},
+  {key:'maintenance',label:'Daily effort?',note:'Be honest.',
+   options:[{v:1,t:'Wash and go'},{v:2,t:'A few minutes'},{v:3,t:'I enjoy styling'}]},
+  {key:'vibe',label:'Goal?',note:'Helps break ties.',
+   options:[{v:'professional',t:'Polished'},{v:'lowkey',t:'Easy / low-key'},{v:'bold',t:'Bold change'}]}
 ];
 
 function renderConfirm() {
-  var html = '', i, j;
-  if (state.analysis && state.analysis.note) {
-    html += '<div class="error-box" style="display:block">' + state.analysis.note + '</div>';
-  }
-  for (i = 0; i < ATTR_DEFS.length; i++) {
-    var def = ATTR_DEFS[i];
-    var detected = state.analysis && state.analysis.detected && state.analysis.detected[def.key];
-    html += '<div class="attr-group"><h3>' + def.label +
-            (detected ? '<span class="detected">detected</span>' : '') +
-            '</h3><div class="attr-note">' + def.note + '</div><div class="chips">';
-    for (j = 0; j < def.options.length; j++) {
-      var opt = def.options[j];
-      var on = (state.attrs[def.key] === opt) ? ' on' : '';
-      var sw = '';
-      if (def.swatch && def.swatch[opt]) { sw = '<span class="dot" style="background:' + def.swatch[opt] + '"></span>'; }
-      html += '<button class="chip' + on + '" onclick="setAttr(\'' + def.key + '\',\'' + opt + '\')">' + sw + cap(opt) + '</button>';
+  var html='',i,j;
+  if(state.analysis&&state.analysis.note) html+='<div class="error-box" style="display:block">'+state.analysis.note+'</div>';
+  for(i=0;i<ATTR_DEFS.length;i++){
+    var def=ATTR_DEFS[i];
+    var detected=state.analysis&&state.analysis.detected&&state.analysis.detected[def.key];
+    html+='<div class="attr-group"><h3>'+def.label+(detected?'<span class="detected">detected</span>':'')+'</h3><div class="attr-note">'+def.note+'</div><div class="chips">';
+    for(j=0;j<def.options.length;j++){
+      var opt=def.options[j], on=(state.attrs[def.key]===opt)?' on':'';
+      var sw='';
+      if(def.swatch&&def.swatch[opt]) sw='<span class="dot" style="background:'+def.swatch[opt]+'"></span>';
+      html+='<button class="chip'+on+'" onclick="setAttr(\''+def.key+'\',\''+opt+'\')">'+sw+cap(opt)+'</button>';
     }
-    html += '</div></div>';
+    html+='</div></div>';
   }
-  document.getElementById('confirmGroups').innerHTML = html;
+  document.getElementById('confirmGroups').innerHTML=html;
 }
-
-function setAttr(key, val) {
-  state.attrs[key] = val;
-  if (state.analysis && state.analysis.detected) { state.analysis.detected[key] = false; }
-  renderConfirm();
-  saveSession();
-}
-
-function renderPrefs() {
-  var html = '', i, j;
-  for (i = 0; i < PREF_DEFS.length; i++) {
-    var def = PREF_DEFS[i];
-    html += '<div class="attr-group"><h3>' + def.label + '</h3><div class="attr-note">' + def.note + '</div><div class="chips">';
-    for (j = 0; j < def.options.length; j++) {
-      var opt = def.options[j];
-      var on = (String(state.prefs[def.key]) === String(opt.v)) ? ' on' : '';
-      html += '<button class="chip' + on + '" onclick="setPref(\'' + def.key + '\',\'' + opt.v + '\')">' + opt.t + '</button>';
+function setAttr(key,val){state.attrs[key]=val;if(state.analysis&&state.analysis.detected)state.analysis.detected[key]=false;renderConfirm();saveSession();}
+function renderPrefs(){
+  var html='',i,j;
+  for(i=0;i<PREF_DEFS.length;i++){
+    var def=PREF_DEFS[i];
+    html+='<div class="attr-group"><h3>'+def.label+'</h3><div class="attr-note">'+def.note+'</div><div class="chips">';
+    for(j=0;j<def.options.length;j++){
+      var opt=def.options[j],on=(String(state.prefs[def.key])===String(opt.v))?' on':'';
+      html+='<button class="chip'+on+'" onclick="setPref(\''+def.key+'\',\''+opt.v+'\')">'+opt.t+'</button>';
     }
-    html += '</div></div>';
+    html+='</div></div>';
   }
-  document.getElementById('prefGroups').innerHTML = html;
+  document.getElementById('prefGroups').innerHTML=html;
 }
+function setPref(key,val){state.prefs[key]=val;renderPrefs();saveSession();}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 
-function setPref(key, val) { state.prefs[key] = val; renderPrefs(); saveSession(); }
+/* ══════════════════════════════════════════════════════════════════════════
+   SVG ILLUSTRATED FALLBACK — identical to v003 but charcoal demo color
+   ══════════════════════════════════════════════════════════════════════════ */
+var OPEN_HIGH="M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z";
+var OPEN_MID="M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z";
+var OPEN_FRINGE="M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z";
 
-function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-/* ============================================================
-   TRY-ON ENGINE — hairstyle overlays drawn onto the user's photo
-   Normalized head space: viewBox 0 0 240 300, eye line y=150,
-   anchor (mid-eyes) at (120,150), cheek width = 112 units.
-   ============================================================ */
-
-var OPEN_HIGH = "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z";
-var OPEN_MID = "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z";
-var OPEN_FRINGE = "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z";
-
-var HAIR_SHAPES = {
-  buzz: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M60,154 C54,68 186,68 180,154 C180,166 172,170 166,162 L74,162 C68,170 60,166 60,154 Z\" fill=\"{C}\" opacity=\"0.62\"/><path d=\"M62,140 C60,76 180,76 178,140\" fill=\"none\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.4\"/>" },
-  crew: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,138 C54,62 186,62 182,138 C182,150 174,154 168,146 L72,146 C66,154 58,150 58,138 Z\" fill=\"url(#hg)\"/><path d=\"M60,142 C58,162 60,176 66,188 L82,188 C76,172 73,156 73,146 Z\" fill=\"{C2}\" opacity=\"0.45\"/><path d=\"M180,142 C182,162 180,176 174,188 L158,188 C164,172 167,156 167,146 Z\" fill=\"{C2}\" opacity=\"0.45\"/><path d=\"M88,92 C104,82 136,82 152,92\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.4\" fill=\"none\"/>" },
-  crop: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,60 192,60 184,150 C182,170 172,180 152,176 L88,176 C68,180 58,170 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M88,112 C87,102 90,94 96,90 M112,108 C111,98 114,90 120,86 M138,108 C138,98 142,92 148,90\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/>", over: "<path d=\"M92,116 C95,124 97,128 98,131 M106,114 C108,122 110,127 111,131 M120,114 C121,122 122,127 122,131 M134,114 C133,122 132,127 131,131 M147,116 C145,123 143,127 142,130\" stroke=\"{C}\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\"/>" },
-  taper: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,148 C52,64 188,64 182,148 C180,166 172,174 154,170 L86,170 C68,174 60,166 58,148 Z\" fill=\"url(#hg)\"/><path d=\"M58,148 C56,168 60,182 68,192 L84,192 C76,176 73,160 74,150 Z\" fill=\"{C2}\" opacity=\"0.5\"/><path d=\"M182,148 C184,168 180,182 172,192 L156,192 C164,176 167,160 166,150 Z\" fill=\"{C2}\" opacity=\"0.5\"/><path d=\"M84,100 C100,88 140,88 156,100\" stroke=\"{C3}\" stroke-width=\"5\" opacity=\"0.5\" fill=\"none\"/>" },
-  sidepart: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,148 C52,66 142,48 166,68 C188,84 188,122 184,150 C182,168 172,176 154,172 L88,172 C68,176 58,166 58,148 Z\" fill=\"url(#hg)\"/><path d=\"M94,80 C96,92 98,103 99,113\" stroke=\"{C2}\" stroke-width=\"5\" opacity=\"0.85\" fill=\"none\"/><path d=\"M103,84 C116,78 132,80 144,90 M103,96 C114,90 130,92 142,102 M103,108 C112,104 126,106 138,113\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.5\" fill=\"none\"/>", over: "<path d=\"M99,114 C114,108 138,110 158,122\" stroke=\"{C}\" stroke-width=\"9\" fill=\"none\" stroke-linecap=\"round\"/>" },
-  quiff: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,152 C56,96 52,44 98,34 C118,28 136,40 140,56 C170,56 186,94 182,152 C180,172 170,182 150,178 L88,178 C68,182 58,172 58,152 Z\" fill=\"url(#hg)\"/><path d=\"M80,120 C76,84 84,52 104,42 M96,124 C92,92 100,62 116,50 M150,120 C152,92 146,68 134,56\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/><path d=\"M88,110 C84,80 92,54 108,45\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.6\" fill=\"none\"/>" },
-  slick: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M60,146 C58,82 88,46 124,48 C170,50 188,92 182,148 C182,158 176,162 170,156 L72,156 C66,162 60,156 60,146 Z\" fill=\"url(#hg)\"/><path d=\"M76,112 C80,78 98,58 122,54 M94,106 C98,80 112,64 132,58 M148,104 C150,84 158,74 166,80 M64,124 C66,96 76,72 94,60\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/><path d=\"M108,102 C112,80 126,64 144,60\" stroke=\"{C3}\" stroke-width=\"5\" opacity=\"0.65\" fill=\"none\"/>" },
-  undercut: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M72,116 C68,66 100,42 128,44 C162,46 178,74 174,116 C174,128 166,132 160,124 L84,124 C76,132 72,128 72,116 Z\" fill=\"url(#hg)\"/><path d=\"M68,148 C66,122 70,106 78,98 L86,116 C81,132 79,146 79,158 Z\" fill=\"{C2}\" opacity=\"0.38\"/><path d=\"M172,148 C174,122 170,106 162,98 L154,116 C159,132 161,146 161,158 Z\" fill=\"{C2}\" opacity=\"0.38\"/><path d=\"M88,108 C92,76 108,56 128,52 M108,106 C112,80 126,62 144,58 M146,104 C150,84 158,70 166,74\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.55\" fill=\"none\"/>" },
-  flow: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M56,150 C52,78 90,50 122,50 C158,50 190,82 184,152 C186,172 182,186 174,192 C166,196 160,188 162,178 C164,166 160,156 154,150 L86,150 C80,156 76,166 78,178 C80,188 74,196 66,192 C58,186 54,170 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M74,138 C72,102 88,70 112,60 M100,132 C100,100 112,76 132,64 M150,132 C152,104 146,82 132,66\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/><path d=\"M88,128 C88,98 100,74 120,64\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.55\" fill=\"none\"/>" },
-  curlshort: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M58,154 C50,98 68,62 120,60 C172,62 190,98 182,154 C180,172 170,182 150,180 L90,180 C72,182 60,172 58,154 Z\" fill=\"url(#hg)\"/><circle cx=\"72\" cy=\"104\" r=\"18\" fill=\"{C}\"/><circle cx=\"97\" cy=\"80\" r=\"19\" fill=\"{C}\"/><circle cx=\"126\" cy=\"72\" r=\"19\" fill=\"{C}\"/><circle cx=\"153\" cy=\"83\" r=\"18\" fill=\"{C}\"/><circle cx=\"172\" cy=\"107\" r=\"17\" fill=\"{C}\"/><circle cx=\"60\" cy=\"133\" r=\"14\" fill=\"{C}\"/><circle cx=\"180\" cy=\"135\" r=\"14\" fill=\"{C}\"/><path d=\"M78,108 a9,9 0 1,1 12,-8 M104,86 a9,9 0 1,1 12,-8 M130,78 a9,9 0 1,1 12,-7 M156,90 a9,9 0 1,1 11,-6 M92,122 a8,8 0 1,1 11,-7 M122,114 a8,8 0 1,1 11,-7 M150,120 a8,8 0 1,1 10,-6\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.55\" fill=\"none\"/>" },
-  coils: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M62,148 C56,92 80,68 120,66 C160,68 184,92 178,148 C176,162 168,170 154,166 L86,166 C72,170 64,162 62,148 Z\" fill=\"url(#hg)\"/><path d=\"M62,148 C60,164 64,176 70,184 L84,184 C78,170 75,158 76,150 Z\" fill=\"{C2}\" opacity=\"0.42\"/><path d=\"M178,148 C180,164 176,176 170,184 L156,184 C162,170 165,158 164,150 Z\" fill=\"{C2}\" opacity=\"0.42\"/><circle cx=\"88\" cy=\"92\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"108\" cy=\"82\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"130\" cy=\"82\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"152\" cy=\"92\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"98\" cy=\"106\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"120\" cy=\"98\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"142\" cy=\"106\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"76\" cy=\"110\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"164\" cy=\"110\" r=\"6\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"110\" cy=\"120\" r=\"5\" fill=\"{C2}\" opacity=\"0.7\"/><circle cx=\"132\" cy=\"120\" r=\"5\" fill=\"{C2}\" opacity=\"0.7\"/>" },
-  twa: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M64,148 C58,104 76,80 96,74 L146,74 C166,80 182,104 176,148 C174,162 166,170 152,166 L88,166 C76,170 66,162 64,148 Z\" fill=\"url(#hg)\"/><circle cx=\"92\" cy=\"60\" r=\"21\" fill=\"{C}\"/><circle cx=\"120\" cy=\"52\" r=\"23\" fill=\"{C}\"/><circle cx=\"148\" cy=\"60\" r=\"21\" fill=\"{C}\"/><circle cx=\"72\" cy=\"90\" r=\"17\" fill=\"{C}\"/><circle cx=\"168\" cy=\"90\" r=\"17\" fill=\"{C}\"/><path d=\"M98,66 a8,8 0 1,1 11,-7 M126,58 a8,8 0 1,1 11,-6 M152,68 a8,8 0 1,1 10,-6 M80,96 a7,7 0 1,1 10,-6 M158,98 a7,7 0 1,1 10,-5\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.55\" fill=\"none\"/>" },
-  afro: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<circle cx=\"120\" cy=\"102\" r=\"95\" fill=\"url(#hg)\"/><circle cx=\"50\" cy=\"120\" r=\"27\" fill=\"{C}\"/><circle cx=\"190\" cy=\"120\" r=\"27\" fill=\"{C}\"/><circle cx=\"68\" cy=\"52\" r=\"25\" fill=\"{C}\"/><circle cx=\"172\" cy=\"52\" r=\"25\" fill=\"{C}\"/><circle cx=\"120\" cy=\"32\" r=\"27\" fill=\"{C}\"/><path d=\"M76,80 a11,11 0 1,1 14,-9 M110,58 a11,11 0 1,1 14,-9 M148,70 a11,11 0 1,1 13,-8 M62,120 a10,10 0 1,1 13,-8 M170,114 a10,10 0 1,1 12,-8 M96,100 a9,9 0 1,1 12,-8 M140,98 a9,9 0 1,1 12,-7\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
-  pixie: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M58,144 C52,62 188,62 182,144 C182,162 174,172 158,168 L82,168 C66,172 58,162 58,144 Z\" fill=\"url(#hg)\"/><path d=\"M70,150 C66,164 68,176 74,184 L86,182 C80,170 78,158 79,150 Z\" fill=\"{C2}\" opacity=\"0.4\"/><path d=\"M170,150 C174,164 172,176 166,184 L154,182 C160,170 162,158 161,150 Z\" fill=\"{C2}\" opacity=\"0.4\"/><path d=\"M88,96 C104,84 138,84 154,98\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.55\" fill=\"none\"/>", over: "<path d=\"M96,114 C100,122 102,127 102,131 M114,112 C116,120 117,126 116,130 M130,112 C130,120 129,126 127,130\" stroke=\"{C}\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\" opacity=\"0.95\"/>" },
-  bob: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,62 192,62 184,150 C188,192 186,216 178,234 C170,244 152,242 150,230 C156,198 155,170 151,150 L89,150 C85,170 84,198 90,230 C88,242 70,244 62,234 C54,216 52,192 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,120 C66,160 68,200 74,226 M170,120 C174,160 172,200 166,226 M84,100 C80,140 80,180 86,214\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/><path d=\"M156,100 C160,140 160,180 154,214\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
-  lob: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,62 192,62 184,150 C190,202 188,238 180,262 C172,274 152,270 152,258 C158,218 157,184 151,150 L89,150 C83,184 82,218 88,258 C88,270 68,274 60,262 C52,238 50,202 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,130 C64,180 66,224 74,252 M170,130 C176,180 174,224 166,252 M84,104 C78,160 78,210 86,246\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/><path d=\"M156,104 C162,160 162,210 154,246\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
-  curtain: { open: "M78,104 C68,128 64,152 70,182 C78,210 96,234 120,240 C144,234 162,210 170,182 C176,152 172,128 162,104 C148,94 92,94 78,104 Z", body: "<path d=\"M56,150 C48,62 192,62 184,150 C190,202 188,238 180,262 C172,274 152,270 152,258 C158,218 157,184 151,150 L89,150 C83,184 82,218 88,258 C88,270 68,274 60,262 C52,238 50,202 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,130 C64,180 66,224 74,252 M170,130 C176,180 174,224 166,252\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/>", over: "<path d=\"M91,100 C85,112 81,126 80,140\" stroke=\"{C}\" stroke-width=\"12\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M149,100 C155,112 159,126 160,140\" stroke=\"{C}\" stroke-width=\"12\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M99,100 C95,110 93,120 93,130\" stroke=\"{C2}\" stroke-width=\"4\" fill=\"none\" opacity=\"0.6\" stroke-linecap=\"round\"/><path d=\"M141,100 C145,110 147,120 147,130\" stroke=\"{C2}\" stroke-width=\"4\" fill=\"none\" opacity=\"0.6\" stroke-linecap=\"round\"/>" },
-  longstraight: { open: "M77,116 C68,138 65,156 70,184 C78,210 96,234 120,240 C144,234 162,210 170,184 C175,156 172,138 163,116 C150,107 121,113 120,113 C119,113 90,107 77,116 Z", body: "<path d=\"M56,150 C48,60 192,60 184,150 C192,212 192,260 184,292 C176,302 154,299 156,286 C161,238 159,190 151,150 L89,150 C81,190 79,238 84,286 C86,299 64,302 56,292 C48,260 48,212 56,150 Z\" fill=\"url(#hg)\"/><path d=\"M70,140 C62,200 64,250 72,282 M170,140 C178,200 176,250 168,282 M84,110 C76,180 76,236 84,276\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.45\" fill=\"none\"/><path d=\"M156,110 C164,180 164,236 156,276\" stroke=\"{C3}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
-  shag: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M56,148 C48,60 192,60 184,148 C190,178 194,204 186,226 L174,214 L176,242 L160,228 L158,250 C152,252 148,246 148,238 L143,150 L97,150 L92,238 C92,246 88,252 82,250 L80,228 L64,242 L66,214 L54,226 C46,204 50,178 56,148 Z\" fill=\"url(#hg)\"/><path d=\"M72,130 C66,170 68,206 74,232 M168,130 C174,170 172,206 166,232 M88,110 C82,150 82,190 88,226 M152,110 C158,150 158,190 152,226\" stroke=\"{C2}\" stroke-width=\"4\" opacity=\"0.5\" fill=\"none\"/>" },
-  curllong: { open: "M76,138 C69,156 67,170 72,192 C80,214 98,236 120,240 C142,236 160,214 168,192 C173,170 171,156 164,138 C150,131 90,131 76,138 Z", body: "<path d=\"M58,148 C50,66 190,66 182,148 C180,166 170,176 154,172 L86,172 C70,176 60,166 58,148 Z\" fill=\"url(#hg)\"/><circle cx=\"74\" cy=\"94\" r=\"19\" fill=\"{C}\"/><circle cx=\"120\" cy=\"78\" r=\"21\" fill=\"{C}\"/><circle cx=\"166\" cy=\"94\" r=\"19\" fill=\"{C}\"/><circle cx=\"62\" cy=\"148\" r=\"18\" fill=\"{C}\"/><circle cx=\"60\" cy=\"184\" r=\"18\" fill=\"{C}\"/><circle cx=\"62\" cy=\"220\" r=\"18\" fill=\"{C}\"/><circle cx=\"68\" cy=\"254\" r=\"17\" fill=\"{C}\"/><circle cx=\"178\" cy=\"148\" r=\"18\" fill=\"{C}\"/><circle cx=\"180\" cy=\"184\" r=\"18\" fill=\"{C}\"/><circle cx=\"178\" cy=\"220\" r=\"18\" fill=\"{C}\"/><circle cx=\"172\" cy=\"254\" r=\"17\" fill=\"{C}\"/><path d=\"M66,152 a9,9 0 1,1 12,-8 M64,188 a9,9 0 1,1 12,-8 M66,224 a9,9 0 1,1 12,-8 M72,256 a8,8 0 1,1 11,-7 M182,152 a9,9 0 1,1 -12,-8 M184,188 a9,9 0 1,1 -12,-8 M182,224 a9,9 0 1,1 -12,-8 M176,256 a8,8 0 1,1 -11,-7 M80,98 a9,9 0 1,1 12,-8 M126,82 a10,10 0 1,1 13,-8 M170,100 a9,9 0 1,1 -12,-8\" stroke=\"{C2}\" stroke-width=\"3.5\" opacity=\"0.55\" fill=\"none\"/>" }
+var HAIR_SHAPES={
+  buzz:{open:OPEN_MID,body:'<path d="M64,152 C58,74 182,74 176,152 C176,162 170,166 164,160 L76,160 C70,166 64,162 64,152 Z" fill="{C}" opacity="0.62"/><path d="M62,140 C60,76 180,76 178,140" fill="none" stroke="{C2}" stroke-width="4" opacity="0.4"/>'},
+  crew:{open:OPEN_MID,body:'<path d="M58,138 C54,62 186,62 182,138 C182,150 174,154 168,146 L72,146 C66,154 58,150 58,138 Z" fill="url(#hg)"/><path d="M60,142 C58,162 60,176 66,188 L82,188 C76,172 73,156 73,146 Z" fill="{C2}" opacity="0.45"/><path d="M180,142 C182,162 180,176 174,188 L158,188 C164,172 167,156 167,146 Z" fill="{C2}" opacity="0.45"/><path d="M88,92 C104,82 136,82 152,92" stroke="{C2}" stroke-width="4" opacity="0.4" fill="none"/>'},
+  crop:{open:OPEN_MID,body:'<path d="M56,150 C48,60 192,60 184,150 C182,170 172,180 152,176 L88,176 C68,180 58,170 56,150 Z" fill="url(#hg)"/><path d="M88,112 C87,102 90,94 96,90 M112,108 C111,98 114,90 120,86 M138,108 C138,98 142,92 148,90" stroke="{C2}" stroke-width="4" opacity="0.45" fill="none"/>',over:'<path d="M96,114 C100,122 102,127 102,131 M114,112 C116,120 117,126 116,130 M130,112 C130,120 129,126 127,130" stroke="{C}" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.95"/>'},
+  taper:{open:OPEN_MID,body:'<path d="M58,148 C52,64 188,64 182,148 C180,166 172,174 154,170 L86,170 C68,174 60,166 58,148 Z" fill="url(#hg)"/><path d="M58,148 C56,168 60,182 68,192 L84,192 C76,176 73,160 74,150 Z" fill="{C2}" opacity="0.5"/><path d="M182,148 C184,168 180,182 172,192 L156,192 C164,176 167,160 166,150 Z" fill="{C2}" opacity="0.5"/><path d="M84,100 C100,88 140,88 156,100" stroke="{C3}" stroke-width="5" opacity="0.5" fill="none"/>'},
+  sidepart:{open:OPEN_MID,body:'<path d="M58,148 C52,66 142,48 166,68 C188,84 188,122 184,150 C182,168 172,176 154,172 L88,172 C68,176 58,166 58,148 Z" fill="url(#hg)"/><path d="M94,80 C96,92 98,103 99,113" stroke="{C2}" stroke-width="5" opacity="0.85" fill="none"/><path d="M103,84 C116,78 132,80 144,90 M103,96 C114,90 130,92 142,102 M103,108 C112,104 126,106 138,113" stroke="{C2}" stroke-width="3.5" opacity="0.5" fill="none"/>'},
+  quiff:{open:OPEN_MID,body:'<path d="M58,152 C56,96 52,44 98,34 C118,28 136,40 140,56 C170,56 186,94 182,152 C180,172 170,182 150,178 L88,178 C68,182 58,172 58,152 Z" fill="url(#hg)"/><path d="M80,120 C76,84 84,52 104,42 M96,124 C92,92 100,62 116,50 M150,120 C152,92 146,68 134,56" stroke="{C2}" stroke-width="4" opacity="0.5" fill="none"/>'},
+  slick:{open:OPEN_HIGH,body:'<path d="M60,146 C58,82 88,46 124,48 C170,50 188,92 182,148 C182,158 176,162 170,156 L72,156 C66,162 60,156 60,146 Z" fill="url(#hg)"/><path d="M76,112 C80,78 98,58 122,54 M94,106 C98,80 112,64 132,58 M148,104 C150,84 158,74 166,80 M64,124 C66,96 76,72 94,60" stroke="{C2}" stroke-width="4" opacity="0.5" fill="none"/>'},
+  undercut:{open:OPEN_HIGH,body:'<path d="M72,116 C68,66 100,42 128,44 C162,46 178,74 174,116 C174,128 166,132 160,124 L84,124 C76,132 72,128 72,116 Z" fill="url(#hg)"/><path d="M68,148 C66,122 70,106 78,98 L86,116 C81,132 79,146 79,158 Z" fill="{C2}" opacity="0.38"/><path d="M172,148 C174,122 170,106 162,98 L154,116 C159,132 161,146 161,158 Z" fill="{C2}" opacity="0.38"/><path d="M88,108 C92,76 108,56 128,52 M108,106 C112,80 126,62 144,58 M146,104 C150,84 158,70 166,74" stroke="{C2}" stroke-width="4" opacity="0.55" fill="none"/>'},
+  flow:{open:OPEN_HIGH,body:'<path d="M56,150 C52,78 90,50 122,50 C158,50 190,82 184,152 C186,172 182,186 174,192 C166,196 160,188 162,178 C164,166 160,156 154,150 L86,150 C80,156 76,166 78,178 C80,188 74,196 66,192 C58,186 54,170 56,150 Z" fill="url(#hg)"/><path d="M74,138 C72,102 88,70 112,60 M100,132 C100,100 112,76 132,64 M150,132 C152,104 146,82 132,66" stroke="{C2}" stroke-width="4" opacity="0.5" fill="none"/>'},
+  curlshort:{open:OPEN_FRINGE,body:'<path d="M58,154 C50,98 68,62 120,60 C172,62 190,98 182,154 C180,172 170,182 150,180 L90,180 C72,182 60,172 58,154 Z" fill="url(#hg)"/><circle cx="72" cy="104" r="18" fill="{C}"/><circle cx="97" cy="80" r="19" fill="{C}"/><circle cx="126" cy="72" r="19" fill="{C}"/><circle cx="153" cy="83" r="18" fill="{C}"/><circle cx="172" cy="107" r="17" fill="{C}"/><circle cx="60" cy="133" r="14" fill="{C}"/><circle cx="180" cy="135" r="14" fill="{C}"/><path d="M78,108 a9,9 0 1,1 12,-8 M104,86 a9,9 0 1,1 12,-8 M130,78 a9,9 0 1,1 12,-7 M156,90 a9,9 0 1,1 11,-6" stroke="{C2}" stroke-width="3.5" opacity="0.55" fill="none"/>'},
+  coils:{open:OPEN_FRINGE,body:'<path d="M62,148 C56,92 80,68 120,66 C160,68 184,92 178,148 C176,162 168,170 154,166 L86,166 C72,170 64,162 62,148 Z" fill="url(#hg)"/><path d="M62,148 C60,164 64,176 70,184 L84,184 C78,170 75,158 76,150 Z" fill="{C2}" opacity="0.42"/><path d="M178,148 C180,164 176,176 170,184 L156,184 C162,170 165,158 164,150 Z" fill="{C2}" opacity="0.42"/><circle cx="88" cy="92" r="6" fill="{C2}" opacity="0.7"/><circle cx="108" cy="82" r="6" fill="{C2}" opacity="0.7"/><circle cx="130" cy="82" r="6" fill="{C2}" opacity="0.7"/><circle cx="152" cy="92" r="6" fill="{C2}" opacity="0.7"/><circle cx="120" cy="98" r="6" fill="{C2}" opacity="0.7"/>'},
+  twa:{open:OPEN_FRINGE,body:'<path d="M64,148 C58,104 76,80 96,74 L146,74 C166,80 182,104 176,148 C174,162 166,170 152,166 L88,166 C76,170 66,162 64,148 Z" fill="url(#hg)"/><circle cx="92" cy="60" r="21" fill="{C}"/><circle cx="120" cy="52" r="23" fill="{C}"/><circle cx="148" cy="60" r="21" fill="{C}"/><circle cx="72" cy="90" r="17" fill="{C}"/><circle cx="168" cy="90" r="17" fill="{C}"/><path d="M98,66 a8,8 0 1,1 11,-7 M126,58 a8,8 0 1,1 11,-6 M80,96 a7,7 0 1,1 10,-6" stroke="{C2}" stroke-width="3.5" opacity="0.55" fill="none"/>'},
+  afro:{open:OPEN_FRINGE,body:'<circle cx="120" cy="102" r="95" fill="url(#hg)"/><circle cx="50" cy="120" r="27" fill="{C}"/><circle cx="190" cy="120" r="27" fill="{C}"/><circle cx="68" cy="52" r="25" fill="{C}"/><circle cx="172" cy="52" r="25" fill="{C}"/><circle cx="120" cy="32" r="27" fill="{C}"/><path d="M76,80 a11,11 0 1,1 14,-9 M110,58 a11,11 0 1,1 14,-9 M148,70 a11,11 0 1,1 13,-8" stroke="{C2}" stroke-width="4" opacity="0.5" fill="none"/>'},
+  pixie:{open:OPEN_MID,body:'<path d="M58,144 C52,62 188,62 182,144 C182,162 174,172 158,168 L82,168 C66,172 58,162 58,144 Z" fill="url(#hg)"/><path d="M70,150 C66,164 68,176 74,184 L86,182 C80,170 78,158 79,150 Z" fill="{C2}" opacity="0.4"/><path d="M170,150 C174,164 172,176 166,184 L154,182 C160,170 162,158 161,150 Z" fill="{C2}" opacity="0.4"/>',over:'<path d="M96,114 C100,122 102,127 102,131 M114,112 C116,120 117,126 116,130 M130,112 C130,120 129,126 127,130" stroke="{C}" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.95"/>'},
+  bob:{open:OPEN_MID,body:'<path d="M56,150 C48,62 192,62 184,150 C188,192 186,216 178,234 C170,244 152,242 150,230 C156,198 155,170 151,150 L89,150 C85,170 84,198 90,230 C88,242 70,244 62,234 C54,216 52,192 56,150 Z" fill="url(#hg)"/><path d="M70,120 C66,160 68,200 74,226 M170,120 C174,160 172,200 166,226 M84,100 C80,140 80,180 86,214" stroke="{C2}" stroke-width="4" opacity="0.45" fill="none"/>'},
+  lob:{open:OPEN_MID,body:'<path d="M56,150 C48,62 192,62 184,150 C190,202 188,238 180,262 C172,274 152,270 152,258 C158,218 157,184 151,150 L89,150 C83,184 82,218 88,258 C88,270 68,274 60,262 C52,238 50,202 56,150 Z" fill="url(#hg)"/><path d="M70,130 C64,180 66,224 74,252 M170,130 C176,180 174,224 166,252 M84,104 C78,160 78,210 86,246" stroke="{C2}" stroke-width="4" opacity="0.45" fill="none"/>'},
+  curtain:{open:OPEN_HIGH,body:'<path d="M56,150 C48,62 192,62 184,150 C190,202 188,238 180,262 C172,274 152,270 152,258 C158,218 157,184 151,150 L89,150 C83,184 82,218 88,258 C88,270 68,274 60,262 C52,238 50,202 56,150 Z" fill="url(#hg)"/><path d="M70,130 C64,180 66,224 74,252 M170,130 C176,180 174,224 166,252" stroke="{C2}" stroke-width="4" opacity="0.45" fill="none"/>',over:'<path d="M91,100 C85,112 81,126 80,140" stroke="{C}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M149,100 C155,112 159,126 160,140" stroke="{C}" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M99,100 C95,110 93,120 93,130" stroke="{C2}" stroke-width="4" fill="none" opacity="0.6" stroke-linecap="round"/><path d="M141,100 C145,110 147,120 147,130" stroke="{C2}" stroke-width="4" fill="none" opacity="0.6" stroke-linecap="round"/>'},
+  longstraight:{open:OPEN_MID,body:'<path d="M56,150 C48,60 192,60 184,150 C192,212 192,260 184,292 C176,302 154,299 156,286 C161,238 159,190 151,150 L89,150 C81,190 79,238 84,286 C86,299 64,302 56,292 C48,260 48,212 56,150 Z" fill="url(#hg)"/><path d="M70,140 C62,200 64,250 72,282 M170,140 C178,200 176,250 168,282 M84,110 C76,180 76,236 84,276" stroke="{C2}" stroke-width="4" opacity="0.45" fill="none"/>'},
+  shag:{open:OPEN_FRINGE,body:'<path d="M56,148 C48,60 192,60 184,148 C190,178 194,204 186,226 L174,214 L176,242 L160,228 L158,250 C152,252 148,246 148,238 L143,150 L97,150 L92,238 C92,246 88,252 82,250 L80,228 L64,242 L66,214 L54,226 C46,204 50,178 56,148 Z" fill="url(#hg)"/><path d="M72,130 C66,170 68,206 74,232 M168,130 C174,170 172,206 166,232" stroke="{C2}" stroke-width="4" opacity="0.5" fill="none"/>'},
+  curllong:{open:OPEN_FRINGE,body:'<path d="M58,148 C50,66 190,66 182,148 C180,166 170,176 154,172 L86,172 C70,176 60,166 58,148 Z" fill="url(#hg)"/><circle cx="74" cy="94" r="19" fill="{C}"/><circle cx="120" cy="78" r="21" fill="{C}"/><circle cx="166" cy="94" r="19" fill="{C}"/><circle cx="62" cy="148" r="18" fill="{C}"/><circle cx="60" cy="184" r="18" fill="{C}"/><circle cx="62" cy="220" r="18" fill="{C}"/><circle cx="178" cy="148" r="18" fill="{C}"/><circle cx="180" cy="184" r="18" fill="{C}"/><circle cx="178" cy="220" r="18" fill="{C}"/><path d="M66,152 a9,9 0 1,1 12,-8 M64,188 a9,9 0 1,1 12,-8 M182,152 a9,9 0 1,1 -12,-8 M184,188 a9,9 0 1,1 -12,-8" stroke="{C2}" stroke-width="3.5" opacity="0.55" fill="none"/>'}
 };
 
-var HAIR_COLORS = {
-  blonde:   { c: '#C9A35F', d: '#9A7A40', l: '#E6C98C' },
-  brown:    { c: '#6B4326', d: '#4E3019', l: '#8A5C38' },
-  brunette: { c: '#46301C', d: '#2F2012', l: '#5E4226' },
-  black:    { c: '#221C16', d: '#120F0C', l: '#3A3129' },
-  auburn:   { c: '#7E3A1D', d: '#5C2A14', l: '#9C512C' },
-  gray:     { c: '#A8A4A0', d: '#7E7A76', l: '#C9C5C1' }
+var HAIR_COLORS={
+  blonde:{c:'#C9A35F',d:'#9A7A40',l:'#E6C98C'},
+  brown:{c:'#5A3A1A',d:'#3A2510',l:'#7A5232'},
+  brunette:{c:'#3A2810',d:'#221808',l:'#52381C'},
+  black:{c:'#1E1A14',d:'#100E0A',l:'#32302A'},
+  auburn:{c:'#7E3A1D',d:'#5C2A14',l:'#9C512C'},
+  gray:{c:'#A8A4A0',d:'#7E7A76',l:'#C9C5C1'}
 };
 
-/* style id -> overlay shape */
-var STYLE_SHAPE = {
-  txcrop: 'crop', classictaper: 'taper', sidepart: 'sidepart', crew: 'crew', pixie: 'pixie',
-  quiff: 'quiff', buzz: 'buzz', slickunder: 'undercut', flow: 'flow',
-  curlyfringe: 'curlshort', spongetwist: 'coils', twa: 'twa', washngo: 'afro',
-  bob: 'bob', bluntlob: 'lob', curtainlob: 'curtain',
-  longlayers: 'longstraight', butterfly: 'longstraight', sideswept: 'longstraight',
-  shag: 'shag', wolf: 'shag', curlylayers: 'curllong'
+var STYLE_SHAPE={
+  txcrop:'crop',classictaper:'taper',sidepart:'sidepart',crew:'crew',pixie:'pixie',
+  quiff:'quiff',buzz:'buzz',slickunder:'undercut',flow:'flow',
+  curlyfringe:'curlshort',spongetwist:'coils',twa:'twa',washngo:'afro',
+  bob:'bob',bluntlob:'lob',curtainlob:'curtain',
+  longlayers:'longstraight',butterfly:'longstraight',sideswept:'longstraight',
+  shag:'shag',wolf:'shag',curlylayers:'curllong'
 };
 
-var hairImgCache = {};
-var basePhotoImg = null;
-
-function hairSvgString(shapeKey, colorKey) {
-  var s = HAIR_SHAPES[shapeKey];
-  var col = HAIR_COLORS[colorKey] || HAIR_COLORS.brown;
-  var inv = 'M-20,-20 H260 V320 H-20 Z ' + s.open;
-  function paint(str) {
-    return str.split('{C3}').join(col.l).split('{C2}').join(col.d).split('{C}').join(col.c);
-  }
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
-    '<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0%" stop-color="' + col.l + '"/><stop offset="55%" stop-color="' + col.c + '"/>' +
-    '<stop offset="100%" stop-color="' + col.d + '"/></linearGradient>' +
-    '<clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
-    '<g clip-path="url(#fc)">' + paint(s.body) + '</g>';
-  if (s.over) { svg += '<g>' + paint(s.over) + '</g>'; }
-  svg += '</svg>';
+/* Illustrated SVG builder */
+function hairSvgString(shapeKey,colorKey) {
+  var s=HAIR_SHAPES[shapeKey], col=HAIR_COLORS[colorKey]||HAIR_COLORS.brunette;
+  var inv='M-20,-20 H260 V320 H-20 Z '+s.open;
+  function paint(str){return str.split('{C3}').join(col.l).split('{C2}').join(col.d).split('{C}').join(col.c);}
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">'+
+    '<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="'+col.l+'"/><stop offset="55%" stop-color="'+col.c+'"/>'+
+    '<stop offset="100%" stop-color="'+col.d+'"/></linearGradient>'+
+    '<clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="'+inv+'"/></clipPath></defs>'+
+    '<g clip-path="url(#fc)">'+paint(s.body)+'</g>';
+  if(s.over){svg+='<g>'+paint(s.over)+'</g>';}
+  svg+='</svg>';
   return svg;
 }
 
-function getHairImage(shapeKey, colorKey, cb) {
-  var key = shapeKey + '_' + colorKey;
-  if (hairImgCache[key]) { cb(hairImgCache[key]); return; }
-  var img = new Image();
-  img.onload = function () { hairImgCache[key] = img; cb(img); };
-  img.onerror = function () { cb(null); };
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(hairSvgString(shapeKey, colorKey));
+var hairImgCache={}, basePhotoImg=null;
+function getHairImage(shapeKey,colorKey,cb){
+  var key=shapeKey+'_'+colorKey;
+  if(hairImgCache[key]){cb(hairImgCache[key]);return;}
+  var img=new Image();
+  img.onload=function(){hairImgCache[key]=img;cb(img);};
+  img.onerror=function(){cb(null);};
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(hairSvgString(shapeKey,colorKey));
+}
+function getBasePhotoImage(cb){
+  if(!state.basePhoto){cb(null);return;}
+  if(basePhotoImg&&basePhotoImg.src===state.basePhoto.dataUrl){cb(basePhotoImg);return;}
+  var img=new Image();
+  img.onload=function(){basePhotoImg=img;cb(img);};
+  img.onerror=function(){cb(null);};
+  img.src=state.basePhoto.dataUrl;
+}
+function pt(arr){return{x:arr[0],y:arr[1]};}
+function avgPts(P,start,n){
+  var x=0,y=0,i;
+  for(i=start;i<start+n;i++){x+=P[i][0];y+=P[i][1];}
+  return{x:x/n,y:y/n};
 }
 
-function getBasePhotoImage(cb) {
-  if (!state.basePhoto) { cb(null); return; }
-  if (basePhotoImg && basePhotoImg.src === state.basePhoto.dataUrl) { cb(basePhotoImg); return; }
-  var img = new Image();
-  img.onload = function () { basePhotoImg = img; cb(img); };
-  img.onerror = function () { cb(null); };
-  img.src = state.basePhoto.dataUrl;
-}
-
-function pt(arr) { return { x: arr[0], y: arr[1] }; }
-
-/* Draw composite (user photo + hair overlay) into target canvas, cropped around the head */
-function renderTryOn(canvas, styleId, done) {
-  var shapeKey = STYLE_SHAPE[styleId] || 'crop';
-  var colorKey = HAIR_COLORS[state.attrs.hairColor] ? state.attrs.hairColor : 'brown';
-
-  if (!state.basePhoto || !state.basePhoto.pts) {
-    renderMannequin(canvas, shapeKey, colorKey);
-    if (done) { done(); }
-    return;
-  }
-
-  getBasePhotoImage(function (photo) {
-    if (!photo) { renderMannequin(canvas, shapeKey, colorKey); if (done) { done(); } return; }
-    getHairImage(shapeKey, colorKey, function (hairImg) {
-      if (!hairImg) { renderMannequin(canvas, shapeKey, colorKey); if (done) { done(); } return; }
-
-      var P = state.basePhoto.pts;
-      var le = avgPts(P, 36, 6), re = avgPts(P, 42, 6);
-      var anchor = { x: (le.x + re.x) / 2, y: (le.y + re.y) / 2 };
-      var angle = Math.atan2(re.y - le.y, re.x - le.x);
-      /* Eye distance is the most stable landmark measure.
-         Normalized head space has eye centers 50 units apart.
-         The 1.12 factor oversizes slightly so the overlay fully
-         covers the person's existing hair. */
-      var eyeDist = Math.sqrt((re.x - le.x) * (re.x - le.x) + (re.y - le.y) * (re.y - le.y));
-      var s = (eyeDist / 50) * 1.12;
-
-      var off = document.createElement('canvas');
-      off.width = photo.width; off.height = photo.height;
-      var ctx = off.getContext('2d');
-      ctx.drawImage(photo, 0, 0);
-      ctx.save();
-      ctx.translate(anchor.x, anchor.y);
-      ctx.rotate(angle);
-      ctx.scale(s, s);
-      ctx.drawImage(hairImg, -120, -150, 240, 300);
-      ctx.restore();
-
-      /* crop a head-centered window sized from the same scale */
-      var cw = 280 * s, chh = 320 * s;
-      var sx = anchor.x - 140 * s;
-      var sy = anchor.y - 165 * s;
-      sx = Math.max(0, Math.min(sx, off.width - 10));
-      sy = Math.max(0, Math.min(sy, off.height - 10));
-      cw = Math.min(cw, off.width - sx);
-      chh = Math.min(chh, off.height - sy);
-
-      canvas.width = 380; canvas.height = Math.round(380 * (chh / cw));
-      canvas.getContext('2d').drawImage(off, sx, sy, cw, chh, 0, 0, canvas.width, canvas.height);
-      if (done) { done(); }
+/* Illustrated overlay on photo (SVG fallback) */
+function renderTryOn(canvas,styleId,done){
+  var shapeKey=STYLE_SHAPE[styleId]||'crop';
+  var colorKey=HAIR_COLORS[state.attrs.hairColor]?state.attrs.hairColor:'brunette';
+  if(!state.basePhoto||!state.basePhoto.pts){renderMannequin(canvas,shapeKey,colorKey);if(done)done();return;}
+  getBasePhotoImage(function(photo){
+    if(!photo){renderMannequin(canvas,shapeKey,colorKey);if(done)done();return;}
+    getHairImage(shapeKey,colorKey,function(hairImg){
+      if(!hairImg){renderMannequin(canvas,shapeKey,colorKey);if(done)done();return;}
+      var P=state.basePhoto.pts;
+      var le=avgPts(P,36,6),re=avgPts(P,42,6);
+      var anchor={x:(le.x+re.x)/2,y:(le.y+re.y)/2};
+      var angle=Math.atan2(re.y-le.y,re.x-le.x);
+      var eyeDist=Math.sqrt((re.x-le.x)*(re.x-le.x)+(re.y-le.y)*(re.y-le.y));
+      var s=(eyeDist/50)*1.12;
+      var off=document.createElement('canvas');
+      off.width=photo.width;off.height=photo.height;
+      var ctx=off.getContext('2d');
+      ctx.drawImage(photo,0,0);
+      ctx.save();ctx.translate(anchor.x,anchor.y);ctx.rotate(angle);ctx.scale(s,s);
+      ctx.drawImage(hairImg,-120,-150,240,300);ctx.restore();
+      var cw=280*s,chh=320*s;
+      var sx=anchor.x-140*s,sy=anchor.y-165*s;
+      sx=Math.max(0,Math.min(sx,off.width-10));sy=Math.max(0,Math.min(sy,off.height-10));
+      cw=Math.min(cw,off.width-sx);chh=Math.min(chh,off.height-sy);
+      canvas.width=380;canvas.height=Math.round(380*(chh/cw));
+      canvas.getContext('2d').drawImage(off,sx,sy,cw,chh,0,0,canvas.width,canvas.height);
+      if(done)done();
     });
   });
 }
 
-function avgPts(P, start, n) {
-  var x = 0, y = 0, i;
-  for (i = start; i < start + n; i++) { x += P[i][0]; y += P[i][1]; }
-  return { x: x / n, y: y / n };
+function renderMannequin(canvas,shapeKey,colorKey){
+  var skinHex={fair:'#F3D9C4',light:'#EAC3A3',medium:'#D29E7C',olive:'#B98860',brown:'#8C5A3B',deep:'#5A3A26'}[state.attrs.skinTone]||'#D29E7C';
+  var col=HAIR_COLORS[colorKey]||HAIR_COLORS.brunette;
+  var s=HAIR_SHAPES[shapeKey];
+  var inv='M-20,-20 H260 V320 H-20 Z '+s.open;
+  function paint(str){return str.split('{C3}').join(col.l).split('{C2}').join(col.d).split('{C}').join(col.c);}
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">'+
+    '<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="'+col.l+'"/><stop offset="55%" stop-color="'+col.c+'"/>'+
+    '<stop offset="100%" stop-color="'+col.d+'"/></linearGradient>'+
+    '<clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="'+inv+'"/></clipPath></defs>'+
+    '<rect width="240" height="300" fill="#3A2C44"/>'+
+    '<ellipse cx="120" cy="168" rx="58" ry="76" fill="'+skinHex+'"/>'+
+    '<circle cx="97" cy="150" r="6" fill="#2E2236"/><circle cx="143" cy="150" r="6" fill="#2E2236"/>'+
+    '<path d="M104,206 C114,212 126,212 136,206" stroke="#9C5B47" stroke-width="4" fill="none"/>'+
+    '<g clip-path="url(#fc)">'+paint(s.body)+'</g>';
+  if(s.over){svg+='<g>'+paint(s.over)+'</g>';}
+  svg+='</svg>';
+  var img=new Image();
+  img.onload=function(){canvas.width=240;canvas.height=300;canvas.getContext('2d').drawImage(img,0,0);};
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
 }
 
-/* Mannequin fallback: style drawn on a neutral face using the user's skin tone */
-function renderMannequin(canvas, shapeKey, colorKey) {
-  var skinHex = { fair: '#F3D9C4', light: '#EAC3A3', medium: '#D29E7C', olive: '#B98860', brown: '#8C5A3B', deep: '#5A3A26' }[state.attrs.skinTone] || '#D29E7C';
-  var col = HAIR_COLORS[colorKey] || HAIR_COLORS.brown;
-  var s = HAIR_SHAPES[shapeKey];
-  var inv = 'M-20,-20 H260 V320 H-20 Z ' + s.open;
-  function paint(str) {
-    return str.split('{C3}').join(col.l).split('{C2}').join(col.d).split('{C}').join(col.c);
-  }
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">' +
-    '<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">' +
-    '<stop offset="0%" stop-color="' + col.l + '"/><stop offset="55%" stop-color="' + col.c + '"/>' +
-    '<stop offset="100%" stop-color="' + col.d + '"/></linearGradient>' +
-    '<clipPath id="fc" clip-rule="evenodd"><path clip-rule="evenodd" d="' + inv + '"/></clipPath></defs>' +
-    '<rect width="240" height="300" fill="#3A2C44"/>' +
-    '<ellipse cx="120" cy="168" rx="58" ry="76" fill="' + skinHex + '"/>' +
-    '<circle cx="97" cy="150" r="6" fill="#2E2236"/><circle cx="143" cy="150" r="6" fill="#2E2236"/>' +
-    '<path d="M104,206 C114,212 126,212 136,206" stroke="#9C5B47" stroke-width="4" fill="none"/>' +
-    '<g clip-path="url(#fc)">' + paint(s.body) + '</g>';
-  if (s.over) { svg += '<g>' + paint(s.over) + '</g>'; }
-  svg += '</svg>';
-  var img = new Image();
-  img.onload = function () {
-    canvas.width = 240; canvas.height = 300;
-    canvas.getContext('2d').drawImage(img, 0, 0);
-  };
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-}
-
-/* ---------- style library (unchanged engine from v001) ---------- */
-var STYLES = [
-  { id: 'txcrop', name: 'Textured Crop', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy', 'curly'], maint: 1, vibe: 'lowkey',
-    shapes: { oval: 3, round: 3, square: 2, heart: 3, diamond: 2, oblong: 2 },
-    desc: 'Short, choppy length on top with a clean taper — modern and forgiving.',
-    cut: [['Top', '2–3 in, point-cut for texture'], ['Sides', '#2–#3 guard, low taper'], ['Back', '#2 guard, blended'], ['Fringe', 'Textured, sits just above brow']],
-    tech: 'Point-cutting on top for separation; low taper fade on the sides. Matte texture, no hard lines.',
-    products: 'Matte clay or sea-salt spray', trim: 4 },
-  { id: 'classictaper', name: 'Classic Taper', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy'], maint: 1, vibe: 'professional',
-    shapes: { oval: 3, round: 2, square: 3, heart: 2, diamond: 2, oblong: 2 },
-    desc: 'The timeless gentleman\'s cut — neat, versatile, works everywhere.',
-    cut: [['Top', '2–4 in, scissor cut'], ['Sides', 'Scissor-over-comb taper'], ['Back', 'Tapered to natural neckline'], ['Part', 'Optional hard or natural part']],
-    tech: 'All-scissor work, tapered nape and sides. No clipper lines — soft and professional.',
-    products: 'Light pomade or cream', trim: 5 },
-  { id: 'sidepart', name: 'Side Part', pres: 'masc', lengths: ['short', 'medium'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
-    shapes: { oval: 3, round: 3, square: 2, heart: 2, diamond: 2, oblong: 1 },
-    desc: 'Clean comb-over with a defined part — sharp without trying hard.',
-    cut: [['Top', '3–4 in, longer at part side'], ['Sides', '#3–#4 guard or scissor taper'], ['Back', 'Blended taper'], ['Part', 'Cut in on natural part line']],
-    tech: 'Establish the part on the natural growth line; keep weight on the parted side. Optional hard-part line.',
-    products: 'Medium-hold pomade, comb in while damp', trim: 4 },
-  { id: 'quiff', name: 'Modern Quiff', pres: 'masc', lengths: ['medium'], textures: ['straight', 'wavy'], maint: 3, vibe: 'bold',
-    shapes: { oval: 2, round: 3, square: 2, heart: 1, diamond: 2, oblong: 0 },
-    desc: 'Volume up front, swept back — adds height and presence.',
-    cut: [['Top', '3–5 in, longest at front'], ['Sides', '#2–#3 guard taper or fade'], ['Back', 'Blended short'], ['Front', 'Keep length to sweep up and back']],
-    tech: 'Graduated length front to crown. Blow-dry up and back with a round brush, finish with product.',
-    products: 'Volumizing powder + medium pomade', trim: 4 },
-  { id: 'buzz', name: 'Buzz Cut', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy', 'curly', 'coily'], maint: 1, vibe: 'lowkey',
-    shapes: { oval: 3, square: 3, diamond: 2, heart: 1, round: 1, oblong: 1 },
-    desc: 'Zero-fuss, maximum confidence. Shows the face — best with strong bone structure.',
-    cut: [['Top', '#1–#3 guard, even all over'], ['Sides', 'Same guard or one shorter'], ['Back', 'Blended, clean neckline'], ['Edges', 'Square or rounded line-up']],
-    tech: 'Single guard all over or subtle fade on sides. Crisp line-up at forehead and temples if desired.',
-    products: 'None needed — sunscreen counts', trim: 3 },
-  { id: 'crew', name: 'Crew Cut', pres: 'masc', lengths: ['short'], textures: ['straight', 'wavy'], maint: 1, vibe: 'professional',
-    shapes: { oval: 3, round: 2, square: 3, heart: 2, diamond: 2, oblong: 2 },
-    desc: 'Military-neat with just enough on top to style — sharp and serviceable.',
-    cut: [['Top', '0.5–1.5 in, graduated to crown'], ['Sides', '#1–#2 guard fade'], ['Back', '#1 guard, tapered'], ['Front', 'Slightly longer for a hint of lift']],
-    tech: 'Short pomp profile: longest at front hairline, tightening toward the crown. Clean fade.',
-    products: 'Tiny dab of matte paste', trim: 3 },
-  { id: 'slickunder', name: 'Slick Back Undercut', pres: 'masc', lengths: ['medium'], textures: ['straight', 'wavy'], maint: 2, vibe: 'bold',
-    shapes: { oval: 2, round: 2, square: 2, heart: 1, diamond: 3, oblong: 0 },
-    desc: 'Long top swept straight back over disconnected short sides.',
-    cut: [['Top', '4–6 in, one length'], ['Sides', '#1–#2 guard, disconnected'], ['Back', 'Matches sides'], ['Disconnect', 'Hard line at parietal ridge']],
-    tech: 'True disconnect — no blend between top and sides. Top stays one length to slick back cleanly.',
-    products: 'High-shine pomade or gel', trim: 4 },
-  { id: 'curlyfringe', name: 'Curly Fringe', pres: 'masc', lengths: ['short', 'medium'], textures: ['curly'], maint: 2, vibe: 'lowkey',
-    shapes: { oval: 3, square: 3, oblong: 3, round: 2, heart: 2, diamond: 2 },
-    desc: 'Curls left full on top and pulled forward — softens angles, hides a tall forehead.',
-    cut: [['Top', '3–4 in of natural curl'], ['Sides', '#2–#3 guard mid taper'], ['Back', 'Tapered, follows curl line'], ['Fringe', 'Cut dry to sit on forehead']],
-    tech: 'Cut curls dry so shrinkage is accounted for. Mid taper keeps the silhouette tidy.',
-    products: 'Curl cream, scrunch while damp', trim: 5 },
-  { id: 'spongetwist', name: 'Sponge Twists', pres: 'masc', lengths: ['short'], textures: ['coily'], maint: 1, vibe: 'lowkey',
-    shapes: { oval: 3, round: 2, square: 3, heart: 2, diamond: 3, oblong: 2 },
-    desc: 'Defined coils on top with a crisp fade — sharp, modern, easy to keep.',
-    cut: [['Top', '1.5–3 in of natural coil'], ['Sides', '#1 guard fade or skin fade'], ['Back', 'Matches fade'], ['Line-up', 'Crisp edge-up all around']],
-    tech: 'Even coil length on top, sponge-twisted after moisturizing. Skin or #1 fade with a sharp line-up.',
-    products: 'Curl sponge + leave-in moisturizer', trim: 2 },
-  { id: 'flow', name: 'Medium Flow', pres: 'masc', lengths: ['medium', 'long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'lowkey',
-    shapes: { oval: 3, square: 3, diamond: 2, round: 1, heart: 2, oblong: 2 },
-    desc: 'Grown-out, pushed-back waves — relaxed and athletic.',
-    cut: [['Top', '4–6 in, layered'], ['Sides', 'Over the ear or tucked'], ['Back', 'Collar length, layered'], ['Layers', 'Long layers for movement']],
-    tech: 'Long layering throughout so it flows back without bulk. No clippers — all scissor.',
-    products: 'Sea-salt spray, air dry pushed back', trim: 8 },
-  { id: 'longlayers', name: 'Long Layers', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
-    shapes: { oval: 3, round: 3, square: 3, heart: 2, diamond: 2, oblong: 1 },
-    desc: 'Face-framing layers through long hair — universally flattering movement.',
-    cut: [['Length', 'Mid-back, 1–2 in off ends'], ['Layers', 'Start at chin, cascade down'], ['Frame', 'Soft face-framing pieces'], ['Ends', 'Point-cut, not blunt']],
-    tech: 'Long internal layers plus face-frame starting at the chin. Point-cut ends to keep softness.',
-    products: 'Heat protectant + light oil on ends', trim: 10 },
-  { id: 'curtainlob', name: 'Curtain-Bang Lob', pres: 'fem', lengths: ['medium'], textures: ['straight', 'wavy'], maint: 2, vibe: 'bold',
-    shapes: { oval: 3, oblong: 3, heart: 3, round: 2, square: 2, diamond: 3 },
-    desc: 'Collarbone-length cut with soft curtain bangs — balances long or wide foreheads beautifully.',
-    cut: [['Length', 'Collarbone, slight A-line'], ['Bangs', 'Curtain, cheekbone length'], ['Layers', 'Subtle, below the bangs'], ['Part', 'Center or soft middle']],
-    tech: 'Curtain bangs cut to swoop at cheekbone; lob kept slightly longer in front. Blends as it grows.',
-    products: 'Round-brush the bangs; smoothing cream', trim: 8 },
-  { id: 'bob', name: 'Classic Chin Bob', pres: 'fem', lengths: ['short'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
-    shapes: { oval: 3, heart: 3, oblong: 3, diamond: 2, square: 1, round: 1 },
-    desc: 'Sharp, chin-grazing, and decisive — adds width right where narrow jaws want it.',
-    cut: [['Length', 'Chin line, blunt or soft'], ['Layers', 'Minimal — weight stays low'], ['Nape', 'Slightly undercut for tuck'], ['Part', 'Center or deep side']],
-    tech: 'Blunt perimeter at the chin; interior left mostly unlayered so the line reads strong.',
-    products: 'Smoothing balm, flat brush blow-dry', trim: 6 },
-  { id: 'pixie', name: 'Soft Pixie', pres: 'fem', lengths: ['short'], textures: ['straight', 'wavy'], maint: 1, vibe: 'bold',
-    shapes: { oval: 3, heart: 3, diamond: 2, square: 1, round: 1, oblong: 1 },
-    desc: 'Cropped with longer texture on top — confident, striking, and quick.',
-    cut: [['Top', '2–3 in, textured'], ['Sides', 'Tapered over ears'], ['Back', 'Tapered to nape'], ['Fringe', 'Wispy, brow-skimming']],
-    tech: 'Scissor-tapered sides and nape; top point-cut for piecey texture. Soft fringe forward.',
-    products: 'Texture paste, finger-styled', trim: 4 },
-  { id: 'shag', name: 'Modern Shag', pres: 'fem', lengths: ['medium'], textures: ['wavy', 'curly'], maint: 1, vibe: 'bold',
-    shapes: { oval: 3, square: 3, round: 2, oblong: 2, heart: 2, diamond: 2 },
-    desc: 'Heavily layered, lived-in cut that makes waves and curls do the work.',
-    cut: [['Length', 'Shoulder, choppy perimeter'], ['Layers', 'Short crown layers, heavy'], ['Bangs', 'Optional shaggy fringe'], ['Ends', 'Razored or slide-cut']],
-    tech: 'Short interior layers from the crown out; razor or slide-cut ends for that undone finish.',
-    products: 'Air-dry cream or mousse, scrunch', trim: 9 },
-  { id: 'butterfly', name: 'Butterfly Layers', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 3, vibe: 'bold',
-    shapes: { oval: 3, round: 3, oblong: 2, square: 2, heart: 2, diamond: 2 },
-    desc: 'Dramatic short-over-long layering — big bouncy volume that frames the face.',
-    cut: [['Length', 'Mid-back base'], ['Layers', 'Short top layer at chin/shoulder'], ['Frame', 'Heavy face-frame, swept back'], ['Ends', 'Feathered out']],
-    tech: 'Two-tier layering: a shorter shell over long base, blown out with a round brush for flip.',
-    products: 'Volumizing mousse + round brush', trim: 8 },
-  { id: 'bluntlob', name: 'Blunt Lob', pres: 'fem', lengths: ['medium'], textures: ['straight'], maint: 2, vibe: 'professional',
-    shapes: { oval: 3, round: 3, heart: 2, diamond: 2, square: 1, oblong: 2 },
-    desc: 'One-length, shoulder-grazing, glassy — minimalism that reads expensive.',
-    cut: [['Length', 'Shoulder, dead level'], ['Layers', 'None — single length'], ['Part', 'Center'], ['Ends', 'Blunt, polished line']],
-    tech: 'Precision one-length cut, checked level all the way around. The line is the style.',
-    products: 'Smoothing serum, occasional flat iron', trim: 8 },
-  { id: 'curlylayers', name: 'Curly Layered Cut', pres: 'fem', lengths: ['medium', 'long'], textures: ['curly'], maint: 2, vibe: 'lowkey',
-    shapes: { oval: 3, square: 3, oblong: 3, heart: 2, round: 2, diamond: 2 },
-    desc: 'Layers cut curl-by-curl so the shape works with your pattern, not against it.',
-    cut: [['Length', 'Shoulder to mid-back (dry)'], ['Layers', 'Cut dry, curl by curl'], ['Frame', 'Shorter spirals at the face'], ['Shape', 'Rounded, balanced silhouette']],
-    tech: 'Dry-cutting (DevaCut-style) so shrinkage is visible while cutting. Shape for the curl pattern.',
-    products: 'Leave-in + gel, scrunch out the cast', trim: 12 },
-  { id: 'washngo', name: 'Coily Wash-and-Go', pres: 'fem', lengths: ['short', 'medium'], textures: ['coily'], maint: 1, vibe: 'lowkey',
-    shapes: { oval: 3, round: 3, square: 3, heart: 2, diamond: 2, oblong: 2 },
-    desc: 'A shaped natural silhouette that springs back every morning with minimal effort.',
-    cut: [['Shape', 'Rounded or slightly oval crown'], ['Sides', 'Balanced to crown'], ['Frame', 'Slightly shorter at face'], ['Cut', 'Always cut dry, in its curl']],
-    tech: 'Dry shaping of the natural coil into a balanced silhouette. No heat, no straightening to cut.',
-    products: 'Leave-in conditioner + curl defining cream', trim: 10 },
-  { id: 'twa', name: 'Tapered Natural (TWA)', pres: 'fem', lengths: ['short'], textures: ['coily', 'curly'], maint: 1, vibe: 'bold',
-    shapes: { oval: 3, heart: 3, diamond: 3, oblong: 2, round: 1, square: 2 },
-    desc: 'Coils kept full on top, tapered at the sides and nape — sculptural and striking.',
-    cut: [['Top', '2–4 in of defined coil'], ['Sides', 'Tapered tight'], ['Nape', 'Tapered, soft edge'], ['Shape', 'Volume weighted to the crown']],
-    tech: 'Clipper-tapered sides/nape with shears shaping the crown. Volume on top elongates the face.',
-    products: 'Curl custard, finger-coil the top', trim: 4 },
-  { id: 'wolf', name: 'Wolf Cut', pres: 'fem', lengths: ['medium'], textures: ['straight', 'wavy', 'curly'], maint: 2, vibe: 'bold',
-    shapes: { oval: 2, round: 3, square: 2, heart: 2, diamond: 2, oblong: 1 },
-    desc: 'Shag-mullet hybrid: big volume at the crown, wispy lengths below. Maximum personality.',
-    cut: [['Crown', 'Short, heavily layered'], ['Length', 'Collarbone wisps'], ['Bangs', 'Choppy, eye-skimming'], ['Ends', 'Thinned and feathered']],
-    tech: 'Aggressive crown layering disconnects into longer wispy lengths. Texturize everything.',
-    products: 'Texture spray, rough-dry', trim: 8 },
-  { id: 'sideswept', name: 'Side-Swept Long', pres: 'fem', lengths: ['long'], textures: ['straight', 'wavy'], maint: 2, vibe: 'professional',
-    shapes: { oval: 3, square: 3, round: 2, oblong: 2, heart: 3, diamond: 2 },
-    desc: 'Long hair with a deep side part and sweeping fringe — softens angles instantly.',
-    cut: [['Length', 'Mid-back'], ['Bangs', 'Long, side-swept'], ['Layers', 'Soft, from cheekbone down'], ['Part', 'Deep side part']],
-    tech: 'Side-swept fringe blended into face-frame; long soft layers keep the sweep moving.',
-    products: 'Light mousse at roots for the sweep', trim: 9 }
-];
-
-var SHAPE_WHY = {
-  oval:    'Your oval proportions are the most versatile — this style simply shows them off.',
-  round:   'This adds height and keeps weight off the cheeks, which lengthens a rounder face.',
-  square:  'The softness here balances a strong jawline instead of competing with it.',
-  heart:   'This adds visual weight near the jaw to balance a wider forehead.',
-  diamond: 'This softens prominent cheekbones and balances a narrower forehead and chin.',
-  oblong:  'This adds width and keeps vertical height in check, balancing a longer face.'
+/* ══════════════════════════════════════════════════════════════════════════
+   HF INPAINTING ENGINE
+   ══════════════════════════════════════════════════════════════════════════ */
+var STYLE_PROMPTS={
+  txcrop:'textured crop haircut, short choppy fringe on top, skin fade sides and back',
+  classictaper:'classic taper haircut, clean scissor cut, neatly tapered neckline, professional',
+  sidepart:'classic side part hairstyle, neatly combed to one side, defined part line, sleek',
+  crew:'crew cut, military short haircut, clean skin fade sides, slight volume on top',
+  quiff:'modern quiff hairstyle, volume swept up and back at front, tapered low fade sides',
+  buzz:'buzz cut, uniformly short hair all over, crisp edge-up hairline',
+  slickunder:'slick back undercut hairstyle, long top swept straight back, disconnected shaved sides',
+  flow:'medium length flow hairstyle, natural waves pushed back over ears, layered and relaxed',
+  curlyfringe:'curly fringe crop, natural curls on top, mid taper fade sides',
+  spongetwist:'sponge twist coil hairstyle, short defined coils on top, clean skin fade',
+  twa:'tapered natural afro TWA hairstyle, short coils full on crown, tight taper sides and nape',
+  washngo:'wash and go natural afro, full rounded coily silhouette, defined curl pattern',
+  bob:'chin length bob haircut, blunt even ends, polished and smooth',
+  bluntlob:'blunt lob hairstyle, sleek collarbone length, one-length polished cut',
+  curtainlob:'curtain bang lob, collarbone length, soft curtain bangs framing the face, center part',
+  longlayers:'long layered hairstyle, mid-back length, soft face-framing layers, feathered ends',
+  butterfly:'butterfly cut, dramatic short over long layering, bouncy volume at crown, feathered flip',
+  sideswept:'side swept long hairstyle, deep side part, sweeping fringe, flowing layers',
+  shag:'modern shag haircut, heavily layered, choppy textured ends, lived-in tousled look',
+  wolf:'wolf cut, voluminous crown layers, wispy long lengths below, shaggy fringe',
+  curlylayers:'curly layered haircut, shoulder length natural curls, curl-by-curl shaped layers',
+  pixie:'soft pixie cut, short cropped back and sides, textured top, wispy fringe'
 };
 
-function scoreStyle(s) {
-  var a = state.attrs, p = state.prefs;
-  var score = 0;
-  var shapeFit = (s.shapes[a.faceShape] !== undefined) ? s.shapes[a.faceShape] : 1;
-  if (shapeFit === 0) { return -1; }
-  score += shapeFit * 5;
-  if (a.texture && s.textures.indexOf(a.texture) > -1) { score += 6; }
-  else if (a.texture) { score -= 4; }
-  if (p.length && p.length !== 'any') {
-    if (s.lengths.indexOf(p.length) > -1) { score += 5; } else { score -= 5; }
-  } else { score += 2; }
-  var pm = parseInt(p.maintenance || 2, 10);
-  score += (2 - Math.abs(pm - s.maint)) * 2;
-  if (p.vibe && p.vibe === s.vibe) { score += 3; }
+function buildHFPrompt(styleId){
+  var color=state.attrs.hairColor||'dark';
+  var style=STYLE_PROMPTS[styleId]||'neat hairstyle';
+  return 'photorealistic portrait photo, person with '+color+' '+style+
+    ', professional photography, consistent natural lighting, high quality DSLR, sharp focus, realistic';
+}
+var NEG_PROMPT='painting, cartoon, anime, illustration, blurry, distorted, artifacts, deformed face, extra hair, wig, unrealistic, low quality, oversaturated';
+
+/* Crop a square around the face, scale to 512, generate mask */
+function prepareForInpainting(dataUrl,pts,cb){
+  var img=new Image();
+  img.onload=function(){
+    var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];});
+    var minX=Math.min.apply(null,xs),maxX=Math.max.apply(null,xs);
+    var minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+    var fW=maxX-minX,fH=maxY-minY;
+    var padX=fW*0.65,padYTop=fH*1.0,padYBot=fH*0.3;
+    var cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+    var cropSz=Math.max(fW+padX*2,fH+padYTop+padYBot);
+    var x0=Math.max(0,cx-cropSz/2),y0=Math.max(0,cy-cropSz/2+(padYTop-padYBot)/4);
+    x0=Math.min(x0,img.width-cropSz);y0=Math.min(y0,img.height-cropSz);
+    var actualSz=Math.min(cropSz,Math.min(img.width-x0,img.height-y0));
+    var SZ=512, scale=SZ/actualSz;
+    var pCanvas=document.createElement('canvas');pCanvas.width=SZ;pCanvas.height=SZ;
+    pCanvas.getContext('2d').drawImage(img,x0,y0,actualSz,actualSz,0,0,SZ,SZ);
+    var sp=pts.map(function(p){return[(p[0]-x0)*scale,(p[1]-y0)*scale];});
+    var mCanvas=buildHairMask(SZ,SZ,sp);
+    cb(pCanvas.toDataURL('image/png').split(',')[1],mCanvas.toDataURL('image/png').split(',')[1]);
+  };
+  img.onerror=function(){cb(null,null);};
+  img.src=dataUrl;
+}
+
+function buildHairMask(W,H,sp){
+  var canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+  var ctx=canvas.getContext('2d');
+  ctx.fillStyle='#000000';ctx.fillRect(0,0,W,H);
+  var browLy=(sp[17][1]+sp[18][1]+sp[19][1])/3;
+  var browRy=(sp[22][1]+sp[24][1]+sp[25][1])/3;
+  var browLx=sp[17][0],browRx=sp[26][0];
+  var midBrowY=(sp[21][1]+sp[22][1])/2,midBrowX=(sp[21][0]+sp[22][0])/2;
+  var faceW=sp[16][0]-sp[0][0];
+  var browToChin=sp[8][1]-midBrowY;
+  var xPad=faceW*0.55;
+  ctx.fillStyle='#FFFFFF';
+  ctx.beginPath();
+  ctx.moveTo(0,0);ctx.lineTo(W,0);
+  ctx.lineTo(W,browRy+browToChin*0.06);
+  ctx.bezierCurveTo(browRx+xPad*0.55,browRy+browToChin*0.14,browRx+xPad*0.2,browRy-browToChin*0.08,browRx,browRy-browToChin*0.04);
+  ctx.bezierCurveTo(midBrowX+faceW*0.18,midBrowY-browToChin*0.20,midBrowX-faceW*0.18,midBrowY-browToChin*0.20,browLx,browLy-browToChin*0.04);
+  ctx.bezierCurveTo(browLx-xPad*0.2,browLy-browToChin*0.08,browLx-xPad*0.55,browLy+browToChin*0.14,0,browLy+browToChin*0.06);
+  ctx.closePath();ctx.fill();
+  return canvas;
+}
+
+/* XHR call to HF Inference API with retry on 503 */
+function callHFInpainting(photoB64,maskB64,prompt,token,attempt,cb){
+  var req=new XMLHttpRequest();
+  req.open('POST','https://api-inference.huggingface.co/models/'+HF_MODEL,true);
+  req.setRequestHeader('Content-Type','application/json');
+  req.setRequestHeader('Authorization','Bearer '+token);
+  req.responseType='blob';
+  req.timeout=180000;
+  req.onload=function(){
+    if(req.status===200){cb(null,URL.createObjectURL(req.response));return;}
+    if(req.status===503&&attempt<4){
+      var wait=attempt===1?35000:20000;
+      setTimeout(function(){callHFInpainting(photoB64,maskB64,prompt,token,attempt+1,cb);},wait);
+      return;
+    }
+    cb('Error '+req.status+' from HuggingFace');
+  };
+  req.onerror=function(){cb('Network error');};
+  req.ontimeout=function(){cb('Generation timed out');};
+  req.send(JSON.stringify({
+    inputs:prompt,
+    parameters:{
+      image:photoB64,mask_image:maskB64,
+      negative_prompt:NEG_PROMPT,
+      num_inference_steps:30,guidance_scale:7.5,strength:0.82
+    }
+  }));
+}
+
+/* Generate one style preview: tries HF first, falls back to SVG illustration */
+function generateStylePreview(styleId,statusEl,canvasEl){
+  var token=getHFToken();
+  var hasFace=!!(state.basePhoto&&state.basePhoto.pts);
+  if(!token||!hasFace){
+    renderTryOn(canvasEl,styleId);
+    if(statusEl) statusEl.innerHTML=token&&!hasFace?'No face detected &mdash; illustrated':'<button class="link-btn" onclick="showTokenOverlay()">Add HF token</button> for AI photo';
+    return;
+  }
+  if(statusEl) statusEl.innerHTML='Generating AI preview&hellip; (~30s)';
+  prepareForInpainting(state.basePhoto.dataUrl,state.basePhoto.pts,function(photoB64,maskB64){
+    if(!photoB64){
+      renderTryOn(canvasEl,styleId);
+      if(statusEl) statusEl.innerHTML='Illustrated preview';
+      return;
+    }
+    var prompt=buildHFPrompt(styleId);
+    callHFInpainting(photoB64,maskB64,prompt,token,1,function(err,url){
+      if(err){
+        renderTryOn(canvasEl,styleId);
+        if(statusEl) statusEl.innerHTML='HF unavailable &mdash; illustrated';
+        return;
+      }
+      var img=new Image();
+      img.onload=function(){
+        canvasEl.width=img.width;canvasEl.height=img.height;
+        canvasEl.getContext('2d').drawImage(img,0,0);
+        if(statusEl) statusEl.innerHTML='AI-generated on your photo';
+      };
+      img.src=url;
+    });
+  });
+}
+
+/* ── style library ───────────────────────────────────────────────────────── */
+var STYLES=[
+  {id:'txcrop',name:'Textured Crop',pres:'masc',lengths:['short'],textures:['straight','wavy','curly'],maint:1,vibe:'lowkey',shapes:{oval:3,round:3,square:2,heart:3,diamond:2,oblong:2},desc:'Short choppy length on top with a clean taper \u2014 modern and forgiving.',cut:[['Top','2\u20133 in, point-cut for texture'],['Sides','#2\u2013#3 guard, low taper'],['Back','#2 guard, blended'],['Fringe','Textured, just above brow']],tech:'Point-cutting on top; low taper fade. Matte texture.',products:'Matte clay or sea-salt spray',trim:4},
+  {id:'classictaper',name:'Classic Taper',pres:'masc',lengths:['short'],textures:['straight','wavy'],maint:1,vibe:'professional',shapes:{oval:3,round:2,square:3,heart:2,diamond:2,oblong:2},desc:'The timeless cut \u2014 neat, versatile, works everywhere.',cut:[['Top','2\u20134 in, scissor cut'],['Sides','Scissor-over-comb taper'],['Back','Tapered neckline'],['Part','Optional hard or natural']],tech:'All-scissor taper. No clipper lines.',products:'Light pomade or cream',trim:5},
+  {id:'sidepart',name:'Side Part',pres:'masc',lengths:['short','medium'],textures:['straight','wavy'],maint:2,vibe:'professional',shapes:{oval:3,round:3,square:2,heart:2,diamond:2,oblong:1},desc:'Clean comb-over with a defined part \u2014 sharp without trying hard.',cut:[['Top','3\u20134 in'],['Sides','#3\u2013#4 guard or taper'],['Back','Blended'],['Part','Natural part line']],tech:'Establish part on natural growth line. Optional hard-part.',products:'Medium-hold pomade',trim:4},
+  {id:'quiff',name:'Modern Quiff',pres:'masc',lengths:['medium'],textures:['straight','wavy'],maint:3,vibe:'bold',shapes:{oval:2,round:3,square:2,heart:1,diamond:2,oblong:0},desc:'Volume up front, swept back \u2014 adds height and presence.',cut:[['Top','3\u20135 in, longest at front'],['Sides','#2\u2013#3 guard taper'],['Back','Blended short'],['Front','Keep length to sweep']],tech:'Graduated front to crown. Blow-dry up and back.',products:'Volumizing powder + pomade',trim:4},
+  {id:'buzz',name:'Buzz Cut',pres:'masc',lengths:['short'],textures:['straight','wavy','curly','coily'],maint:1,vibe:'lowkey',shapes:{oval:3,square:3,diamond:2,heart:1,round:1,oblong:1},desc:'Zero-fuss, maximum confidence. Shows the face.',cut:[['Top','#1\u2013#3 guard, even'],['Sides','Same or one shorter'],['Back','Blended, clean neckline'],['Edges','Square or rounded']],tech:'Single guard or subtle fade. Crisp line-up.',products:'None needed',trim:3},
+  {id:'crew',name:'Crew Cut',pres:'masc',lengths:['short'],textures:['straight','wavy'],maint:1,vibe:'professional',shapes:{oval:3,round:2,square:3,heart:2,diamond:2,oblong:2},desc:'Military-neat with enough on top to style.',cut:[['Top','0.5\u20131.5 in, graduated'],['Sides','#1\u2013#2 fade'],['Back','#1, tapered'],['Front','Slightly longer for lift']],tech:'Short pomp profile. Clean fade.',products:'Matte paste',trim:3},
+  {id:'slickunder',name:'Slick Back Undercut',pres:'masc',lengths:['medium'],textures:['straight','wavy'],maint:2,vibe:'bold',shapes:{oval:2,round:2,square:2,heart:1,diamond:3,oblong:0},desc:'Long top swept straight back over disconnected short sides.',cut:[['Top','4\u20136 in, one length'],['Sides','#1\u2013#2, disconnected'],['Back','Matches sides'],['Disconnect','Hard line at parietal ridge']],tech:'True disconnect, no blend. Top stays one length.',products:'High-shine pomade or gel',trim:4},
+  {id:'curlyfringe',name:'Curly Fringe',pres:'masc',lengths:['short','medium'],textures:['curly'],maint:2,vibe:'lowkey',shapes:{oval:3,square:3,oblong:3,round:2,heart:2,diamond:2},desc:'Curls left full on top and pulled forward \u2014 softens angles.',cut:[['Top','3\u20134 in natural curl'],['Sides','#2\u2013#3 guard taper'],['Back','Tapered'],['Fringe','Cut dry, on forehead']],tech:'Cut curls dry. Mid taper.',products:'Curl cream, scrunch damp',trim:5},
+  {id:'spongetwist',name:'Sponge Twists',pres:'masc',lengths:['short'],textures:['coily'],maint:1,vibe:'lowkey',shapes:{oval:3,round:2,square:3,heart:2,diamond:3,oblong:2},desc:'Defined coils on top with a crisp fade.',cut:[['Top','1.5\u20133 in coil'],['Sides','#1 skin fade'],['Back','Matches fade'],['Line-up','Crisp edge-up']],tech:'Even coil length, sponge-twisted. Skin fade.',products:'Curl sponge + leave-in',trim:2},
+  {id:'flow',name:'Medium Flow',pres:'masc',lengths:['medium','long'],textures:['straight','wavy'],maint:2,vibe:'lowkey',shapes:{oval:3,square:3,diamond:2,round:1,heart:2,oblong:2},desc:'Grown-out, pushed-back waves \u2014 relaxed and athletic.',cut:[['Top','4\u20136 in, layered'],['Sides','Over the ear'],['Back','Collar length, layered'],['Layers','Long for movement']],tech:'Long layering, no clippers.',products:'Sea-salt spray, air dry',trim:8},
+  {id:'longlayers',name:'Long Layers',pres:'fem',lengths:['long'],textures:['straight','wavy'],maint:2,vibe:'professional',shapes:{oval:3,round:3,square:3,heart:2,diamond:2,oblong:1},desc:'Face-framing layers \u2014 universally flattering movement.',cut:[['Length','Mid-back, 1\u20132 in off'],['Layers','Start at chin'],['Frame','Soft face-frame'],['Ends','Point-cut, not blunt']],tech:'Long internal layers + face-frame.',products:'Heat protectant + light oil',trim:10},
+  {id:'curtainlob',name:'Curtain-Bang Lob',pres:'fem',lengths:['medium'],textures:['straight','wavy'],maint:2,vibe:'bold',shapes:{oval:3,oblong:3,heart:3,round:2,square:2,diamond:3},desc:'Collarbone-length with soft curtain bangs \u2014 balances long foreheads.',cut:[['Length','Collarbone, A-line'],['Bangs','Curtain, cheekbone length'],['Layers','Subtle'],['Part','Center or soft middle']],tech:'Curtain bangs at cheekbone; lob slightly longer front.',products:'Round-brush bangs; smoothing cream',trim:8},
+  {id:'bob',name:'Classic Chin Bob',pres:'fem',lengths:['short'],textures:['straight','wavy'],maint:2,vibe:'professional',shapes:{oval:3,heart:3,oblong:3,diamond:2,square:1,round:1},desc:'Sharp, chin-grazing \u2014 adds width where narrow jaws want it.',cut:[['Length','Chin line'],['Layers','Minimal, weight stays low'],['Nape','Slightly undercut'],['Part','Center or deep side']],tech:'Blunt perimeter at chin.',products:'Smoothing balm, flat brush',trim:6},
+  {id:'pixie',name:'Soft Pixie',pres:'fem',lengths:['short'],textures:['straight','wavy'],maint:1,vibe:'bold',shapes:{oval:3,heart:3,diamond:2,square:1,round:1,oblong:1},desc:'Cropped with longer texture on top \u2014 confident and quick.',cut:[['Top','2\u20133 in, textured'],['Sides','Tapered over ears'],['Back','Tapered to nape'],['Fringe','Wispy, brow-skimming']],tech:'Scissor-tapered sides; point-cut top.',products:'Texture paste, finger-styled',trim:4},
+  {id:'shag',name:'Modern Shag',pres:'fem',lengths:['medium'],textures:['wavy','curly'],maint:1,vibe:'bold',shapes:{oval:3,square:3,round:2,oblong:2,heart:2,diamond:2},desc:'Heavily layered, lived-in cut that makes waves do the work.',cut:[['Length','Shoulder, choppy'],['Layers','Short crown layers'],['Bangs','Optional shaggy fringe'],['Ends','Razored or slide-cut']],tech:'Short interior layers, razor ends.',products:'Air-dry cream or mousse',trim:9},
+  {id:'butterfly',name:'Butterfly Layers',pres:'fem',lengths:['long'],textures:['straight','wavy'],maint:3,vibe:'bold',shapes:{oval:3,round:3,oblong:2,square:2,heart:2,diamond:2},desc:'Dramatic short-over-long layering \u2014 big bouncy volume.',cut:[['Length','Mid-back base'],['Layers','Short top layer at chin'],['Frame','Heavy face-frame'],['Ends','Feathered']],tech:'Two-tier layering blown with round brush.',products:'Volumizing mousse + round brush',trim:8},
+  {id:'bluntlob',name:'Blunt Lob',pres:'fem',lengths:['medium'],textures:['straight'],maint:2,vibe:'professional',shapes:{oval:3,round:3,heart:2,diamond:2,square:1,oblong:2},desc:'One-length, shoulder-grazing, glassy \u2014 reads expensive.',cut:[['Length','Shoulder, level'],['Layers','None'],['Part','Center'],['Ends','Blunt, polished']],tech:'Precision one-length cut.',products:'Smoothing serum, flat iron',trim:8},
+  {id:'curlylayers',name:'Curly Layered Cut',pres:'fem',lengths:['medium','long'],textures:['curly'],maint:2,vibe:'lowkey',shapes:{oval:3,square:3,oblong:3,heart:2,round:2,diamond:2},desc:'Layers cut curl-by-curl so the shape works with your pattern.',cut:[['Length','Shoulder to mid-back (dry)'],['Layers','Cut dry, curl by curl'],['Frame','Shorter spirals at face'],['Shape','Rounded silhouette']],tech:'Dry-cutting, DevaCut-style.',products:'Leave-in + gel, scrunch cast',trim:12},
+  {id:'washngo',name:'Coily Wash-and-Go',pres:'fem',lengths:['short','medium'],textures:['coily'],maint:1,vibe:'lowkey',shapes:{oval:3,round:3,square:3,heart:2,diamond:2,oblong:2},desc:'A shaped natural silhouette that springs back every morning.',cut:[['Shape','Rounded or oval crown'],['Sides','Balanced'],['Frame','Shorter at face'],['Cut','Always cut dry, in curl']],tech:'Dry shaping of natural coil.',products:'Leave-in + curl defining cream',trim:10},
+  {id:'twa',name:'Tapered Natural (TWA)',pres:'fem',lengths:['short'],textures:['coily','curly'],maint:1,vibe:'bold',shapes:{oval:3,heart:3,diamond:3,oblong:2,round:1,square:2},desc:'Coils full on top, tapered at sides \u2014 sculptural and striking.',cut:[['Top','2\u20134 in coil'],['Sides','Tight taper'],['Nape','Tapered, soft edge'],['Shape','Volume at crown']],tech:'Clipper-tapered sides, shears on crown.',products:'Curl custard, finger-coil top',trim:4},
+  {id:'wolf',name:'Wolf Cut',pres:'fem',lengths:['medium'],textures:['straight','wavy','curly'],maint:2,vibe:'bold',shapes:{oval:2,round:3,square:2,heart:2,diamond:2,oblong:1},desc:'Shag-mullet hybrid: big crown volume, wispy lengths. Maximum personality.',cut:[['Crown','Short, heavily layered'],['Length','Collarbone wisps'],['Bangs','Choppy, eye-skimming'],['Ends','Thinned and feathered']],tech:'Aggressive crown layers into wispy lengths.',products:'Texture spray, rough-dry',trim:8},
+  {id:'sideswept',name:'Side-Swept Long',pres:'fem',lengths:['long'],textures:['straight','wavy'],maint:2,vibe:'professional',shapes:{oval:3,square:3,round:2,oblong:2,heart:3,diamond:2},desc:'Long hair with a deep side part and sweeping fringe.',cut:[['Length','Mid-back'],['Bangs','Long, side-swept'],['Layers','Soft, from cheekbone'],['Part','Deep side part']],tech:'Swept fringe blended into face-frame.',products:'Light mousse at roots',trim:9}
+];
+
+var SHAPE_WHY={
+  oval:'Your oval proportions are the most versatile \u2014 this style simply shows them off.',
+  round:'This adds height and keeps weight off the cheeks, which lengthens a rounder face.',
+  square:'The softness here balances a strong jawline instead of competing with it.',
+  heart:'This adds visual weight near the jaw to balance a wider forehead.',
+  diamond:'This softens prominent cheekbones and balances a narrower forehead and chin.',
+  oblong:'This adds width and keeps vertical height in check, balancing a longer face.'
+};
+
+function scoreStyle(s){
+  var a=state.attrs,p=state.prefs,score=0;
+  var fit=(s.shapes[a.faceShape]!==undefined)?s.shapes[a.faceShape]:1;
+  if(fit===0) return -1;
+  score+=fit*5;
+  if(a.texture&&s.textures.indexOf(a.texture)>-1) score+=6; else if(a.texture) score-=4;
+  if(p.length&&p.length!=='any'){if(s.lengths.indexOf(p.length)>-1) score+=5; else score-=5;} else score+=2;
+  var pm=parseInt(p.maintenance||2,10); score+=(2-Math.abs(pm-s.maint))*2;
+  if(p.vibe&&p.vibe===s.vibe) score+=3;
   return score;
 }
 
-function showResults() {
-  var a = state.attrs, p = state.prefs;
-  if (!a.texture) { a.texture = 'straight'; }
-  if (!p.presentation) { p.presentation = 'all'; }
-
-  var pool = [], i;
-  for (i = 0; i < STYLES.length; i++) {
-    var s = STYLES[i];
-    if (p.presentation !== 'all' && s.pres !== p.presentation) { continue; }
-    var sc = scoreStyle(s);
-    if (sc >= 0) { pool.push({ s: s, sc: sc }); }
+/* ── results screen ──────────────────────────────────────────────────────── */
+function showResults(){
+  var a=state.attrs,p=state.prefs;
+  if(!a.texture) a.texture='straight';
+  if(!p.presentation) p.presentation='all';
+  var pool=[],i;
+  for(i=0;i<STYLES.length;i++){
+    var s=STYLES[i];
+    if(p.presentation!=='all'&&s.pres!==p.presentation) continue;
+    var sc=scoreStyle(s);
+    if(sc>=0) pool.push({s:s,sc:sc});
   }
-  pool.sort(function (x, y) { return y.sc - x.sc; });
-  pool = pool.slice(0, 6);
-
-  var maxSc = pool.length ? pool[0].sc : 1;
-  var html = '';
-  for (i = 0; i < pool.length; i++) {
-    var st = pool[i].s;
-    var pct = Math.round(60 + 38 * (pool[i].sc / Math.max(1, maxSc)));
-    if (pct > 98) { pct = 98; }
-    var why = SHAPE_WHY[a.faceShape] || '';
-    var texNote = (st.textures.indexOf(a.texture) > -1) ? ' Works with your natural ' + a.texture + ' texture as-is.' : '';
-    var capLabel = state.basePhoto ? 'Illustrated preview on your photo' : 'Illustrated preview';
-    html += '<div class="style-card' + (i === 0 ? ' top-pick' : '') + '">' +
-      (i === 0 ? '<span class="rank-badge">TOP PICK FOR YOUR FACE</span>' : '') +
-      '<div class="tryon-box"><canvas id="tryon-' + st.id + '"></canvas><div class="tryon-cap">' + capLabel + '</div></div>' +
-      '<div class="style-body">' +
-      '<span class="match-pct">' + pct + '%</span>' +
-      '<h3>' + st.name + '</h3>' +
-      '<div class="style-meta">Length: <b>' + st.lengths.join(' / ') + '</b> &middot; Effort: <b>' + ['', 'wash & go', 'a few minutes', 'daily styling'][st.maint] + '</b> &middot; Trim every <b>' + st.trim + ' weeks</b></div>' +
-      '<p class="style-why">' + st.desc + ' ' + why + texNote + '</p>' +
-      '<button class="btn btn-copper" style="padding:10px 24px;font-size:15px" onclick="chooseStyle(\'' + st.id + '\')">This is the one &rarr;</button>' +
+  pool.sort(function(x,y){return y.sc-x.sc;});
+  pool=pool.slice(0,6);
+  var maxSc=pool.length?pool[0].sc:1;
+  var html='',hasToken=!!getHFToken();
+  for(i=0;i<pool.length;i++){
+    var st=pool[i].s;
+    var pct=Math.round(60+38*(pool[i].sc/Math.max(1,maxSc)));
+    if(pct>98) pct=98;
+    var why=SHAPE_WHY[a.faceShape]||'';
+    var texNote=(st.textures.indexOf(a.texture)>-1)?' Works with your natural '+a.texture+' texture as-is.':'';
+    var capLabel=hasToken&&state.basePhoto?'Generating AI preview\u2026':'Illustrated preview';
+    html+='<div class="style-card'+(i===0?' top-pick':'')+'">'+
+      (i===0?'<span class="rank-badge">TOP PICK FOR YOUR FACE</span>':'')+
+      '<div class="tryon-box"><canvas id="tryon-'+st.id+'"></canvas>'+
+      '<div class="gen-status" id="genstatus-'+st.id+'">'+capLabel+'</div></div>'+
+      '<div class="style-body">'+
+      '<span class="match-pct">'+pct+'%</span>'+
+      '<h3>'+st.name+'</h3>'+
+      '<div class="style-meta">Length: <b>'+st.lengths.join(' / ')+'</b> &middot; Effort: <b>'+['','wash &amp; go','a few minutes','daily styling'][st.maint]+'</b> &middot; Trim every <b>'+st.trim+' weeks</b></div>'+
+      '<p class="style-why">'+st.desc+' '+why+texNote+'</p>'+
+      '<button class="btn btn-copper" style="padding:10px 24px;font-size:15px" onclick="chooseStyle(\''+st.id+'\')">This is the one &rarr;</button>'+
       '</div></div>';
   }
-  if (!html) { html = '<p style="text-align:center">No matches with those filters — try widening your length or presentation choices.</p>'; }
-  document.getElementById('resultsList').innerHTML = html;
-  document.getElementById('resultsLede').innerHTML =
-    'Ranked for your <strong>' + a.faceShape + '</strong> face shape and <strong>' + a.texture + '</strong> texture — each shown in your <strong>' + a.hairColor + '</strong>.';
+  if(!html) html='<p style="text-align:center">No matches with those filters \u2014 try widening length or presentation.</p>';
+  document.getElementById('resultsList').innerHTML=html;
+  document.getElementById('resultsLede').innerHTML='Ranked for your <strong>'+a.faceShape+'</strong> face shape and <strong>'+a.texture+'</strong> texture.';
   saveSession();
   goTo('results');
-
-  /* render previews after the canvases exist */
-  for (i = 0; i < pool.length; i++) {
-    (function (sid) { renderTryOn(document.getElementById('tryon-' + sid), sid); })(pool[i].s.id);
+  for(i=0;i<pool.length;i++){
+    (function(sid){
+      setTimeout(function(){
+        var canvasEl=document.getElementById('tryon-'+sid);
+        var statusEl=document.getElementById('genstatus-'+sid);
+        if(canvasEl) generateStylePreview(sid,statusEl,canvasEl);
+      },i*500);
+    })(pool[i].s.id);
   }
 }
 
-/* ---------- stylist card ---------- */
-function chooseStyle(id) {
-  var i, st = null;
-  for (i = 0; i < STYLES.length; i++) { if (STYLES[i].id === id) { st = STYLES[i]; } }
-  if (!st) { return; }
-  state.chosenStyle = id;
-  saveSession();
-
-  var a = state.attrs;
-  var zones = '', j;
-  for (j = 0; j < st.cut.length; j++) {
-    zones += '<div class="sc-zone"><span>' + st.cut[j][0] + '</span><b>' + st.cut[j][1] + '</b></div>';
+/* ── stylist card ────────────────────────────────────────────────────────── */
+function chooseStyle(id){
+  var i,st=null;
+  for(i=0;i<STYLES.length;i++){if(STYLES[i].id===id)st=STYLES[i];}
+  if(!st) return;
+  state.chosenStyle=id; saveSession();
+  var a=state.attrs,zones='',j;
+  for(j=0;j<st.cut.length;j++){
+    zones+='<div class="sc-zone"><span>'+st.cut[j][0]+'</span><b>'+st.cut[j][1]+'</b></div>';
   }
-  var today = new Date();
-  var dateStr = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
-
-  var html =
-    '<div class="stylist-card">' +
-      '<div class="sc-head">' +
-        '<svg width="46" height="46" viewBox="0 0 240 240"><rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/><path d="M56,168 C60,142 46,116 60,90 C61,87 64,87 65,90 C76,118 86,142 94,168 Z" fill="#D9A84E"/><path d="M98,168 C104,132 98,100 116,66 C118,62 122,62 123,66 C126,84 114,112 122,134 C126,146 136,156 142,168 Z" fill="#D9A84E"/><path d="M123,66 C130,58 142,60 145,70 C148,80 140,88 132,85" fill="none" stroke="#D9A84E" stroke-width="8" stroke-linecap="round"/><path d="M146,168 C154,142 164,118 175,90 C176,87 179,87 180,90 C194,116 180,142 184,168 Z" fill="#D9A84E"/><rect x="44" y="168" width="152" height="20" rx="10" fill="#D9A84E"/><circle cx="78" cy="178" r="5" fill="#C26E5A"/><circle cx="120" cy="178" r="5" fill="#C26E5A"/><circle cx="162" cy="178" r="5" fill="#C26E5A"/></svg>' +
-        '<div><h3>' + st.name + '</h3><div class="sc-sub">Stylist Card &middot; generated by Hair Apparent &middot; ' + dateStr + '</div></div>' +
-      '</div>' +
-      '<div class="sc-grid">' +
-        '<div class="sc-block sc-look"><h4>The Look</h4><canvas id="cardTryon"></canvas><p style="font-size:11px;color:#6B5A78;margin-top:5px">Illustrated preview — shape and color reference</p></div>' +
-        '<div class="sc-block"><h4>The Client</h4>' +
-          '<div class="sc-zone"><span>Face shape</span><b>' + cap(a.faceShape) + '</b></div>' +
-          '<div class="sc-zone"><span>Natural texture</span><b>' + cap(a.texture) + '</b></div>' +
-          '<div class="sc-zone"><span>Natural color</span><b>' + cap(a.hairColor) + '</b></div>' +
-          '<div class="sc-zone"><span>Skin tone</span><b>' + cap(a.skinTone) + '</b></div>' +
-        '</div>' +
-        '<div class="sc-block"><h4>Cut Map</h4>' + zones + '</div>' +
-        '<div class="sc-block"><h4>Technique Notes</h4><p>' + st.tech + '</p></div>' +
-        '<div class="sc-block"><h4>Styling &amp; Upkeep</h4>' +
-          '<div class="sc-zone"><span>Products</span><b>' + st.products + '</b></div>' +
-          '<div class="sc-zone"><span>Trim interval</span><b>Every ' + st.trim + ' weeks</b></div>' +
-          '<div class="sc-zone"><span>Daily effort</span><b>' + ['', 'Wash & go', 'A few minutes', 'Styled daily'][st.maint] + '</b></div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="sc-foot"><span>Why this works: ' + (SHAPE_WHY[a.faceShape] || '') + '</span><span>Hair Apparent &middot; free &amp; open source</span></div>' +
+  var today=new Date();
+  var dateStr=(today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear();
+  var cardLogoSvg='<svg width="46" height="46" viewBox="0 0 240 240"><rect x="0" y="0" width="240" height="240" rx="52" fill="#2E2236"/><path d="M52,164 L68,84 C70,74 82,74 84,84 L100,164 Z" fill="#D9A84E"/><path d="M98,164 L112,64 C114,52 126,52 128,64 L142,164 Z" fill="#D9A84E"/><path d="M140,164 L156,84 C158,74 170,74 172,84 L188,164 Z" fill="#D9A84E"/><rect x="44" y="164" width="152" height="24" rx="12" fill="#D9A84E"/><circle cx="82" cy="176" r="6" fill="#C26E5A"/><circle cx="120" cy="176" r="6" fill="#C26E5A"/><circle cx="158" cy="176" r="6" fill="#C26E5A"/></svg>';
+  var html='<div class="stylist-card">'+
+    '<div class="sc-head">'+cardLogoSvg+
+    '<div><h3>'+st.name+'</h3><div class="sc-sub">Stylist Card &middot; Hair Apparent &middot; '+dateStr+'</div></div></div>'+
+    '<div class="sc-grid">'+
+    '<div class="sc-block sc-look"><h4>The Look</h4><canvas id="cardTryon"></canvas>'+
+    '<div class="gen-status" id="cardGenStatus" style="color:#6B5A78">Loading preview\u2026</div></div>'+
+    '<div class="sc-block"><h4>The Client</h4>'+
+    '<div class="sc-zone"><span>Face shape</span><b>'+cap(a.faceShape)+'</b></div>'+
+    '<div class="sc-zone"><span>Natural texture</span><b>'+cap(a.texture)+'</b></div>'+
+    '<div class="sc-zone"><span>Hair color</span><b>'+cap(a.hairColor)+'</b></div>'+
+    '<div class="sc-zone"><span>Skin tone</span><b>'+cap(a.skinTone)+'</b></div></div>'+
+    '<div class="sc-block"><h4>Cut Map</h4>'+zones+'</div>'+
+    '<div class="sc-block"><h4>Technique</h4><p>'+st.tech+'</p></div>'+
+    '<div class="sc-block"><h4>Upkeep</h4>'+
+    '<div class="sc-zone"><span>Products</span><b>'+st.products+'</b></div>'+
+    '<div class="sc-zone"><span>Trim</span><b>Every '+st.trim+' weeks</b></div>'+
+    '<div class="sc-zone"><span>Effort</span><b>'+['','Wash &amp; go','A few minutes','Styled daily'][st.maint]+'</b></div></div>'+
+    '</div>'+
+    '<div class="sc-foot"><span>'+( SHAPE_WHY[a.faceShape]||'')+'</span><span>Hair Apparent &middot; free &amp; open source</span></div>'+
     '</div>';
-
-  document.getElementById('cardHolder').innerHTML = html;
+  document.getElementById('cardHolder').innerHTML=html;
   goTo('card');
-  renderTryOn(document.getElementById('cardTryon'), id);
+  var ce=document.getElementById('cardTryon'),se=document.getElementById('cardGenStatus');
+  if(ce) generateStylePreview(id,se,ce);
 }
 
-/* ---------- session persistence (localStorage only) ---------- */
-function saveSession() {
-  try {
-    var save = {
-      attrs: state.attrs, prefs: state.prefs, chosenStyle: state.chosenStyle,
-      basePhoto: state.basePhoto, when: new Date().getTime()
-    };
-    localStorage.setItem(STORE_KEY, JSON.stringify(save));
-  } catch (e) {
-    /* photo may exceed quota — retry without it so settings still persist */
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ attrs: state.attrs, prefs: state.prefs, chosenStyle: state.chosenStyle }));
-    } catch (e2) { /* storage blocked — fine */ }
+/* ── session ─────────────────────────────────────────────────────────────── */
+function saveSession(){
+  try{
+    var save={attrs:state.attrs,prefs:state.prefs,chosenStyle:state.chosenStyle,basePhoto:state.basePhoto,when:new Date().getTime()};
+    localStorage.setItem(STORE_KEY,JSON.stringify(save));
+  }catch(e){
+    try{localStorage.setItem(STORE_KEY,JSON.stringify({attrs:state.attrs,prefs:state.prefs,chosenStyle:state.chosenStyle}));}catch(e2){}
   }
 }
-
-function resumeSession() {
-  try {
-    var raw = localStorage.getItem(STORE_KEY);
-    if (!raw) { return; }
-    var save = JSON.parse(raw);
-    state.attrs = save.attrs || {};
-    state.prefs = save.prefs || {};
-    state.chosenStyle = save.chosenStyle || null;
-    state.basePhoto = save.basePhoto || null;
-    state.analysis = { detected: {}, note: '' };
-    if (state.attrs.faceShape) { showResults(); } else { goTo('confirm'); }
-  } catch (e) { goTo('photos'); }
+function resumeSession(){
+  try{
+    var raw=localStorage.getItem(STORE_KEY);
+    if(!raw) return;
+    var save=JSON.parse(raw);
+    state.attrs=save.attrs||{};state.prefs=save.prefs||{};
+    state.chosenStyle=save.chosenStyle||null;state.basePhoto=save.basePhoto||null;
+    state.analysis={detected:{},note:''};
+    if(state.attrs.faceShape) showResults(); else goTo('confirm');
+  }catch(e){goTo('photos');}
 }
-
-(function init() {
-  try {
-    if (localStorage.getItem(STORE_KEY)) {
-      document.getElementById('resumeBtn').style.display = 'inline-block';
-    }
-  } catch (e) { /* private mode */ }
+(function init(){
+  try{if(localStorage.getItem(STORE_KEY)) document.getElementById('resumeBtn').style.display='inline-block';} catch(e){}
   drawSteps('welcome');
+  updateHFStatus();
 })();
 </script>
 </body>

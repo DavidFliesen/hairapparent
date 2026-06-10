@@ -32,7 +32,9 @@
 
 :root {
   --primary: #4b2b5b; /* deep plum */
+  --primary-dark: #2f173b;
   --accent: #d4af37; /* warm gold */
+  --rose-gold: #b98767;
   --bg: #f8f6f8; /* light lavender/grey */
   --danger: #c0392b; /* red for destructive actions */
   --text-dark: #333333;
@@ -44,13 +46,35 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
-  background: var(--bg);
   color: var(--text-dark);
 }
 
 body {
   display: flex;
   flex-direction: column;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(212,175,55,.13), transparent 26%),
+    radial-gradient(circle at 82% 8%, rgba(75,43,91,.10), transparent 28%),
+    radial-gradient(circle at 50% 94%, rgba(185,135,103,.11), transparent 38%),
+    linear-gradient(135deg, rgba(255,255,255,.82), rgba(248,246,248,.92)),
+    repeating-linear-gradient(45deg, rgba(75,43,91,.018) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(-45deg, rgba(212,175,55,.018) 0 1px, transparent 1px 11px),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background-image:
+    radial-gradient(rgba(75,43,91,.22) .55px, transparent .55px),
+    radial-gradient(rgba(212,175,55,.18) .45px, transparent .45px);
+  background-size: 22px 22px, 30px 30px;
+  background-position: 0 0, 8px 12px;
+  mix-blend-mode: multiply;
 }
 
 /* Header styles */
@@ -59,36 +83,71 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1.5rem;
-  background: #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  background: rgba(255,255,255,.78);
+  backdrop-filter: blur(16px) saturate(1.08);
+  -webkit-backdrop-filter: blur(16px) saturate(1.08);
+  border-bottom: 1px solid rgba(75,43,91,.08);
+  box-shadow: 0 10px 30px rgba(75,43,91,.07);
   z-index: 10;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  gap: .72rem;
+  letter-spacing: .01em;
 }
 
 .logo-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.28), transparent 34%),
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.35), transparent 18%),
+    linear-gradient(135deg, var(--primary-dark), #6b3e72 46%, var(--accent));
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  font-size: 1.3rem;
+  font-weight: 800;
+  font-size: 1.34rem;
+  letter-spacing: -.08em;
+  box-shadow: 0 12px 28px rgba(75,43,91,.25), inset 0 0 0 1px rgba(255,255,255,.28);
+  position: relative;
+  overflow: hidden;
+}
+.logo-icon::after {
+  content: '';
+  position: absolute;
+  width: 38px;
+  height: 58px;
+  border: 2px solid rgba(255,255,255,.72);
+  border-left: 0;
+  border-bottom: 0;
+  border-radius: 50%;
+  transform: rotate(23deg) translate(7px, 2px);
+  opacity: .62;
 }
 
 .logo-text {
-  margin-left: 0.5rem;
+  margin-left: 0;
   font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--primary);
+  font-weight: 800;
+  font-size: clamp(1.55rem, 2.2vw, 2.05rem);
+  color: var(--primary-dark);
+  text-shadow: 0 1px 0 rgba(255,255,255,.8);
+}
+.logo-text::after {
+  content: 'AI salon preview';
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--rose-gold);
+  margin-top: -.12rem;
 }
 
 /* App container and screens */
@@ -111,7 +170,9 @@ body {
 
 .screen.active {
   display: block;
+  animation: screenRise .32s ease both;
 }
+@keyframes screenRise { from { opacity: .2; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 .screen-title {
   font-family: 'Playfair Display', serif;
@@ -480,7 +541,7 @@ body {
   </head>
   <body>
     <header class="header">
-      <div class="logo">
+      <div class="logo" aria-label="Hair Apparent logo">
         <div class="logo-icon">HA</div>
         <div class="logo-text">Hair&nbsp;Apparent</div>
       </div>
@@ -632,7 +693,7 @@ body {
       </section>
     </main>
     <footer class="app-footer">
-      <p>Build 2026.06.10.020</p>
+      <p>Build 2026.06.10.021</p>
     </footer>
     <div id="image-modal" class="image-modal" aria-hidden="true">
       <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="image-modal-title">
@@ -769,6 +830,19 @@ body {
     { name:'Bold Tapered Undercut', description:'A sharper silhouette with contrast at the sides for a confident change.', prompt:'bold tapered undercut hairstyle, versatile, high contrast sides, modern change', presentation:'universal', length:'short', effort:'enjoy-styling', goal:'bold' },
     { name:'Medium Textured Sweep', description:'A medium-length swept shape with texture and natural direction.', prompt:'medium textured sweep hairstyle, versatile, natural direction, salon finish', presentation:'universal', length:'medium', effort:'few-minutes', goal:'easy' },
     { name:'Long Layered Transformation', description:'A fuller long-layered makeover with stronger movement and styling impact.', prompt:'long layered transformation hairstyle, versatile, long length, dramatic salon makeover', presentation:'universal', length:'long', effort:'enjoy-styling', goal:'bold' }
+,
+    { name:'Low Fade with Textured Top', description:'A clean low fade with natural texture on top for a current masculine look that still feels wearable.', prompt:'low fade with textured top, masculine, clean blended sides, natural top texture', presentation:'masculine', length:'short', effort:'few-minutes', goal:'polished', taxonomy:{silhouette:'taper', length:'short', fringe:'textured', parting:'natural', sides:'tapered low fade', volume:'natural', texture:'textured', finish:'polished'} },
+    { name:'Brush-Back Executive Cut', description:'A medium masculine cut brushed back with soft control and professional polish.', prompt:'brush back executive haircut, masculine, medium length, clean sides, professional finish', presentation:'masculine', length:'medium', effort:'few-minutes', goal:'polished', taxonomy:{silhouette:'layered', length:'medium', fringe:'none', parting:'swept back', sides:'blended', volume:'medium', texture:'soft', finish:'polished'} },
+    { name:'Short Caesar Texture', description:'A compact Caesar-inspired cut with light forward texture and easy maintenance.', prompt:'short caesar textured haircut, masculine, compact fringe, low maintenance', presentation:'masculine', length:'short', effort:'wash-and-go', goal:'easy', taxonomy:{silhouette:'crop', length:'short', fringe:'short forward', parting:'none', sides:'clean', volume:'low', texture:'textured', finish:'low-key'} },
+    { name:'Silver Fox Shape Control', description:'A mature, polished cut that keeps the sides neat and the top natural without over-styling.', prompt:'mature masculine silver fox haircut, refined shape control, neat sides, natural top', presentation:'masculine', length:'short', effort:'wash-and-go', goal:'polished', taxonomy:{silhouette:'shape-control', length:'short', fringe:'none', parting:'natural', sides:'blended', volume:'natural', texture:'soft', finish:'classic'} },
+    { name:'Long Layered Blowout', description:'Long, face-framing layers with a salon blowout finish and soft movement through the ends.', prompt:'long layered blowout, feminine, face-framing layers, soft volume, salon finish', presentation:'feminine', length:'long', effort:'enjoy-styling', goal:'polished', taxonomy:{silhouette:'layered', length:'long', fringe:'face-framing', parting:'center or soft side', sides:'layered', volume:'medium', texture:'flowing', finish:'polished'} },
+    { name:'Collarbone Butterfly Layers', description:'Medium-to-long butterfly layers with lift around the face and lighter movement at the ends.', prompt:'collarbone butterfly layers, feminine, medium long, face framing lift, soft salon movement', presentation:'feminine', length:'medium', effort:'few-minutes', goal:'bold', taxonomy:{silhouette:'layered', length:'medium', fringe:'face-framing', parting:'center', sides:'layered', volume:'medium', texture:'flowing', finish:'editorial'} },
+    { name:'Rounded Soft Bob', description:'A rounded bob with gentle shape around the jawline for a polished but approachable look.', prompt:'rounded soft bob, feminine, jaw length, smooth curved silhouette, polished salon finish', presentation:'feminine', length:'short', effort:'few-minutes', goal:'polished', taxonomy:{silhouette:'bob', length:'short', fringe:'none', parting:'natural side', sides:'soft rounded', volume:'natural', texture:'sleek', finish:'polished'} },
+    { name:'Airy Curtain Lob', description:'A long bob with airy curtain framing and movement that feels stylish without being extreme.', prompt:'airy curtain lob, feminine, long bob, curtain face framing, soft movement', presentation:'feminine', length:'medium', effort:'few-minutes', goal:'easy', taxonomy:{silhouette:'lob', length:'medium', fringe:'curtain', parting:'center', sides:'layered', volume:'natural', texture:'soft', finish:'low-key'} },
+    { name:'Soft Wolf Cut', description:'A controlled version of the wolf cut with visible texture, movement, and a bolder salon feel.', prompt:'soft wolf cut, layered shag, textured crown, face framing, bold salon makeover', presentation:'universal', length:'medium', effort:'enjoy-styling', goal:'bold', taxonomy:{silhouette:'shag', length:'medium', fringe:'soft textured', parting:'natural', sides:'layered', volume:'high', texture:'textured', finish:'editorial'} },
+    { name:'Natural Shape Reset', description:'A versatile reset cut that cleans up the outline while keeping natural movement and easy styling.', prompt:'natural shape reset haircut, universal, clean outline, natural movement, low maintenance', presentation:'universal', length:'medium', effort:'wash-and-go', goal:'easy', taxonomy:{silhouette:'shape-control', length:'medium', fringe:'none', parting:'natural', sides:'blended', volume:'natural', texture:'soft', finish:'low-key'} },
+    { name:'Modern Androgynous Crop', description:'A chic short crop with balanced softness and structure that can read masculine, feminine, or neutral.', prompt:'modern androgynous crop, short chic haircut, balanced softness and structure', presentation:'universal', length:'short', effort:'few-minutes', goal:'bold', taxonomy:{silhouette:'crop', length:'short', fringe:'soft', parting:'natural', sides:'clean', volume:'low', texture:'textured', finish:'editorial'} },
+    { name:'Shoulder-Length Soft Flow', description:'A universal shoulder-length cut with softened edges and natural movement for easy wear.', prompt:'shoulder length soft flow haircut, universal, softened edges, natural movement', presentation:'universal', length:'medium', effort:'wash-and-go', goal:'easy', taxonomy:{silhouette:'flow', length:'medium', fringe:'none', parting:'natural', sides:'soft', volume:'natural', texture:'flowing', finish:'low-key'} }
   ];
 
   const salonBackgrounds = [
@@ -786,6 +860,46 @@ body {
 
   function randomSalonBackground() {
     return salonBackgrounds[Math.floor(Math.random() * salonBackgrounds.length)];
+  }
+
+  // Local taxonomy inspired by K-Hairstyle's expert-annotated attribute approach
+  // and Hairmony's multi-attribute hairstyle taxonomy. No external images or datasets are bundled.
+  const hairstyleTaxonomy = {
+    silhouettes: ['crop', 'taper', 'bob', 'lob', 'layered', 'pixie', 'quiff', 'flow', 'shag', 'curtain', 'crew', 'shape-control'],
+    fringe: ['none', 'side-swept', 'curtain', 'soft', 'textured'],
+    parting: ['none', 'side', 'center', 'natural', 'swept'],
+    sides: ['tapered', 'clean', 'soft', 'layered', 'blended'],
+    volume: ['low', 'natural', 'medium', 'high'],
+    texture: ['sleek', 'soft', 'textured', 'flowing', 'structured'],
+    finish: ['polished', 'low-key', 'editorial', 'classic']
+  };
+
+  function taxonomyPrompt(style) {
+    const t = style.taxonomy || {};
+    const parts = [];
+    if (t.silhouette) parts.push(`silhouette: ${t.silhouette}`);
+    if (t.length) parts.push(`length: ${t.length}`);
+    if (t.fringe) parts.push(`fringe/bangs: ${t.fringe}`);
+    if (t.parting) parts.push(`parting: ${t.parting}`);
+    if (t.sides) parts.push(`sides: ${t.sides}`);
+    if (t.volume) parts.push(`volume: ${t.volume}`);
+    if (t.texture) parts.push(`texture: ${t.texture}`);
+    if (t.finish) parts.push(`finish: ${t.finish}`);
+    return parts.length ? `Taxonomy attributes to keep the style distinct: ${parts.join(', ')}.` : '';
+  }
+
+  function inferTaxonomy(style) {
+    const p = `${style.name} ${style.prompt}`.toLowerCase();
+    return {
+      silhouette: p.includes('bob') ? 'bob' : p.includes('crop') ? 'crop' : p.includes('quiff') ? 'quiff' : p.includes('crew') ? 'crew' : p.includes('taper') ? 'taper' : p.includes('layer') ? 'layered' : p.includes('flow') ? 'flow' : p.includes('pixie') ? 'pixie' : p.includes('shag') ? 'shag' : 'shape-control',
+      length: style.length,
+      fringe: p.includes('curtain') ? 'curtain' : p.includes('side') ? 'side-swept' : p.includes('bang') ? 'soft' : 'none',
+      parting: p.includes('side') ? 'side' : p.includes('center') ? 'center' : 'natural',
+      sides: p.includes('taper') ? 'tapered' : p.includes('crew') ? 'clean' : p.includes('blend') ? 'blended' : 'soft',
+      volume: p.includes('volume') || p.includes('quiff') ? 'medium' : 'natural',
+      texture: p.includes('textured') ? 'textured' : p.includes('sleek') ? 'sleek' : p.includes('flow') ? 'flowing' : 'soft',
+      finish: style.goal === 'bold' ? 'editorial' : style.goal === 'easy' ? 'low-key' : 'polished'
+    };
   }
 
 
@@ -871,11 +985,15 @@ body {
 
   function styleScore(style) {
     let score = 0;
+    const taxonomy = style.taxonomy || inferTaxonomy(style);
     if (style.effort === dailyEffort) score += 3;
     if (style.goal === styleGoal) score += 3;
     if (lengthPreference !== 'surprise' && style.length === lengthPreference) score += 4;
     if (styleExpression !== 'show-everything' && style.presentation === styleExpression) score += 2;
     if (style.presentation === 'universal') score += 1;
+    if (styleGoal === 'bold' && ['shag','quiff','pixie','crop','bob'].includes(taxonomy.silhouette)) score += 1.5;
+    if (styleGoal === 'easy' && ['low-key','classic'].includes(taxonomy.finish)) score += 1.5;
+    if (styleGoal === 'polished' && ['polished','classic'].includes(taxonomy.finish)) score += 1.5;
     return score;
   }
 
@@ -890,12 +1008,26 @@ body {
       .sort((a, b) => b.score - a.score)
       .map((item) => item.style);
     const chosen = [];
+    const usedSilhouettes = new Set();
+    const usedLengths = new Set();
     while (chosen.length < count && pool.length > 0) {
-      const takeFrom = pool.slice(0, Math.min(pool.length, 10));
+      const ranked = pool
+        .map((style) => {
+          const taxonomy = style.taxonomy || inferTaxonomy(style);
+          let diversityBoost = 0;
+          if (!usedSilhouettes.has(taxonomy.silhouette)) diversityBoost += 3;
+          if (!usedLengths.has(style.length)) diversityBoost += 1;
+          return { style, rank: styleScore(style) + diversityBoost + Math.random() * 1.35 };
+        })
+        .sort((a, b) => b.rank - a.rank);
+      const takeFrom = ranked.slice(0, Math.min(ranked.length, 8));
       const idx = Math.floor(Math.random() * takeFrom.length);
-      const style = takeFrom[idx];
+      const style = takeFrom[idx].style;
+      const taxonomy = style.taxonomy || inferTaxonomy(style);
       pool = pool.filter((item) => item.name !== style.name);
-      chosen.push(style);
+      chosen.push({ ...style, taxonomy });
+      usedSilhouettes.add(taxonomy.silhouette);
+      usedLengths.add(style.length);
       usedStyles.add(`${styleExpression}:${lengthPreference}:${dailyEffort}:${styleGoal}:${style.name}`);
     }
     return chosen;
@@ -1133,6 +1265,7 @@ body {
       `Create a photorealistic hairstyle makeover preview using the uploaded person as the single identity reference. ` +
       `Preserve the person's face, age, facial expression, skin tone, head angle, facial proportions, eye spacing, nose, mouth, cheeks, jawline, and overall identity. Do not beautify into a different person. Change only the hairstyle, grooming, and hair color when needed. ` +
       `Desired hairstyle direction: ${style.prompt}. Length preference: ${lengthPreference}. Daily effort preference: ${dailyEffort}. Style goal: ${styleGoal}. ` +
+      `${taxonomyPrompt(style)} ` +
       `${getPresentationInstruction(style)} ` +
       `Place the person in this salon setting: ${style.salonBackground}. Keep the background softly blurred and secondary to the person. ` +
       `Preserve apparent age, identity, and facial structure. Compose this like a professional salon headshot from the breasts / mid-chest upward, not a tight face crop. The full head and full head of hair must be visible: crown, top of hair, sides of hair, forehead, ears when visible, face, neck, shoulders, and upper chest. Leave about one fist of empty background above the highest hair point, roughly 15 to 20 percent of the image height. If necessary, zoom the portrait out to include the whole hairstyle. Never crop, cut off, touch, or hide the top of the hair. Prioritize showing the full hairstyle over making the face large in the frame. ` +
